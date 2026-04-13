@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme {
+  --font-ubuntu: "Ubuntu", sans-serif;
+
+  --color-dark-green: #024221;
+  --color-medium-green: #024e46;
+  --color-light-green: #01a368;
+  --color-answer-user: #ff7900;
+
+  --color-Red-500: hsl(354, 84%, 75%);
+  --color-Purple-600: hsl(243, 100%, 62%);
+  --color-Blue-950: hsl(213, 96%, 18%);
+  --color-Blue-300: hsl(228, 100%, 84%);
+  --color-Blue-200: hsl(206, 94%, 87%);
+
+  --color-Grey-500: hsl(231, 11%, 63%);
+  --color-Purple-200: hsl(229, 24%, 87%);
+  --color-Blue-100: hsl(218, 100%, 97%);
+  --color-Blue-50: hsl(231, 100%, 99%);
+  --color-White: hsl(0, 100%, 100%);
+}
+
+* {
+  list-style: none;
+}
+
+body {
+  @apply bg-White font-ubuntu;
+}
+
+p {
+  @apply font-ubuntu text-lg;
+}
+
+h1 {
+  @apply font-ubuntu text-dark-green text-3xl font-bold;
+}
+
+h2 {
+  @apply text-2xl font-bold text-Blue-950;
+}
+
+h3 {
+  @apply text-lg font-bold text-Blue-950;
+}
