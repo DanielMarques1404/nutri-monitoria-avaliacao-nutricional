@@ -20,20 +20,19 @@ export const Answer = ({ option }: AnswerProps) => {
 
   return (
     <div
-      className="w-64 h-52 p-2 cursor-pointer"
+      className={cn(
+        "h-full rounded-lg flex flex-col",
+        "card", 
+        isSelected && "border-4 border-answer-user",
+      )}
       onClick={() => setUserAnswer(option.id)}
     >
-      <div
-        className={cn(
-          "h-full rounded-lg border-2 border-light-green flex flex-col relative overflow-hidden",
-          isSelected && "border-4 border-answer-user",
-        )}
-      >
-        <h1 className="text-sm text-center tracking-widest title-font mb-1 font-medium bg-light-green">
-          {option.id}
-        </h1>
-        <span className="font-ubuntu text-dark-green text-sm mx-3 my-1 ">{option.text}</span>
-      </div>
+      <h1 className="text-sm text-center tracking-widest title-font mb-1 font-medium bg-light-green">
+        {option.id}
+      </h1>
+      <span className="font-ubuntu text-dark-green text-sm mx-3 my-1 ">
+        {option.text}
+      </span>
     </div>
   );
 };

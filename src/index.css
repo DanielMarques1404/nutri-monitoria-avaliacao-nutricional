@@ -44,3 +44,48 @@ h2 {
 h3 {
   @apply text-lg font-bold text-Blue-950;
 }
+
+/* @property --angle {
+  syntax: "<angle>";
+  initial-value: 90deg;
+  inherits: false;
+} */
+
+.card {
+  margin: 0 auto;
+  width: calc(var(--spacing) * 52);
+  height: calc(var(--spacing) * 52);
+  padding: calc(var(--spacing) * 2);
+  background: white;
+  cursor: pointer;
+  position: relative;
+}
+
+.card::after, .card::before {
+  --angle: 0deg;
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  background-image: conic-gradient(from var(--angle), var(--color-answer-user), var(--color-dark-green), var(--color-light-green), var(--color-answer-user));
+  border-radius: 100%;
+  z-index: -1;
+  animation: 3s spin linear infinite;
+}
+
+.card::before {
+  filter: blur(1.5rem);
+  opacity: 0.9;
+}
+
+@keyframes spin {
+  from {
+    --angle: 0deg;
+  }
+  to {
+    --angle: 360deg;
+  }
+}
