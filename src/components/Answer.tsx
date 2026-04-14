@@ -8,26 +8,32 @@ type AnswerProps = {
 };
 
 export const Answer = ({ option }: AnswerProps) => {
-  const { currentQuestion, setUserAnswer, answerUpdateTrigger } =
-    useQuestionnaireContext();
+  const {
+    currentQuestion,
+    answer,
+    currentUserAnswer,
+    isCurrentVisibleAnswer,
+  } = useQuestionnaireContext();
+
   const [isSelected, setIsSelected] = useState(
-    currentQuestion?.getUserAnswer() === option.id,
+    currentUserAnswer === option.id,
   );
 
   useEffect(() => {
-    setIsSelected(currentQuestion?.getUserAnswer() === option.id);
-  }, [currentQuestion, option.id, answerUpdateTrigger]);
+    setIsSelected(currentUserAnswer === option.id);
+  }, [currentUserAnswer, option.id]);
 
   return (
     <div
       className={cn(
-        "h-full rounded-lg flex flex-col",
-        "card", 
-        isSelected && "border-4 border-answer-user",
+        "flex flex-col w-52 h-52 bg-white rounded-xl cursor-pointer border border-medium-green",
+        !isSelected && "hover:border-4 hover:border-dark-green",
+        isCurrentVisibleAnswer && currentQuestion!.correctOptionId === option.id && "card",
+        isSelected && "border-4 border-answer-user ",
       )}
-      onClick={() => setUserAnswer(option.id)}
+      onClick={() => answer(option.id)}
     >
-      <h1 className="text-sm text-center tracking-widest title-font mb-1 font-medium bg-light-green">
+      <h1 className="text-sm text-center tracking-widest title-font mb-1 font-medium bg-light-green rounded-t-lg">
         {option.id}
       </h1>
       <span className="font-ubuntu text-dark-green text-sm mx-3 my-1 ">

@@ -8,17 +8,6 @@
   --color-light-green: #01a368;
   --color-answer-user: #ff7900;
 
-  --color-Red-500: hsl(354, 84%, 75%);
-  --color-Purple-600: hsl(243, 100%, 62%);
-  --color-Blue-950: hsl(213, 96%, 18%);
-  --color-Blue-300: hsl(228, 100%, 84%);
-  --color-Blue-200: hsl(206, 94%, 87%);
-
-  --color-Grey-500: hsl(231, 11%, 63%);
-  --color-Purple-200: hsl(229, 24%, 87%);
-  --color-Blue-100: hsl(218, 100%, 97%);
-  --color-Blue-50: hsl(231, 100%, 99%);
-  --color-White: hsl(0, 100%, 100%);
 }
 
 * {
@@ -26,7 +15,7 @@
 }
 
 body {
-  @apply bg-White font-ubuntu;
+  @apply bg-white font-ubuntu;
 }
 
 p {
@@ -38,26 +27,14 @@ h1 {
 }
 
 h2 {
-  @apply text-2xl font-bold text-Blue-950;
+  @apply text-2xl font-bold text-dark-green;
 }
 
 h3 {
-  @apply text-lg font-bold text-Blue-950;
+  @apply text-lg font-bold text-dark-green;
 }
 
-/* @property --angle {
-  syntax: "<angle>";
-  initial-value: 90deg;
-  inherits: false;
-} */
-
 .card {
-  margin: 0 auto;
-  width: calc(var(--spacing) * 52);
-  height: calc(var(--spacing) * 52);
-  padding: calc(var(--spacing) * 2);
-  background: white;
-  cursor: pointer;
   position: relative;
 }
 
@@ -73,12 +50,11 @@ h3 {
   background-image: conic-gradient(from var(--angle), var(--color-answer-user), var(--color-dark-green), var(--color-light-green), var(--color-answer-user));
   border-radius: 100%;
   z-index: -1;
-  animation: 3s spin linear infinite;
+  animation: 2s spin linear infinite;
 }
 
 .card::before {
-  filter: blur(1.5rem);
-  opacity: 0.9;
+  filter: blur(2.5rem);
 }
 
 @keyframes spin {
