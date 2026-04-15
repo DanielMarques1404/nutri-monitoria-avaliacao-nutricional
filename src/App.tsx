@@ -8,9 +8,10 @@ import Modal from "./components/layout/Modal";
 import { QuestionForm } from "./components/QuestionForm";
 import { Summary } from "./components/Summary";
 import { Button } from "./components/ui/Button";
+import { NavButtons } from "./components/NavButtons";
 
 function App() {
-  const { currentQuestion, next, prior, showAnswer } =
+  const { currentQuestion } =
     useQuestionnaireContext();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,26 +30,7 @@ function App() {
           // <Summary question={currentQuestion} />
           <>
             <QuestionForm />
-            <nav className="flex items-center justify-center gap-2 w-full">
-              {currentQuestion.index > 1 && <Button
-                label={"Anterior"}
-                onClick={prior}
-                classname="bg-light-green rounded-md px-3 py-2 text-white m-1"
-              />}
-              <Button
-                label={"Ver resposta"}
-                onClick={() => {
-                  showAnswer(true);
-                  handleOpen();
-                }}
-                classname="bg-light-green rounded-md px-3 py-2 text-white m-1"
-              />
-              {currentQuestion.index < 10 && <Button
-                label={"Próxima"}
-                onClick={next}
-                classname="bg-light-green rounded-md px-3 py-2 text-white m-1"
-              />}
-            </nav>
+            <NavButtons handleOpenModal={handleOpen} />
           </>
         )}
 

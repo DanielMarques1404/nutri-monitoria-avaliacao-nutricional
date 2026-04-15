@@ -47,7 +47,7 @@ h3 {
   top: 50%;
   left: 50%;
   translate: -50% -50%;
-  background-image: conic-gradient(from var(--angle), var(--color-answer-user), var(--color-dark-green), var(--color-light-green), var(--color-answer-user));
+  background-image: conic-gradient(from var(--angle), var(--color-answer-user), var(--color-dark-green), var(--color-light-green), var(--color-dark-green), var(--color-answer-user));
   border-radius: 100%;
   z-index: -1;
   animation: 2s spin linear infinite;
