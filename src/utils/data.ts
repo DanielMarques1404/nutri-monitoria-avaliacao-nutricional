@@ -39,8 +39,9 @@ export const data: QuizQuestion[] = [
       "Peso isolado não classifica. A classificação depende do IMC, que considera peso e altura.",
     category: "conceito",
     difficulty: "facil",
-    tags: ["conceito", "peso isolado"],
+    tags: ["peso isolado", "IMC"],
     source: "Texto colado.txt",
+    summaryImage: "/assets/images/caso-1-manu.png",
   },
   {
     id: "caso-2",

@@ -24,6 +24,7 @@ export type QuizQuestion = {
   difficulty: QuizDifficulty;
   tags?: string[];
   source?: string;
+  summaryImage?: string;
   data?: {
     prePregnancyWeightKg?: number;
     currentWeightKg?: number;

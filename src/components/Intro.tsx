@@ -10,7 +10,7 @@ export const Intro = () => {
           <img
             className="object-cover object-center rounded"
             alt="hero"
-            src="/assets/images/start-image.png"
+            src="/assets/images/start-image-manu.png"
           />
         </div>
         <div className="lg:grow md:w-1/2 lg:pl-24 md:pl-16 flex flex-col md:items-start md:text-left items-center text-center">
