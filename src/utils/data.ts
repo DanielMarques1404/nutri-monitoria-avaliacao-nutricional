@@ -11,6 +11,7 @@ export const Professor: Person = {
   prefix: "Professor:",
   name: "Leonardo Furtado de Oliveira",
   instagram: "https://www.instagram.com/leofnutricionista/",
+  email: "leonardo.oliveira@professor.unifametro.edu.br",
 };
 
 export const data: QuizQuestion[] = [

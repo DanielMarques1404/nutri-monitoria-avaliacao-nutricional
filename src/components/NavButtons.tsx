@@ -10,7 +10,7 @@ export const NavButtons = ({ handleOpenModal }: NavButtonsProps) => {
     useQuestionnaireContext();
 
   return (
-    <nav className="flex items-center justify-center gap-2 w-full">
+    <nav className="flex items-center justify-center gap-2 w-full my-2">
       {currentQuestion!.index > 1 && (
         <Button
           label={"Anterior"}
