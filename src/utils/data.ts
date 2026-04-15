@@ -16,6 +16,7 @@ export const Professor: Person = {
 export const data: QuizQuestion[] = [
   {
     id: "caso-1",
+    index: 1,
     caseTitle: "CASO 1",
     statement:
       "Durante a monitoria, foi apresentado o seguinte comentário: “Se a gestante pesa pouco, ela obrigatoriamente tem baixo peso pré-gravídico.”",
@@ -45,6 +46,7 @@ export const data: QuizQuestion[] = [
   },
   {
     id: "caso-2",
+    index: 2,
     caseTitle: "CASO 2",
     statement:
       "Na triagem do ambulatório, Mariana informa que engravidou com 58 kg e 1,62 m. No dia da consulta, com 18 semanas, está com 63,4 kg. Um colega anota o IMC usando o peso atual “porque é o peso mais recente”.",
@@ -79,6 +81,7 @@ export const data: QuizQuestion[] = [
   },
   {
     id: "caso-3",
+    index: 3,
     caseTitle: "CASO 3",
     statement:
       "Em uma questão discursiva, o professor pergunta: “Por que o IMC pré-gravídico é relevante na avaliação nutricional da gestante?”",
@@ -107,6 +110,7 @@ export const data: QuizQuestion[] = [
   },
   {
     id: "caso-4",
+    index: 4,
     caseTitle: "CASO 4",
     statement:
       "Bruna pesava 53 kg antes da gestação e media 1,59 m. Um grupo calculou IMC de 20,96 kg/m². Outro grupo arredondou para 21,0 kg/m².",
@@ -141,6 +145,7 @@ export const data: QuizQuestion[] = [
   },
   {
     id: "caso-5",
+    index: 5,
     caseTitle: "CASO 5",
     statement:
       "Em um caso discutido em sala, a gestante tinha peso pré-gestacional de 72 kg e altura de 1,68 m. Um aluno encontrou IMC de 42,8 kg/m².",
@@ -164,6 +169,7 @@ export const data: QuizQuestion[] = [
   },
   {
     id: "caso-6",
+    index: 6,
     caseTitle: "CASO 6",
     statement:
       "Patrícia relata que antes de engravidar pesava 49 kg e media 1,70 m. No registro antigo da academia consta 1,67 m, mas na consulta atual a altura aferida corretamente é 1,70 m.",
@@ -188,6 +194,7 @@ export const data: QuizQuestion[] = [
   },
   {
     id: "caso-7",
+    index: 7,
     caseTitle: "CASO 7",
     statement:
       "Jéssica iniciou a gestação com 64 kg e 1,58 m. Uma aluna calculou o IMC e marcou 25,6 kg/m². Outra disse que, como ficou “quase normal”, poderia classificar como eutrofia.",
@@ -213,6 +220,7 @@ export const data: QuizQuestion[] = [
   },
   {
     id: "caso-8",
+    index: 8,
     caseTitle: "CASO 8",
     statement:
       "Na última questão, a professora entrega este caso: “Gestante com peso pré-gestacional de 90 kg e altura de 1,73 m. O estudante calculou IMC de 30,1 kg/m² e classificou como sobrepeso.”",
@@ -244,6 +252,7 @@ export const data: QuizQuestion[] = [
   },
   {
     id: "caso-9",
+    index: 9,
     caseTitle: "CASO 9",
     statement:
       "Na prova prática, a professora mostra o seguinte caso: “Gestante com peso pré-gestacional de 81 kg, peso atual de 85 kg, altura de 1,64 m. O aluno precisa apenas calcular e classificar o IMC pré-gravídico.”",
@@ -270,6 +279,7 @@ export const data: QuizQuestion[] = [
   },
   {
     id: "caso-10",
+    index: 10,
     caseTitle: "CASO 10",
     statement:
       "Lorena refere peso pré-gestacional de 46 kg e altura de 1,54 m. O aluno calculou corretamente o IMC, mas classificou como eutrofia “porque está perto de 19”.",

@@ -14,6 +14,7 @@ export type QuizOption = {
 
 export type QuizQuestion = {
   id: string;
+  index: number;
   caseTitle: string;
   statement: string;
   question: string;

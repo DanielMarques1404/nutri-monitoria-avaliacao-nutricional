@@ -14,7 +14,7 @@ export const Button = ({ label, classname, ...buttonProps }: ButtonProps) => {
         classname,
       )}
     >
-      <button className="cursor-pointer" {...buttonProps}>{label}</button>
+      <button className="cursor-pointer select-none" {...buttonProps}>{label}</button>
     </label>
   );
 };
