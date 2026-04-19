@@ -43,7 +43,7 @@ export const data: QuizQuestion[] = [
     difficulty: "facil",
     tags: ["peso isolado", "IMC"],
     source: "Texto colado.txt",
-    summaryImage: "/assets/images/caso-1-manu.png",
+    summaryImage: "/assets/images/caso-1.png",
   },
   {
     id: "caso-2",
@@ -73,6 +73,7 @@ export const data: QuizQuestion[] = [
     difficulty: "facil",
     tags: ["imc pre-gravidico", "peso atual x pre-gestacional"],
     source: "Texto colado.txt",
+    summaryImage: "/assets/images/caso-2.png",
     data: {
       prePregnancyWeightKg: 58,
       currentWeightKg: 63.4,

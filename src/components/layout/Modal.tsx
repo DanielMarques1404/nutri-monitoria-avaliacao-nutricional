@@ -8,7 +8,6 @@ type ModalProps = {
 const Modal = ({ isOpen, children }: ModalProps) => {
   if (!isOpen) return null;
 
-  // Render the modal using a Portal to append it to the document body
   return ReactDOM.createPortal(
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div

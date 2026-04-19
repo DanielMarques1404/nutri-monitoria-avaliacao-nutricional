@@ -7,11 +7,10 @@ import { Intro } from "./components/Intro";
 import Modal from "./components/layout/Modal";
 import { QuestionForm } from "./components/QuestionForm";
 import { Summary } from "./components/Summary";
-import { Button } from "./components/ui/Button";
 import { NavButtons } from "./components/NavButtons";
 
 function App() {
-  const { currentQuestion } =
+  const { currentQuestion, currentUserAnswer } =
     useQuestionnaireContext();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,7 +26,6 @@ function App() {
         {!currentQuestion ? (
           <Intro />
         ) : (
-          // <Summary question={currentQuestion} />
           <>
             <QuestionForm />
             <NavButtons handleOpenModal={handleOpen} />
@@ -38,7 +36,7 @@ function App() {
       </div>
       {isModalOpen && currentQuestion && (
         <Modal isOpen={isModalOpen}>
-          <Summary handleClose={handleClose} question={currentQuestion} message="Parabéns"/>
+          <Summary handleClose={handleClose} question={currentQuestion} message={!currentUserAnswer ? "Ainda não respondida" : currentUserAnswer === currentQuestion.correctOptionId ? "PARABÉNS" : "Não foi dessa vez!"}/>
         </Modal>
       )}
     </>
