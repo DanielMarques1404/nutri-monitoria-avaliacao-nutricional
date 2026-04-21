@@ -1,13 +1,14 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
+import { RouterProvider } from "react-router-dom";
 import { QuestionnaireProvider } from "./app/context/QuestionnaireContext.tsx";
 import "./index.css";
+import { router } from "./routers/index.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QuestionnaireProvider>
-      <App />
+      <RouterProvider router={router} />
     </QuestionnaireProvider>
   </StrictMode>,
 );
