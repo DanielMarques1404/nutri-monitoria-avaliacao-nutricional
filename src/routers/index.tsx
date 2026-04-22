@@ -3,6 +3,7 @@ import { ProtectedRoute } from "../pages/ProtectedRoute";
 import RootLayout from "../pages/RootLayout";
 import App from "../App";
 import { Login } from "../pages/Login";
+import { Admin } from "../pages/Admin";
 
 export const router = createBrowserRouter([
   {
@@ -22,10 +23,10 @@ export const router = createBrowserRouter([
             path: "login",
             element: <Login />,
           },
-          // {
-          //   path: "register",
-          //   element: <Register />,
-          // },
+          {
+            path: "admin",
+            element: <Admin />,
+          },
         ],
       },
     ],
