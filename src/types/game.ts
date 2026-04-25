@@ -6,7 +6,7 @@ export type Category = {
 
 export type Option = {
   id: number;
-  value: "A" | "B" | "C" | "D";
+  questionId: string;
   description: string;
 };
 
@@ -21,7 +21,7 @@ export type Question = {
   statement: string;
   question: string;
   options: Option[];
-  correctOptionId: Option["value"];
+  correctOptionId: number;
   explanation: string;
   category: Category;
   difficulty: string;

@@ -6,7 +6,7 @@ export class CategorySupabaseRepository implements ICategoryRepository {
   async create(category: Category): Promise<void> {
     const { error } = await supabase
       .from("Categories")
-      .insert([{ name: category.name, active: true }])
+      .insert([{ name: category.name, active: category.active }])
       .select();
     if (error) {
       throw error;

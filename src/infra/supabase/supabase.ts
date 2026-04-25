@@ -60,26 +60,34 @@ export type Database = {
         }
         Relationships: []
       }
-      Options: {
+      QuestionOptions: {
         Row: {
           created_at: string
-          description: string | null
+          description: string
           id: number
-          value: string | null
+          questionId: number
         }
         Insert: {
           created_at?: string
-          description?: string | null
+          description: string
           id?: number
-          value?: string | null
+          questionId: number
         }
         Update: {
           created_at?: string
-          description?: string | null
+          description?: string
           id?: number
-          value?: string | null
+          questionId?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "QuestionOptions_questionId_fkey"
+            columns: ["questionId"]
+            isOneToOne: false
+            referencedRelation: "Questions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       Questions: {
         Row: {
@@ -128,43 +136,7 @@ export type Database = {
           },
         ]
       }
-      QuestionsOptions: {
-        Row: {
-          created_at: string
-          id: number
-          optionsId: number
-          questionId: number
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-          optionsId: number
-          questionId: number
-        }
-        Update: {
-          created_at?: string
-          id?: number
-          optionsId?: number
-          questionId?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "QuestionsOptions_optionsId_fkey"
-            columns: ["optionsId"]
-            isOneToOne: false
-            referencedRelation: "Options"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "QuestionsOptions_questionId_fkey"
-            columns: ["questionId"]
-            isOneToOne: false
-            referencedRelation: "Questions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      QuestionsTags: {
+      QuestionTags: {
         Row: {
           created_at: string
           id: number
