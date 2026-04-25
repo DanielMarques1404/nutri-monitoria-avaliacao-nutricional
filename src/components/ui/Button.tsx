@@ -8,13 +8,14 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export const Button = ({ label, classname, ...buttonProps }: ButtonProps) => {
   return (
-    <label
+    <button
       className={cn(
-        "bg-dark-green hover:bg-medium-green cursor-pointer",
+        "bg-dark-green hover:bg-medium-green cursor-pointer select-none",
         classname,
       )}
+      {...buttonProps}
     >
-      <button className="cursor-pointer select-none" {...buttonProps}>{label}</button>
-    </label>
+      {label}
+    </button>
   );
 };
