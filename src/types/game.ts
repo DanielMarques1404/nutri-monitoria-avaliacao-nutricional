@@ -1,37 +1,31 @@
 type QuizCategory =
-  | 'peso_pre_gestacional'
-  | 'calculo_imc'
-  | 'classificacao_imc'
-  | 'arredondamento'
-  | 'conceito';
-
-type QuizDifficulty = 'facil' | 'media' | 'dificil';
+  | "peso_pre_gestacional"
+  | "calculo_imc"
+  | "classificacao_imc"
+  | "arredondamento"
+  | "conceito";
 
 export type QuizOption = {
-  id: 'A' | 'B' | 'C' | 'D';
-  text: string;
+  id: number;
+  value: "A" | "B" | "C" | "D";
+  description: string;
 };
+
+export type QuizTag = {
+  id: number;
+  name: string;
+}
 
 export type QuizQuestion = {
   id: string;
-  index: number;
-  caseTitle: string;
+  title: string;
   statement: string;
   question: string;
   options: QuizOption[];
-  correctOptionId: QuizOption['id'];
+  correctOptionId: QuizOption["value"];
   explanation: string;
   category: QuizCategory;
-  difficulty: QuizDifficulty;
-  tags?: string[];
-  source?: string;
+  difficulty: string;
+  tags?: QuizTag[];
   summaryImage?: string;
-  data?: {
-    prePregnancyWeightKg?: number;
-    currentWeightKg?: number;
-    heightM?: number;
-    gestationalWeeks?: number;
-    expectedBmi?: number;
-    expectedClassification?: 'baixo_peso' | 'eutrofia' | 'sobrepeso' | 'obesidade';
-  };
 };

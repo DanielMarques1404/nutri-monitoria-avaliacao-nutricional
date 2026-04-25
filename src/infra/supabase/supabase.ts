@@ -39,74 +39,182 @@ export type Database = {
   }
   public: {
     Tables: {
-      options: {
+      Categories: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: number
+          name: string
+        }
+        Insert: {
+          active: boolean
+          created_at?: string
+          id?: number
+          name: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
+      Options: {
         Row: {
           created_at: string
           description: string | null
           id: number
-          questionId: number | null
           value: string | null
         }
         Insert: {
           created_at?: string
           description?: string | null
           id?: number
-          questionId?: number | null
           value?: string | null
         }
         Update: {
           created_at?: string
           description?: string | null
           id?: number
-          questionId?: number | null
           value?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "options_questionId_fkey"
-            columns: ["questionId"]
-            isOneToOne: false
-            referencedRelation: "question"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
-      question: {
+      Questions: {
         Row: {
+          category: number | null
           correctOptionId: string
           created_at: string
+          difficulty: string | null
           explanation: string | null
           id: number
-          index: number | null
-          name: string
           question: string
           statement: string
           summaryImage: string | null
           title: string | null
         }
         Insert: {
+          category?: number | null
           correctOptionId: string
           created_at?: string
+          difficulty?: string | null
           explanation?: string | null
           id?: number
-          index?: number | null
-          name?: string
           question: string
           statement: string
           summaryImage?: string | null
           title?: string | null
         }
         Update: {
+          category?: number | null
           correctOptionId?: string
           created_at?: string
+          difficulty?: string | null
           explanation?: string | null
           id?: number
-          index?: number | null
-          name?: string
           question?: string
           statement?: string
           summaryImage?: string | null
           title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Questions_category_fkey"
+            columns: ["category"]
+            isOneToOne: false
+            referencedRelation: "Categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      QuestionsOptions: {
+        Row: {
+          created_at: string
+          id: number
+          optionsId: number
+          questionId: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          optionsId: number
+          questionId: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          optionsId?: number
+          questionId?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "QuestionsOptions_optionsId_fkey"
+            columns: ["optionsId"]
+            isOneToOne: false
+            referencedRelation: "Options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "QuestionsOptions_questionId_fkey"
+            columns: ["questionId"]
+            isOneToOne: false
+            referencedRelation: "Questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      QuestionsTags: {
+        Row: {
+          created_at: string
+          id: number
+          questionId: number
+          tagId: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          questionId: number
+          tagId: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          questionId?: number
+          tagId?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "QuestionsTags_questionId_fkey"
+            columns: ["questionId"]
+            isOneToOne: false
+            referencedRelation: "Questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "QuestionsTags_tagId_fkey"
+            columns: ["tagId"]
+            isOneToOne: false
+            referencedRelation: "Tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Tags: {
+        Row: {
+          created_at: string
+          id: number
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          name?: string
         }
         Relationships: []
       }
