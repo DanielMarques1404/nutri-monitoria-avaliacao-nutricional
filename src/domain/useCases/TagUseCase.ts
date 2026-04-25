@@ -12,7 +12,11 @@ export class TagUseCase {
     return this.repository.list();
   }
 
-  async create(tag: Tag): Promise<void> {
-    return this.repository.create(tag);
+  async createOrUpdate(tag: Tag): Promise<void> {
+    return this.repository.createOrUpdate(tag);
+  }
+
+  async delete(id: number): Promise<void> {
+    return this.repository.delete(id);
   }
 }

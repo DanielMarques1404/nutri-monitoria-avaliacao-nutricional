@@ -2,5 +2,6 @@ import type { Tag } from "../../types/game";
 
 export interface ITagRepository {
   list(): Promise<Tag[] | null>;
-  create(tag: Tag): Promise<void>;
+  createOrUpdate(tag: Tag): Promise<void>;
+  delete(id: number): Promise<void>;
 }
