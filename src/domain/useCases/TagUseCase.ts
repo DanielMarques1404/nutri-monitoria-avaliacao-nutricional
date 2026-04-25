@@ -1,4 +1,4 @@
-import type { QuizTag } from "../../types/game";
+import type { Tag } from "../../types/game";
 import type { ITagRepository } from "../repositories/ITagRepository";
 
 export class TagUseCase {
@@ -8,11 +8,11 @@ export class TagUseCase {
     this.repository = repository;
   }
 
-  async listAll(): Promise<QuizTag[] | null> {
+  async listAll(): Promise<Tag[] | null> {
     return this.repository.list();
   }
 
-  async create(tag: QuizTag): Promise<void> {
+  async create(tag: Tag): Promise<void> {
     return this.repository.create(tag);
   }
 }

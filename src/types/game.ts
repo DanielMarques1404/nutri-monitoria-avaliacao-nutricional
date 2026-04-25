@@ -1,31 +1,30 @@
-type QuizCategory =
-  | "peso_pre_gestacional"
-  | "calculo_imc"
-  | "classificacao_imc"
-  | "arredondamento"
-  | "conceito";
+export type Category = {
+  id: number;
+  name: string;
+  active: boolean;
+};
 
-export type QuizOption = {
+export type Option = {
   id: number;
   value: "A" | "B" | "C" | "D";
   description: string;
 };
 
-export type QuizTag = {
+export type Tag = {
   id: number;
   name: string;
-}
+};
 
-export type QuizQuestion = {
+export type Question = {
   id: string;
   title: string;
   statement: string;
   question: string;
-  options: QuizOption[];
-  correctOptionId: QuizOption["value"];
+  options: Option[];
+  correctOptionId: Option["value"];
   explanation: string;
-  category: QuizCategory;
+  category: Category;
   difficulty: string;
-  tags?: QuizTag[];
+  tags?: Tag[];
   summaryImage?: string;
 };

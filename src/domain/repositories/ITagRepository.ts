@@ -1,6 +1,6 @@
-import type { QuizTag } from "../../types/game";
+import type { Tag } from "../../types/game";
 
 export interface ITagRepository {
-    list(): Promise<QuizTag[] | null>;
-    create(tag: QuizTag): Promise<void>
+  list(): Promise<Tag[] | null>;
+  create(tag: Tag): Promise<void>;
 }
