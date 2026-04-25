@@ -1,47 +1,72 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { CategoryUseCase } from "../../domain/useCases/CategoryUseCase";
-import { CategorySupabaseRepository } from "../../infra/supabase/CategorySupabaseRepository";
-import type { Category } from "../../types/game";
+import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
+import { Table } from "../layout/Table";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
+import { SupabaseRepository } from "../../infra/supabase/SupabaseRepository";
+import type { ICategory } from "../../domain/entities/entities";
 
-const ucCategory = new CategoryUseCase(new CategorySupabaseRepository());
+const ucCategory = new GenericUseCases<ICategory>(new SupabaseRepository("Categories"));
 
 export const CategoryForm = () => {
-  const { register, handleSubmit, reset, watch } = useForm<Category>({
+  const { register, handleSubmit, reset, watch, setValue } = useForm<ICategory>({
     defaultValues: {
+      id: 0,
       name: "",
-      active: true,
     },
   });
 
-  const [categoriesList, setCategoriesList] = useState<Category[] | null>(null);
+  const [categoriesList, setCategoriesList] = useState<ICategory[] | null>(null);
 
-  useEffect(() => {
+  const updateList = () =>
     ucCategory.listAll().then((categories) => {
       setCategoriesList(categories);
     });
+
+  useEffect(() => {
+    updateList();
   }, []);
 
-  const submit = async (data: Category) => {
+  const submit = async (data: ICategory) => {
     try {
-      console.log(data);
-      await ucCategory.create({ id: 0, name: data.name, active: data.active });
-      toast.success("Categoria criada com sucesso!");
+      await ucCategory.createOrUpdate(data);
+      toast.success(`Categoria "${data.name}" ${data.id ? "atualizada" : "criada"} com sucesso!`);
       reset();
+      updateList();
     } catch (error) {
       console.error("Falha ao registrar Categoria", error);
       toast.error("Falha ao registrar Categoria");
     }
   };
 
-  return (
-    <section>
-      <h1>Categorias</h1>
+  const handleDelete = async (id: number) => {
+    try {
+      await ucCategory.delete(id);
+      updateList();
+      toast.success("Categoria excluída com sucesso!");
+    } catch (error) {
+      console.error("Falha ao excluir Categoria", error);
+      toast.error("Falha ao excluir Categoria");
+    }
+  };
 
-      <form onSubmit={handleSubmit(submit)}>
+  const handleUpdate = async (id: number) => {
+    const CategoryToUpdate = categoriesList?.find((Category) => Category.id === id);
+    if (!CategoryToUpdate) {
+      toast.error("Categoria não encontrada");
+      return;
+    }
+
+    setValue("id", CategoryToUpdate.id);
+    setValue("name", CategoryToUpdate.name);
+    setValue("active", CategoryToUpdate.active);
+  };
+
+  return (
+    <section className="flex flex-col gap-2 w-1/2 border-2 border-mediumGrey p-4 rounded-md">
+      <form className="flex flex-col gap-2" onSubmit={handleSubmit(submit)}>
         <Input
           label={"Categoria"}
           type="text"
@@ -56,17 +81,20 @@ export const CategoryForm = () => {
           {...register("active")}
         />
         <Button
-          classname="inline-flex text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
+          classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg ml-auto"
           type="submit"
-          label={"Adicionar"}
+          label="Salvar"
         />
       </form>
 
-      <ul>
-        {categoriesList?.map((category) => (
-          <li key={category.id}>{category.name}</li>
-        ))}
-      </ul>
+      <div className="border-2 border-dark-green my-2"></div>
+
+      <Table
+        caption={"Categorias"}
+        items={categoriesList || []}
+        deleteAction={(id) => handleDelete(id)}
+        updateAction={(id) => handleUpdate(id)}
+      />
     </section>
   );
 };

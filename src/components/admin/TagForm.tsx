@@ -1,24 +1,24 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import { TagUseCase } from "../../domain/useCases/TagUseCase";
-import { TagSupabaseRepository } from "../../infra/supabase/TagSupabaseRepository";
-import type { Tag } from "../../types/game";
+import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
 import { Table } from "../layout/Table";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
+import { SupabaseRepository } from "../../infra/supabase/SupabaseRepository";
+import type { ITag } from "../../domain/entities/entities";
 
-const ucTag = new TagUseCase(new TagSupabaseRepository());
+const ucTag = new GenericUseCases<ITag>(new SupabaseRepository("Tags"));
 
 export const TagForm = () => {
-  const { register, handleSubmit, reset, watch, setValue } = useForm<Tag>({
+  const { register, handleSubmit, reset, watch, setValue } = useForm<ITag>({
     defaultValues: {
       id: 0,
       name: "",
     },
   });
 
-  const [tagsList, setTagsList] = useState<Tag[] | null>(null);
+  const [tagsList, setTagsList] = useState<ITag[] | null>(null);
 
   const updateList = () =>
     ucTag.listAll().then((tags) => {
@@ -29,9 +29,9 @@ export const TagForm = () => {
     updateList();
   }, []);
 
-  const submit = async (data: Tag) => {
+  const submit = async (data: ITag) => {
     try {
-      await ucTag.createOrUpdate({ id: data.id, name: data.name });
+      await ucTag.createOrUpdate(data);
       toast.success(`TAG "${data.name}" ${data.id ? "atualizada" : "criada"} com sucesso!`);
       reset();
       updateList();
