@@ -92,7 +92,7 @@ export type Database = {
       Questions: {
         Row: {
           category: number | null
-          correctOptionId: string
+          correctOptionId: string | null
           created_at: string
           difficulty: string | null
           explanation: string | null
@@ -100,11 +100,11 @@ export type Database = {
           question: string
           statement: string
           summaryImage: string | null
-          title: string | null
+          title: string
         }
         Insert: {
           category?: number | null
-          correctOptionId: string
+          correctOptionId?: string | null
           created_at?: string
           difficulty?: string | null
           explanation?: string | null
@@ -112,11 +112,11 @@ export type Database = {
           question: string
           statement: string
           summaryImage?: string | null
-          title?: string | null
+          title: string
         }
         Update: {
           category?: number | null
-          correctOptionId?: string
+          correctOptionId?: string | null
           created_at?: string
           difficulty?: string | null
           explanation?: string | null
@@ -124,7 +124,7 @@ export type Database = {
           question?: string
           statement?: string
           summaryImage?: string | null
-          title?: string | null
+          title?: string
         }
         Relationships: [
           {

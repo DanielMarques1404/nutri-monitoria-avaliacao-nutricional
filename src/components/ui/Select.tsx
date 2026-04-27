@@ -1,13 +1,16 @@
-import { useState, type InputHTMLAttributes } from "react";
+import { useState, type SelectHTMLAttributes } from "react";
 import type { FieldError } from "react-hook-form";
 import { cn } from "../../utils/cn";
 
-type InputProps = InputHTMLAttributes<HTMLInputElement> & {
+type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   label: string;
+  placeholder: string;
+  items: { id: number; name: string }[];
   errors?: FieldError;
+  onchange?: (id: number) => void;
 };
 
-export const Input = (props: InputProps) => {
+export const Select = (props: SelectProps) => {
   const [focus, setFocus] = useState(false);
   const { onFocus: propsOnFocus, onBlur: propsOnBlur } = props;
 
@@ -30,12 +33,9 @@ export const Input = (props: InputProps) => {
             : "hover:border-Blue-950 hover:border-2",
         )}
       >
-        <input
+        <select
           {...props}
-          className={cn(
-            "w-full font-ubuntu text-Blue-950 font-semibold placeholder:text-Grey-500 px-2 placeholder:font-semibold focus:outline-none focus:ring-0 ",
-            props.className ?? "",
-          )}
+          className="w-full font-ubuntu text-Blue-950 font-semibold placeholder:text-Grey-500 px-2 placeholder:font-semibold focus:outline-none focus:ring-0"
           onFocus={(event) => {
             propsOnFocus?.(event);
             setFocus(true);
@@ -44,7 +44,21 @@ export const Input = (props: InputProps) => {
             propsOnBlur?.(event);
             setFocus(false);
           }}
-        />
+          onChange={
+            props.onchange
+              ? (e) =>
+                  props.onchange &&
+                  props.onchange(Number(e.currentTarget.value))
+              : undefined
+          }
+        >
+          <option value="0">{props.placeholder}</option>
+          {props.items.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
       </div>
     </div>
   );

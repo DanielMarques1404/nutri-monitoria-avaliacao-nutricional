@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CategoryForm } from "../../components/admin/CategoryForm";
 import { TagForm } from "../../components/admin/TagForm";
 import { Button } from "../../components/ui/Button";
+import { QuestionForm } from "../../components/admin/QuestionForm";
 
 export const Admin = () => {
   const [entity, setEntity] = useState<"tag" | "category" | "question">("tag");
@@ -29,7 +30,7 @@ export const Admin = () => {
       <div className="flex items-center justify-center py-2 px-6 w-full">
         {entity === "tag" && <TagForm />}
         {entity === "category" && <CategoryForm />}
-        {/* {entity === "question" && <QuestionForm />} */}
+        {entity === "question" && <QuestionForm />}
       </div>
     </section>
   );

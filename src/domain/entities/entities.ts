@@ -1,6 +1,5 @@
 export interface IGeneric {
   id: number;
-  entityType: "Tags" | "Options" | "Categories" | "Questions";
 }
 
 export interface ITag extends IGeneric {
@@ -24,7 +23,7 @@ export interface IQuestion extends IGeneric {
   options: IOption[];
   correctOptionId: number;
   explanation: string;
-  category: ICategory;
+  categoryId: number;
   difficulty: string;
   tags?: ITag[];
   summaryImage?: string;
