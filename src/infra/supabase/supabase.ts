@@ -91,8 +91,8 @@ export type Database = {
       }
       Questions: {
         Row: {
-          category: number | null
-          correctOptionId: string | null
+          categoryId: number | null
+          correctOptionId: number | null
           created_at: string
           difficulty: string | null
           explanation: string | null
@@ -103,8 +103,8 @@ export type Database = {
           title: string
         }
         Insert: {
-          category?: number | null
-          correctOptionId?: string | null
+          categoryId?: number | null
+          correctOptionId?: number | null
           created_at?: string
           difficulty?: string | null
           explanation?: string | null
@@ -115,8 +115,8 @@ export type Database = {
           title: string
         }
         Update: {
-          category?: number | null
-          correctOptionId?: string | null
+          categoryId?: number | null
+          correctOptionId?: number | null
           created_at?: string
           difficulty?: string | null
           explanation?: string | null
@@ -128,8 +128,8 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "Questions_category_fkey"
-            columns: ["category"]
+            foreignKeyName: "Questions_categoryId_fkey"
+            columns: ["categoryId"]
             isOneToOne: false
             referencedRelation: "Categories"
             referencedColumns: ["id"]

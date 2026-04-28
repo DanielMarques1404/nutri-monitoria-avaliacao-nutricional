@@ -1,41 +1,40 @@
-import { toast } from "react-toastify";
-import type { IQuestionRepository } from "../../domain/repositories/IQuestionsRepository";
-import type { QuizQuestion } from "../../types/game";
+import type { IQuestion } from "../../domain/entities/entities";
+import type { IQuestionRepository } from "../../domain/repositories/IQuestionRepository";
 import { supabase } from "./config";
 
 export class QuestionSupabaseRepository implements IQuestionRepository {
-  async insert(question: QuizQuestion): Promise<void> {
-    console.log("inserindo question no supabase", question);
-
-    const { data, error } = await supabase
-      .from("question")
-      .insert([{ some_column: "someValue", other_column: "otherValue" }])
-      .select();
-
-    if (error) {
-      toast.error("Erro ao atualizar conta");
-      throw error;
-    }
-
-    toast.success("Conta atualizada com sucesso");
-  }
-
-  async list(): Promise<QuizQuestion | null> {
-    let { data: question, error } = await supabase.from("").select("*");
+  async list(): Promise<IQuestion[] | null> {
+    const { data, error } = await supabase.from("Questions").select("*");
 
     if (error) {
       console.error(error);
       return null;
     }
 
-    if (!question) return null;
-
-    const result: QuizQuestion = {
+    if (!data) return null;
+    const questions: IQuestion[] = data.map((question) => ({
       id: question.id,
-      title: question.name,
-      balance: question.balance,
-    };
+      title: question.title,
+      statement: question.statement,
+      question: question.question,
+      options: [],
+      correctOptionId: question.correctOptionId || 0,
+      explanation: question.explanation || "",
+      categoryId: question.categoryId || 0,
+      difficulty: question.difficulty || "",
+      tags: [],
+      summaryImage: question.summaryImage || "",
+    }));
 
-    return result;
+    return questions.sort((a: any, b: any) =>
+      a.title.localeCompare(b.title),
+    ) as IQuestion[];
+  }
+
+  createOrUpdate(question: IQuestion): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  delete(id: number): Promise<void> {
+    throw new Error("Method not implemented.");
   }
 }

@@ -8,15 +8,15 @@ import type {
   ITag,
 } from "../../domain/entities/entities";
 import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
+import { QuestionUseCases } from "../../domain/useCases/QuestionUseCases";
+import { QuestionSupabaseRepository } from "../../infra/supabase/QuestionSupabaseRepository";
 import { SupabaseRepository } from "../../infra/supabase/SupabaseRepository";
 import { Table } from "../layout/Table";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
 
-const ucQuestion = new GenericUseCases<IQuestion>(
-  new SupabaseRepository("Questions"),
-);
+const ucQuestions = new QuestionUseCases(new QuestionSupabaseRepository());
 
 const ucTags = new GenericUseCases<ITag>(new SupabaseRepository("Tags"));
 const ucCategories = new GenericUseCases<ICategory>(
@@ -51,10 +51,9 @@ export const QuestionForm = () => {
   const [categoriesList, setCategoriesList] = useState<ICategory[] | null>(
     null,
   );
-  // const [selectedCategoryId, setSelectedCategoryId] = useState(0);
 
   const updateList = () =>
-    ucQuestion.listAll().then((questions) => {
+    ucQuestions.listAll().then((questions) => {
       setQuestionsList(questions);
     });
 
@@ -70,11 +69,9 @@ export const QuestionForm = () => {
     });
   }, []);
 
-
-
   const submit = async (data: IQuestion) => {
     // try {
-    //   await ucQuestion.createOrUpdate(data);
+    //   await ucQuestions.createOrUpdate(data);
     //   toast.success(
     //     `Pergunta "${data.title}" ${data.id ? "atualizada" : "criada"} com sucesso!`,
     //   );
@@ -89,7 +86,7 @@ export const QuestionForm = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await ucQuestion.delete(id);
+      await ucQuestions.delete(id);
       updateList();
       toast.success("Pergunta excluída com sucesso!");
     } catch (error) {
@@ -109,9 +106,13 @@ export const QuestionForm = () => {
 
     setValue("id", QuestionToUpdate.id);
     setValue("title", QuestionToUpdate.title);
+    setValue("question", QuestionToUpdate.question);
+    setValue("explanation", QuestionToUpdate.explanation);
     setValue("statement", QuestionToUpdate.statement);
     setValue("tags", QuestionToUpdate.tags || []);
     setValue("categoryId", QuestionToUpdate.categoryId || 0);
+    setValue("difficulty", QuestionToUpdate.difficulty);
+    setValue("summaryImage", QuestionToUpdate.summaryImage || "");
   };
 
   const addTagToQuestion = (tagId: number) => {
@@ -127,11 +128,6 @@ export const QuestionForm = () => {
     }
     setValue("tags", [...currentTags, tagToAdd]);
   };
-
-  const setSelectedCategoryId = (categoryId: number) => {
-    // setSelectedCategoryId(categoryId);
-    setValue("categoryId", categoryId);
-  }
 
   return (
     <section className="flex flex-col gap-2 w-1/2 border-2 border-mediumGrey p-4 rounded-md">
@@ -160,6 +156,30 @@ export const QuestionForm = () => {
           {...register("question")}
         />
 
+        <Input
+          label={"Explicação"}
+          type="text"
+          placeholder="Explicação"
+          value={watch("explanation")}
+          {...register("explanation")}
+        />
+
+        <Input
+          label={"Dificuldade"}
+          type="text"
+          placeholder="Dificuldade"
+          value={watch("difficulty")}
+          {...register("difficulty")}
+        />
+
+        <Input
+          label={"Imagem associada - não finalizado"}
+          type="text"
+          placeholder="Imagem associada"
+          value={watch("summaryImage")}
+          {...register("summaryImage")}
+        />
+
         <Select
           label={"Categoria"}
           placeholder={"Selecione a categoria"}
@@ -169,7 +189,8 @@ export const QuestionForm = () => {
               name: category.name,
             })) || []
           }
-          onchange={setSelectedCategoryId}
+          onchange={() => setValue("categoryId", Number(watch("categoryId")))}
+          value={watch("categoryId")}
         />
 
         <div className="flex gap-2 items-center cursor-pointer">
