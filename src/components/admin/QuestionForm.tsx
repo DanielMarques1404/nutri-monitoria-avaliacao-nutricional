@@ -2,10 +2,11 @@ import { IconArrowBigDownLines, IconPlusFilled } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import type {
-  ICategory,
-  IQuestion,
-  ITag,
+import {
+  type ICategory,
+  type IOption,
+  type IQuestion,
+  type ITag,
 } from "../../domain/entities/entities";
 import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
 import { QuestionUseCases } from "../../domain/useCases/QuestionUseCases";
@@ -48,6 +49,9 @@ export const QuestionForm = () => {
   const [categoriesList, setCategoriesList] = useState<ICategory[] | null>(
     null,
   );
+  const [correctOption, setCorrectOption] = useState<
+    "A" | "B" | "C" | "D" | null
+  >(null);
 
   const updateList = () =>
     ucQuestions.listAll().then((questions) => {
@@ -110,6 +114,9 @@ export const QuestionForm = () => {
     setValue("categoryId", QuestionToUpdate.categoryId || 0);
     setValue("difficulty", QuestionToUpdate.difficulty);
     setValue("summaryImage", QuestionToUpdate.summaryImage || "");
+    setValue("options", QuestionToUpdate.options || []);
+
+    handleSelectRightOption(QuestionToUpdate.correctOptionId);
   };
 
   const addTagToQuestion = (tagId: number) => {
@@ -124,6 +131,24 @@ export const QuestionForm = () => {
       return;
     }
     setValue("tags", [...currentTags, tagToAdd]);
+  };
+
+  const handleSelectRightOption = (optionId: number) => {
+    setValue("correctOptionId", optionId);
+    const idx = watch("options")?.findIndex(
+      (option: IOption) => option.id === optionId,
+    );
+    setCorrectOption(
+      idx === 0
+        ? "A"
+        : idx === 1
+          ? "B"
+          : idx === 2
+            ? "C"
+            : idx === 3
+              ? "D"
+              : null,
+    );
   };
 
   return (
@@ -218,6 +243,29 @@ export const QuestionForm = () => {
           }
         />
 
+        <div className="flex flex-col gap-2 my-2">
+          <Table
+            caption={"Opções de Resposta"}
+            items={
+              watch("options")?.map((option: IOption) => ({
+                id: option.id,
+                name: option.description,
+              })) || []
+            }
+            onSelectOption={handleSelectRightOption}
+            deleteAction={(optionId) =>
+              setValue(
+                "options",
+                watch("options")?.filter(
+                  (option: IOption) => option.id !== optionId,
+                ) || [],
+              )
+            }
+          />
+
+          <label className="font-semibold">{`Opção Correta: ${correctOption || "Nenhuma selecionada ainda"}`}</label>
+        </div>
+
         <Button
           classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg ml-auto"
           type="submit"
@@ -225,7 +273,7 @@ export const QuestionForm = () => {
         />
       </form>
 
-      <div className="border-2 border-dark-green my-2"></div>
+      <div className="border-2 border-dark-green my-3"></div>
 
       <Table
         caption={"Perguntas"}
