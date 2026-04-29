@@ -36,10 +36,7 @@ export const QuestionForm = () => {
         explanation: "",
         categoryId: 0,
         difficulty: "",
-        tags: [
-          // { id: 0, name: "teste1" },
-          // { id: 1, name: "teste2" },
-        ],
+        tags: [],
         summaryImage: "",
       },
     },

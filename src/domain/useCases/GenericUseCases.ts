@@ -9,7 +9,7 @@ export class GenericUseCases<T extends IGeneric> {
   }
 
   async listAll(): Promise<T[] | null> {
-    return this.repository.list();
+    return this.repository.listAll();
   }
 
   async createOrUpdate(obj: T): Promise<void> {

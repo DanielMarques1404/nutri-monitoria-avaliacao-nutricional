@@ -7,7 +7,7 @@ export interface ITag extends IGeneric {
 }
 
 export interface IOption extends IGeneric {
-  questionId: string;
+  questionId: number;
   description: string;
 }
 
@@ -20,7 +20,7 @@ export interface IQuestion extends IGeneric {
   title: string;
   statement: string;
   question: string;
-  options: IOption[];
+  options?: IOption[];
   correctOptionId: number;
   explanation: string;
   categoryId: number;

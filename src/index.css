@@ -72,6 +72,6 @@ table {
 }
 
 /* Zebra striping for rows */
-table tr:nth-child(even) {
+table tr:nth-child(odd) {
   background-color: var(--color-lighter-green);
 }
