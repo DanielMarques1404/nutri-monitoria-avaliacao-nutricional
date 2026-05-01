@@ -49,9 +49,7 @@ export const QuestionForm = () => {
   const [categoriesList, setCategoriesList] = useState<ICategory[] | null>(
     null,
   );
-  const [correctOption, setCorrectOption] = useState<
-    "A" | "B" | "C" | "D" | null
-  >(null);
+
 
   const updateList = () =>
     ucQuestions.listAll().then((questions) => {
@@ -137,17 +135,6 @@ export const QuestionForm = () => {
     setValue("correctOptionId", optionId);
     const idx = watch("options")?.findIndex(
       (option: IOption) => option.id === optionId,
-    );
-    setCorrectOption(
-      idx === 0
-        ? "A"
-        : idx === 1
-          ? "B"
-          : idx === 2
-            ? "C"
-            : idx === 3
-              ? "D"
-              : null,
     );
   };
 
@@ -261,9 +248,10 @@ export const QuestionForm = () => {
                 ) || [],
               )
             }
+            selectedOption={watch("correctOptionId")}
+            highlightingOption
           />
 
-          <label className="font-semibold">{`Opção Correta: ${correctOption || "Nenhuma selecionada ainda"}`}</label>
         </div>
 
         <Button

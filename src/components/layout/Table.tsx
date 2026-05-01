@@ -1,8 +1,17 @@
 import { IconTrash } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
+import { cn } from "../../utils/cn";
+
+type ItemTable = {
+  id: number;
+  name: string;
+};
 
 type RegisterdItemProps = {
   caption: string;
-  items: any[];
+  items: ItemTable[];
+  selectedOption?: number;
+  highlightingOption?: boolean;
   onSelectOption?: (id: number) => void;
   deleteAction?: (id: number) => void;
   updateAction?: (id: number) => void;
@@ -11,10 +20,20 @@ type RegisterdItemProps = {
 export const Table = ({
   caption,
   items,
+  selectedOption,
+  highlightingOption,
   onSelectOption,
   deleteAction,
   updateAction,
 }: RegisterdItemProps) => {
+  const [selectedItem, setSelectedItem] = useState<number | undefined>(
+    selectedOption,
+  );
+
+  useEffect(() => {
+    setSelectedItem(selectedOption);
+  }, [selectedOption]);
+
   return (
     <table>
       <caption className="w-full p-1 font-semibold">{caption}</caption>
@@ -22,10 +41,14 @@ export const Table = ({
         {items?.map((item) => (
           <tr
             key={item.id}
-            className="cursor-pointer hover:font-semibold"
+            className={cn("cursor-pointer hover:font-semibold", {
+              "border-4 border-answer-user":
+                highlightingOption && selectedItem === item.id,
+            })}
             onClick={() => {
               onSelectOption && onSelectOption(item.id);
               updateAction && updateAction(item.id);
+              setSelectedItem(item.id);
             }}
           >
             <td className="p-2">{item.name}</td>
