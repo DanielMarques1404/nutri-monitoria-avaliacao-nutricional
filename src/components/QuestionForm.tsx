@@ -9,7 +9,7 @@ export const QuestionForm = () => {
       <div className="container p-2 mx-auto">
         <div className="flex flex-col text-center w-full mb-2">
           <h1 className="sm:text-4xl text-3xl font-medium title-font mb-2 text-dark-green">
-            {currentQuestion!.caseTitle}
+            {currentQuestion!.title}
           </h1>
           <p className="lg:w-2/3 mx-auto leading-relaxed text-base text-gray-500">
             {currentQuestion!.statement}
@@ -20,11 +20,9 @@ export const QuestionForm = () => {
         </div>
         <div className="flex items-center justify-center">
           <ul className="flex flex-wrap items-center justify-center w-full gap-4">
-            {currentQuestion!.options.map((option) => (
+            {currentQuestion?.options?.map((option) => (
               <li key={`q-${currentQuestion!.id}-${option.id}`}>
-                <Answer
-                  option={option}
-                />
+                <Answer option={option} />
               </li>
             ))}
           </ul>

@@ -1,12 +1,13 @@
-import type { QuizQuestion } from "../types/game";
+import type { Question } from "../types/game";
+import type { IQuestion } from "./entities/entities";
 
 export class Questionnaire {
-  private _questions: QuizQuestion[];
+  private _questions: IQuestion[];
   private _currentQuestionId: number;
-  private _userAnswers: ("A" | "B" | "C" | "D" | undefined)[];
+  private _userAnswers: (number | undefined)[];
   private _visibleAnswers: boolean[];
 
-  constructor(questions: QuizQuestion[]) {
+  constructor(questions: IQuestion[]) {
     this._questions = questions;
     this._currentQuestionId = -1;
     this._userAnswers = [];
@@ -18,15 +19,15 @@ export class Questionnaire {
     });
   }
 
-  getCurrentQuestion(): QuizQuestion | null {
+  getCurrentQuestion(): IQuestion | null {
     return this._questions[this._currentQuestionId];
   }
 
-  getCurrentUserAnswer(): "A" | "B" | "C" | "D" | undefined {
+  getCurrentUserAnswer(): number | undefined {
     return this._userAnswers[this._currentQuestionId];
   }
 
-  setCurrentUserAnswer(value: "A" | "B" | "C" | "D") {
+  setCurrentUserAnswer(value: number) {
     this._userAnswers[this._currentQuestionId] = value;
   }
 
@@ -38,7 +39,7 @@ export class Questionnaire {
     return this._visibleAnswers[this._currentQuestionId];
   }
 
-  next(): QuizQuestion {
+  next(): IQuestion {
     this._currentQuestionId = Math.min(
       this._currentQuestionId + 1,
       this._questions.length - 1,
@@ -46,7 +47,7 @@ export class Questionnaire {
     return this._questions[this._currentQuestionId];
   }
 
-  prior(): QuizQuestion {
+  prior(): IQuestion {
     this._currentQuestionId = Math.max(this._currentQuestionId - 1, 0);
     return this._questions[this._currentQuestionId];
   }

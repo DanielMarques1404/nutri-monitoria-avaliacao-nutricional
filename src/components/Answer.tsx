@@ -1,19 +1,15 @@
 import { useEffect, useState } from "react";
 import { useQuestionnaireContext } from "../app/hooks/useQuestionnaireContext";
-import type { QuizOption } from "../types/game";
 import { cn } from "../utils/cn";
+import type { IOption } from "../domain/entities/entities";
 
 type AnswerProps = {
-  option: QuizOption;
+  option: IOption;
 };
 
 export const Answer = ({ option }: AnswerProps) => {
-  const {
-    currentQuestion,
-    answer,
-    currentUserAnswer,
-    isCurrentVisibleAnswer,
-  } = useQuestionnaireContext();
+  const { currentQuestion, answer, currentUserAnswer, isCurrentVisibleAnswer } =
+    useQuestionnaireContext();
 
   const [isSelected, setIsSelected] = useState(
     currentUserAnswer === option.id,
@@ -28,7 +24,9 @@ export const Answer = ({ option }: AnswerProps) => {
       className={cn(
         "flex flex-col w-52 h-52 bg-white rounded-xl cursor-pointer border border-medium-green",
         !isSelected && "hover:border-4 hover:border-dark-green",
-        isCurrentVisibleAnswer && currentQuestion!.correctOptionId === option.id && "card",
+        isCurrentVisibleAnswer &&
+          currentQuestion!.correctOptionId === option.id &&
+          "card",
         isSelected && "border-4 border-answer-user ",
       )}
       onClick={() => answer(option.id)}
@@ -37,7 +35,7 @@ export const Answer = ({ option }: AnswerProps) => {
         {option.id}
       </h1>
       <span className="font-ubuntu text-dark-green text-sm mx-3 my-1 ">
-        {option.text}
+        {option.description}
       </span>
     </div>
   );

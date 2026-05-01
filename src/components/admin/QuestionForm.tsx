@@ -133,9 +133,6 @@ export const QuestionForm = () => {
 
   const handleSelectRightOption = (optionId: number) => {
     setValue("correctOptionId", optionId);
-    const idx = watch("options")?.findIndex(
-      (option: IOption) => option.id === optionId,
-    );
   };
 
   return (

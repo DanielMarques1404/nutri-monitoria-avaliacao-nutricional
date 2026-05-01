@@ -1,12 +1,19 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import type { IQuestion } from "../../domain/entities/entities";
 import { Questionnaire } from "../../domain/Questionnaire";
-import { type QuizQuestion } from "../../types/game";
-import { data } from "../../utils/data";
+import { QuestionUseCases } from "../../domain/useCases/QuestionUseCases";
+import { QuestionSupabaseRepository } from "../../infra/supabase/QuestionSupabaseRepository";
 
 type QuestionnaireContextType = {
-  currentQuestion: QuizQuestion | null;
-  currentUserAnswer: "A" | "B" | "C" | "D" | undefined;
-  answer: (answer: "A" | "B" | "C" | "D") => void;
+  currentQuestion: IQuestion | null;
+  currentUserAnswer: number | undefined;
+  answer: (answer: number) => void;
   isCurrentVisibleAnswer: boolean;
   showAnswer: (value: boolean) => void;
   next: () => void;
@@ -17,35 +24,48 @@ export const QuestionnaireContext = createContext<
   QuestionnaireContextType | undefined
 >(undefined);
 
+const ucQuestions = new QuestionUseCases(new QuestionSupabaseRepository());
+
 export const QuestionnaireProvider = ({
   children,
 }: {
   children: ReactNode;
 }) => {
-  const [questionnaire, _] = useState<Questionnaire>(new Questionnaire(data));
-  const [currentQuestion, setCurrentQuestion] = useState<QuizQuestion | null>(
-    questionnaire.getCurrentQuestion(),
+  const [questionnaire, setQuestionnaire] = useState<Questionnaire | null>(
+    null,
+  );
+  const [currentQuestion, setCurrentQuestion] = useState<IQuestion | null>(
+    questionnaire?.getCurrentQuestion() || null,
   );
   const [currentUserAnswer, setCurrentUserAnswer] = useState<
-    "A" | "B" | "C" | "D" | undefined
-  >(questionnaire.getCurrentUserAnswer());
+    number | undefined
+  >(questionnaire?.getCurrentUserAnswer());
   const [isCurrentVisibleAnswer, setCurrentVisibleAnswer] = useState<boolean>(
-    questionnaire.isCurrentVisibleAnswer(),
+    questionnaire?.isCurrentVisibleAnswer() || false,
   );
 
+  useEffect(() => {
+    ucQuestions.listAll().then((questions) => {
+      setQuestionnaire(questions && new Questionnaire(questions));
+    });
+  }, []);
+
   const next = () => {
+    if (!questionnaire) return;
     setCurrentQuestion(questionnaire.next());
     setCurrentUserAnswer(questionnaire.getCurrentUserAnswer());
     setCurrentVisibleAnswer(questionnaire.isCurrentVisibleAnswer());
   };
 
   const prior = () => {
+    if (!questionnaire) return;
     setCurrentQuestion(questionnaire.prior());
     setCurrentUserAnswer(questionnaire.getCurrentUserAnswer());
     setCurrentVisibleAnswer(questionnaire.isCurrentVisibleAnswer());
   };
 
-  const answer = (answer: "A" | "B" | "C" | "D") => {
+  const answer = (answer: number) => {
+    if (!questionnaire) return;
     questionnaire.setCurrentUserAnswer(answer);
     setCurrentUserAnswer(answer);
     setCurrentQuestion(questionnaire.getCurrentQuestion());
@@ -53,6 +73,7 @@ export const QuestionnaireProvider = ({
   };
 
   const showAnswer = (value: boolean) => {
+    if (!questionnaire) return;
     questionnaire.setCurrentVisibleAnswer(value);
     setCurrentVisibleAnswer(value);
     setCurrentUserAnswer(questionnaire.getCurrentUserAnswer());
