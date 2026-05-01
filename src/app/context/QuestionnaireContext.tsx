@@ -9,6 +9,7 @@ import type { IQuestion } from "../../domain/entities/entities";
 import { Questionnaire } from "../../domain/Questionnaire";
 import { QuestionUseCases } from "../../domain/useCases/QuestionUseCases";
 import { QuestionSupabaseRepository } from "../../infra/supabase/QuestionSupabaseRepository";
+import { useQuery } from "@tanstack/react-query";
 
 type QuestionnaireContextType = {
   currentQuestion: IQuestion | null;
@@ -31,9 +32,14 @@ export const QuestionnaireProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const [questionnaire, setQuestionnaire] = useState<Questionnaire | null>(
-    null,
-  );
+
+  const { isPending, error, data: questionnaire, isFetching } = useQuery({
+    queryKey: ['nutri-monitoria-quiz'],
+    queryFn: async () => {
+      return await ucQuestions.listAll().then((questions) => questions && new Questionnaire(questions));
+    },
+  })
+
   const [currentQuestion, setCurrentQuestion] = useState<IQuestion | null>(
     questionnaire?.getCurrentQuestion() || null,
   );
@@ -43,12 +49,6 @@ export const QuestionnaireProvider = ({
   const [isCurrentVisibleAnswer, setCurrentVisibleAnswer] = useState<boolean>(
     questionnaire?.isCurrentVisibleAnswer() || false,
   );
-
-  useEffect(() => {
-    ucQuestions.listAll().then((questions) => {
-      setQuestionnaire(questions && new Questionnaire(questions));
-    });
-  }, []);
 
   const next = () => {
     if (!questionnaire) return;
