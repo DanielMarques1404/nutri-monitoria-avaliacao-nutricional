@@ -1,6 +1,11 @@
-import { createContext, useEffect, useState, type PropsWithChildren } from "react";
-import { supabase } from "../../infra/supabase/config";
 import type { Session } from "@supabase/supabase-js";
+import {
+  createContext,
+  useEffect,
+  useState,
+  type PropsWithChildren,
+} from "react";
+import { supabase } from "../../infra/supabase/config";
 
 interface IAuthContext {
   logout: () => Promise<void>;
@@ -50,7 +55,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return (
     <AuthContext.Provider value={{ session, logout, login }}>
-      {isLoading ? 'carregando...' : children}
+      {isLoading ? "carregando..." : children}
     </AuthContext.Provider>
   );
 };
