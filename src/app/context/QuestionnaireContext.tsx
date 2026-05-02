@@ -1,7 +1,6 @@
 import {
   createContext,
   useContext,
-  useEffect,
   useState,
   type ReactNode,
 } from "react";
@@ -33,7 +32,7 @@ export const QuestionnaireProvider = ({
   children: ReactNode;
 }) => {
 
-  const { isPending, error, data: questionnaire, isFetching } = useQuery({
+  const { data: questionnaire } = useQuery({
     queryKey: ['nutri-monitoria-quiz'],
     queryFn: async () => {
       return await ucQuestions.listAll().then((questions) => questions && new Questionnaire(questions));

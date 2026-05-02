@@ -44,9 +44,11 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
   }
 
   createOrUpdate(question: IQuestion): Promise<void> {
+    console.log("criando/atualizando", question)
     throw new Error("Method not implemented.");
   }
   delete(id: number): Promise<void> {
+    console.log("deletando", id)
     throw new Error("Method not implemented.");
   }
 }

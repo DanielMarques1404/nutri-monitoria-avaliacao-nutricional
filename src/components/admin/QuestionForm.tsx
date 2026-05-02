@@ -16,6 +16,7 @@ import { Table } from "../layout/Table";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const ucQuestions = new QuestionUseCases(new QuestionSupabaseRepository());
 
@@ -43,39 +44,66 @@ export const QuestionForm = () => {
     },
   );
 
-  const [questionsList, setQuestionsList] = useState<IQuestion[] | null>(null);
-  const [tagsList, setTagsList] = useState<ITag[] | null>(null);
+  const queryClient = useQueryClient();
+
+  const { data: tagsList } = useQuery({
+    queryKey: ["nutri-monitoria-tags"],
+    queryFn: async () => {
+      return await ucTags.listAll();
+    },
+  });
+
+  const { data: categoriesList } = useQuery({
+    queryKey: ["nutri-monitoria-categories"],
+    queryFn: async () => {
+      return await ucCategories.listAll();
+    },
+  });
+
+  const { data: questionsList } = useQuery({
+    queryKey: ["nutri-monitoria-questions"],
+    queryFn: async () => {
+      return await ucQuestions.listAll();
+    },
+  });
+
+  const createUpdateMutation = useMutation({
+    mutationFn: (question: IQuestion) => {
+      return ucQuestions.createOrUpdate(question);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-questions"],
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => {
+      return ucQuestions.delete(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-questions"],
+      });
+    },
+  });  
+
+  // const [questionsList, setQuestionsList] = useState<IQuestion[] | null>(null);
+  // const [tagsList, setTagsList] = useState<ITag[] | null>(null);
   const [selectedTagId, setSelectedTagId] = useState(0);
-  const [categoriesList, setCategoriesList] = useState<ICategory[] | null>(
-    null,
-  );
+  // const [categoriesList, setCategoriesList] = useState<ICategory[] | null>(
+  //   null,
+  // );
 
-
-  const updateList = () =>
-    ucQuestions.listAll().then((questions) => {
-      setQuestionsList(questions);
-    });
-
-  useEffect(() => {
-    updateList();
-
-    ucTags.listAll().then((tags) => {
-      setTagsList(tags);
-    });
-
-    ucCategories.listAll().then((categories) => {
-      setCategoriesList(categories);
-    });
-  }, []);
 
   const submit = async (data: IQuestion) => {
     // try {
-    //   await ucQuestions.createOrUpdate(data);
+    //   createUpdateMutation.mutate(data);
     //   toast.success(
     //     `Pergunta "${data.title}" ${data.id ? "atualizada" : "criada"} com sucesso!`,
     //   );
     //   reset();
-    //   updateList();
     // } catch (error) {
     //   console.error("Falha ao registrar Pergunta", error);
     //   toast.error("Falha ao registrar Pergunta");
@@ -85,8 +113,7 @@ export const QuestionForm = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await ucQuestions.delete(id);
-      updateList();
+      deleteMutation.mutate(id);
       toast.success("Pergunta excluída com sucesso!", {position: "bottom-right"});
     } catch (error) {
       console.error("Falha ao excluir Pergunta", error);

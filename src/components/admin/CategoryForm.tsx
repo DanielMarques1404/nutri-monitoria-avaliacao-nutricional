@@ -1,61 +1,90 @@
-import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import type { ICategory } from "../../domain/entities/entities";
 import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
+import { SupabaseRepository } from "../../infra/supabase/SupabaseRepository";
 import { Table } from "../layout/Table";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
-import { SupabaseRepository } from "../../infra/supabase/SupabaseRepository";
-import type { ICategory } from "../../domain/entities/entities";
 
-const ucCategory = new GenericUseCases<ICategory>(new SupabaseRepository("Categories"));
+const ucCategory = new GenericUseCases<ICategory>(
+  new SupabaseRepository("Categories"),
+);
 
 export const CategoryForm = () => {
-  const { register, handleSubmit, reset, watch, setValue } = useForm<ICategory>({
-    defaultValues: {
-      id: 0,
-      name: "",
+  const queryClient = useQueryClient();
+
+  const { data: categoriesList } = useQuery({
+    queryKey: ["nutri-monitoria-categories"],
+    queryFn: async () => {
+      return await ucCategory.listAll();
     },
   });
 
-  const [categoriesList, setCategoriesList] = useState<ICategory[] | null>(null);
+  const createUpdateMutation = useMutation({
+    mutationFn: (category: ICategory) => {
+      return ucCategory.createOrUpdate(category);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-categories"],
+      });
+    },
+  });
 
-  const updateList = () =>
-    ucCategory.listAll().then((categories) => {
-      setCategoriesList(categories);
-    });
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => {
+      return ucCategory.delete(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-categories"],
+      });
+    },
+  });
 
-  useEffect(() => {
-    updateList();
-  }, []);
+  const { register, handleSubmit, reset, watch, setValue } = useForm<ICategory>(
+    {
+      defaultValues: {
+        id: 0,
+        name: "",
+      },
+    },
+  );
 
-  const submit = async (data: ICategory) => {
+  const submit = (data: ICategory) => {
     try {
-      await ucCategory.createOrUpdate(data);
-      toast.success(`Categoria "${data.name}" ${data.id ? "atualizada" : "criada"} com sucesso!`, {position: "bottom-right"});
+      createUpdateMutation.mutate(data);
+      toast.success(
+        `Categoria "${data.name}" ${data.id ? "atualizada" : "criada"} com sucesso!`,
+        { position: "bottom-right" },
+      );
       reset();
-      updateList();
     } catch (error) {
       console.error("Falha ao registrar Categoria", error);
-      toast.error("Falha ao registrar Categoria", {position: "bottom-right"});
+      toast.error("Falha ao registrar Categoria", { position: "bottom-right" });
     }
   };
 
   const handleDelete = async (id: number) => {
     try {
-      await ucCategory.delete(id);
-      updateList();
-      toast.success("Categoria excluída com sucesso!", {position: "bottom-right"});
+      deleteMutation.mutate(id);
+      toast.success("Categoria excluída com sucesso!", {
+        position: "bottom-right",
+      });
     } catch (error) {
       console.error("Falha ao excluir Categoria", error);
-      toast.error("Falha ao excluir Categoria", {position: "bottom-right"});
+      toast.error("Falha ao excluir Categoria", { position: "bottom-right" });
     }
   };
 
   const handleUpdate = async (id: number) => {
-    const CategoryToUpdate = categoriesList?.find((Category) => Category.id === id);
+    const CategoryToUpdate = categoriesList?.find(
+      (Category) => Category.id === id,
+    );
     if (!CategoryToUpdate) {
-      toast.error("Categoria não encontrada", {position: "bottom-right"});
+      toast.error("Categoria não encontrada", { position: "bottom-right" });
       return;
     }
 

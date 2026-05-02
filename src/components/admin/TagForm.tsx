@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import type { ITag } from "../../domain/entities/entities";
 import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
+import { SupabaseRepository } from "../../infra/supabase/SupabaseRepository";
 import { Table } from "../layout/Table";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
-import { SupabaseRepository } from "../../infra/supabase/SupabaseRepository";
-import type { ITag } from "../../domain/entities/entities";
 
 const ucTag = new GenericUseCases<ITag>(new SupabaseRepository("Tags"));
 
@@ -18,44 +18,65 @@ export const TagForm = () => {
     },
   });
 
-  const [tagsList, setTagsList] = useState<ITag[] | null>(null);
+  const queryClient = useQueryClient();
 
-  const updateList = () =>
-    ucTag.listAll().then((tags) => {
-      setTagsList(tags);
-    });
+  const { data: tagsList } = useQuery({
+    queryKey: ["nutri-monitoria-tags"],
+    queryFn: async () => {
+      return await ucTag.listAll();
+    },
+  });
 
-  useEffect(() => {
-    updateList();
-  }, []);
+  const createUpdateMutation = useMutation({
+    mutationFn: (tag: ITag) => {
+      return ucTag.createOrUpdate(tag);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-tags"],
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => {
+      return ucTag.delete(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-tags"],
+      });
+    },
+  });
 
   const submit = async (data: ITag) => {
     try {
-      await ucTag.createOrUpdate(data);
-      toast.success(`TAG "${data.name}" ${data.id ? "atualizada" : "criada"} com sucesso!`, {position: "bottom-right"});
+      createUpdateMutation.mutate(data);
+      toast.success(
+        `TAG "${data.name}" ${data.id ? "atualizada" : "criada"} com sucesso!`,
+        { position: "bottom-right" },
+      );
       reset();
-      updateList();
     } catch (error) {
       console.error("Falha ao registrar TAG", error);
-      toast.error("Falha ao registrar TAG", {position: "bottom-right"});
+      toast.error("Falha ao registrar TAG", { position: "bottom-right" });
     }
   };
 
   const handleDelete = async (id: number) => {
     try {
-      await ucTag.delete(id);
-      updateList();
-      toast.success("TAG excluída com sucesso!", {position: "bottom-right"});
+      deleteMutation.mutate(id);
+      toast.success("TAG excluída com sucesso!", { position: "bottom-right" });
     } catch (error) {
       console.error("Falha ao excluir TAG", error);
-      toast.error("Falha ao excluir TAG", {position: "bottom-right"});
+      toast.error("Falha ao excluir TAG", { position: "bottom-right" });
     }
   };
 
   const handleUpdate = async (id: number) => {
     const tagToUpdate = tagsList?.find((tag) => tag.id === id);
     if (!tagToUpdate) {
-      toast.error("TAG não encontrada", {position: "bottom-right"});
+      toast.error("TAG não encontrada", { position: "bottom-right" });
       return;
     }
 
