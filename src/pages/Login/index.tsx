@@ -21,11 +21,11 @@ export const Login = () => {
         evt.preventDefault();
         try {
             login && await login(credentials.email, credentials.password);
-            toast.success("Login efetuado com sucesso!");
-            navigate('/admin/admin');
+            toast.success("Login efetuado com sucesso!", { position: "bottom-right"});
+            navigate('/admin/');
         } catch (error) {
             console.error("Falha ao efetuar login", error);
-            toast.error("Falha no login");
+            toast.error("Falha no login", { position: "bottom-right"});
         }
     };
 

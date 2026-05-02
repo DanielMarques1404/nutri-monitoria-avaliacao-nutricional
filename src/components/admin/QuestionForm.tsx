@@ -87,10 +87,10 @@ export const QuestionForm = () => {
     try {
       await ucQuestions.delete(id);
       updateList();
-      toast.success("Pergunta excluída com sucesso!");
+      toast.success("Pergunta excluída com sucesso!", {position: "bottom-right"});
     } catch (error) {
       console.error("Falha ao excluir Pergunta", error);
-      toast.error("Falha ao excluir Pergunta");
+      toast.error("Falha ao excluir Pergunta", {position: "bottom-right"});
     }
   };
 
@@ -99,7 +99,7 @@ export const QuestionForm = () => {
       (Question) => Question.id === id,
     );
     if (!QuestionToUpdate) {
-      toast.error("Pergunta não encontrada");
+      toast.error("Pergunta não encontrada", {position: "bottom-right"});
       return;
     }
 
@@ -120,12 +120,12 @@ export const QuestionForm = () => {
   const addTagToQuestion = (tagId: number) => {
     const currentTags = watch("tags") || [];
     if (currentTags.find((t: ITag) => t.id === tagId)) {
-      toast.error("TAG já adicionada à pergunta");
+      toast.error("TAG já adicionada à pergunta", {position: "bottom-right"});
       return;
     }
     const tagToAdd = tagsList?.find((tag) => tag.id === tagId);
     if (!tagToAdd) {
-      toast.error("TAG não encontrada");
+      toast.error("TAG não encontrada", {position: "bottom-right"});
       return;
     }
     setValue("tags", [...currentTags, tagToAdd]);

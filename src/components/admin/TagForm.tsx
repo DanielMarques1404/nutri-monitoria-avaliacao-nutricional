@@ -32,12 +32,12 @@ export const TagForm = () => {
   const submit = async (data: ITag) => {
     try {
       await ucTag.createOrUpdate(data);
-      toast.success(`TAG "${data.name}" ${data.id ? "atualizada" : "criada"} com sucesso!`);
+      toast.success(`TAG "${data.name}" ${data.id ? "atualizada" : "criada"} com sucesso!`, {position: "bottom-right"});
       reset();
       updateList();
     } catch (error) {
       console.error("Falha ao registrar TAG", error);
-      toast.error("Falha ao registrar TAG");
+      toast.error("Falha ao registrar TAG", {position: "bottom-right"});
     }
   };
 
@@ -45,17 +45,17 @@ export const TagForm = () => {
     try {
       await ucTag.delete(id);
       updateList();
-      toast.success("TAG excluída com sucesso!");
+      toast.success("TAG excluída com sucesso!", {position: "bottom-right"});
     } catch (error) {
       console.error("Falha ao excluir TAG", error);
-      toast.error("Falha ao excluir TAG");
+      toast.error("Falha ao excluir TAG", {position: "bottom-right"});
     }
   };
 
   const handleUpdate = async (id: number) => {
     const tagToUpdate = tagsList?.find((tag) => tag.id === id);
     if (!tagToUpdate) {
-      toast.error("TAG não encontrada");
+      toast.error("TAG não encontrada", {position: "bottom-right"});
       return;
     }
 

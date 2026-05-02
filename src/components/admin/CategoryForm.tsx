@@ -32,12 +32,12 @@ export const CategoryForm = () => {
   const submit = async (data: ICategory) => {
     try {
       await ucCategory.createOrUpdate(data);
-      toast.success(`Categoria "${data.name}" ${data.id ? "atualizada" : "criada"} com sucesso!`);
+      toast.success(`Categoria "${data.name}" ${data.id ? "atualizada" : "criada"} com sucesso!`, {position: "bottom-right"});
       reset();
       updateList();
     } catch (error) {
       console.error("Falha ao registrar Categoria", error);
-      toast.error("Falha ao registrar Categoria");
+      toast.error("Falha ao registrar Categoria", {position: "bottom-right"});
     }
   };
 
@@ -45,17 +45,17 @@ export const CategoryForm = () => {
     try {
       await ucCategory.delete(id);
       updateList();
-      toast.success("Categoria excluída com sucesso!");
+      toast.success("Categoria excluída com sucesso!", {position: "bottom-right"});
     } catch (error) {
       console.error("Falha ao excluir Categoria", error);
-      toast.error("Falha ao excluir Categoria");
+      toast.error("Falha ao excluir Categoria", {position: "bottom-right"});
     }
   };
 
   const handleUpdate = async (id: number) => {
     const CategoryToUpdate = categoriesList?.find((Category) => Category.id === id);
     if (!CategoryToUpdate) {
-      toast.error("Categoria não encontrada");
+      toast.error("Categoria não encontrada", {position: "bottom-right"});
       return;
     }
 
