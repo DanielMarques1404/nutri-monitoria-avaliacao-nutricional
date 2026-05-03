@@ -2,13 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { IQuestion } from "../../domain/entities/entities";
 import { Questionnaire } from "../../domain/Questionnaire";
-import { QuestionUseCases } from "../../domain/useCases/QuestionUseCases";
-import { QuestionSupabaseRepository } from "../../infra/supabase/QuestionSupabaseRepository";
-import { QuestionTagsSupabaseRepository } from "../../infra/supabase/QuestionTagsSupabaseRepository";
+import { QuestionnaireUseCase } from "../../domain/useCases/QuestionnaireUseCase";
+import { QuestionnaireSupabaseRepository } from "../../infra/supabase/QuestionnaireSupabaseRepository";
 
 type QuestionnaireContextType = {
   currentQuestion: IQuestion | null;
   currentUserAnswer: number | undefined;
+  currentQuestionIndex: number;
   answer: (answer: number) => void;
   isCurrentVisibleAnswer: boolean;
   showAnswer: (value: boolean) => void;
@@ -20,9 +20,8 @@ export const QuestionnaireContext = createContext<
   QuestionnaireContextType | undefined
 >(undefined);
 
-const ucQuestions = new QuestionUseCases(
-  new QuestionSupabaseRepository(),
-  new QuestionTagsSupabaseRepository(),
+const ucQuestionnaire = new QuestionnaireUseCase(
+  new QuestionnaireSupabaseRepository(),
 );
 
 export const QuestionnaireProvider = ({
@@ -33,9 +32,11 @@ export const QuestionnaireProvider = ({
   const { data: questionnaire } = useQuery({
     queryKey: ["nutri-monitoria-quiz"],
     queryFn: async () => {
-      return await ucQuestions
-        .listAll()
-        .then((questions) => questions && new Questionnaire(questions));
+      return await ucQuestionnaire
+        .getCurrentQuestionnaire()
+        .then((questionnaire) =>
+          questionnaire ? new Questionnaire(questionnaire.questions) : null,
+        );
     },
   });
 
@@ -48,10 +49,14 @@ export const QuestionnaireProvider = ({
   const [isCurrentVisibleAnswer, setCurrentVisibleAnswer] = useState<boolean>(
     questionnaire?.isCurrentVisibleAnswer() || false,
   );
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(
+    questionnaire?.getCurrentQuestionIndex() || -1,
+  );
 
   const next = () => {
     if (!questionnaire) return;
     setCurrentQuestion(questionnaire.next());
+    setCurrentQuestionIndex(questionnaire.getCurrentQuestionIndex());
     setCurrentUserAnswer(questionnaire.getCurrentUserAnswer());
     setCurrentVisibleAnswer(questionnaire.isCurrentVisibleAnswer());
   };
@@ -59,6 +64,7 @@ export const QuestionnaireProvider = ({
   const prior = () => {
     if (!questionnaire) return;
     setCurrentQuestion(questionnaire.prior());
+    setCurrentQuestionIndex(questionnaire.getCurrentQuestionIndex());
     setCurrentUserAnswer(questionnaire.getCurrentUserAnswer());
     setCurrentVisibleAnswer(questionnaire.isCurrentVisibleAnswer());
   };
@@ -68,6 +74,7 @@ export const QuestionnaireProvider = ({
     questionnaire.setCurrentUserAnswer(answer);
     setCurrentUserAnswer(answer);
     setCurrentQuestion(questionnaire.getCurrentQuestion());
+    setCurrentQuestionIndex(questionnaire.getCurrentQuestionIndex());
     setCurrentVisibleAnswer(questionnaire.isCurrentVisibleAnswer());
   };
 
@@ -77,11 +84,13 @@ export const QuestionnaireProvider = ({
     setCurrentVisibleAnswer(value);
     setCurrentUserAnswer(questionnaire.getCurrentUserAnswer());
     setCurrentQuestion(questionnaire.getCurrentQuestion());
+    setCurrentQuestionIndex(questionnaire.getCurrentQuestionIndex());
   };
 
   const value = {
     currentQuestion,
     currentUserAnswer,
+    currentQuestionIndex,
     answer,
     isCurrentVisibleAnswer,
     showAnswer,

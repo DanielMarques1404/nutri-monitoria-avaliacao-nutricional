@@ -77,7 +77,7 @@ export const QuestionForm = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["nutri-monitoria-questions"],
+        queryKey: ["nutri-monitoria-questions", "nutri-monitoria-quiz"],
       });
       toast.success(
         `Pergunta "${variables.title}" ${variables.id ? "atualizada" : "criada"} com sucesso!`,

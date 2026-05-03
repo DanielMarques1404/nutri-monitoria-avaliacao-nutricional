@@ -28,3 +28,9 @@ export interface IQuestion extends IGeneric {
   tags?: ITag[];
   summaryImage?: string;
 }
+
+export interface IQuestionnaire extends IGeneric {
+  name: string;
+  description: string;
+  questions: IQuestion[];
+}

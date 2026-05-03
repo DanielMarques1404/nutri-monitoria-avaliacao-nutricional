@@ -13,6 +13,8 @@ export const Professor: Person = {
   email: "leonardo.oliveira@professor.unifametro.edu.br",
 };
 
+export const CURRENT_QUESTIONNAIRE = 1;
+
 // export const data: Question[] = [
 //   {
 //     id: "caso-1",

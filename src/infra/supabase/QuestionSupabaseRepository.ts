@@ -3,6 +3,47 @@ import type { IQuestionRepository } from "../../domain/repositories/IQuestionRep
 import { supabase } from "./config";
 
 export class QuestionSupabaseRepository implements IQuestionRepository {
+
+  private transformToQuestion(question: any): IQuestion {
+    return {
+      id: question.id,
+      title: question.title,
+      statement: question.statement,
+      question: question.question,
+      options:
+        question.QuestionOptions?.map((qo: any) => ({
+          id: qo.id,
+          questionId: qo.questionId,
+          description: qo.description,
+        })) || [],
+      correctOptionId: question.correctOptionId || 0,
+      explanation: question.explanation || "",
+      categoryId: question.categoryId || 0,
+      difficulty: question.difficulty || "",
+      tags:
+        question.QuestionTags?.map((qt: any) => ({
+          id: qt.Tags.id,
+          name: qt.Tags.name,
+        })) || [],
+      summaryImage: question.summaryImage || "",
+    }
+  }
+
+  async listByIds(ids: number[]): Promise<IQuestion[] | null> {
+        const { data, error } = await supabase
+      .from("Questions")
+      .select("*, QuestionTags(Tags(*)), QuestionOptions(*)")
+      .in("id", ids);
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    if (!data) return null;
+    return data.map((question) => this.transformToQuestion(question));
+  }
+
   async list(): Promise<IQuestion[] | null> {
     const { data, error } = await supabase
       .from("Questions")
@@ -15,28 +56,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
 
     if (!data) return null;
 
-    const questions: IQuestion[] = data.map((question) => ({
-      id: question.id,
-      title: question.title,
-      statement: question.statement,
-      question: question.question,
-      options:
-        question.QuestionOptions?.map((qo) => ({
-          id: qo.id,
-          questionId: qo.questionId,
-          description: qo.description,
-        })) || [],
-      correctOptionId: question.correctOptionId || 0,
-      explanation: question.explanation || "",
-      categoryId: question.categoryId || 0,
-      difficulty: question.difficulty || "",
-      tags:
-        question.QuestionTags?.map((qt) => ({
-          id: qt.Tags.id,
-          name: qt.Tags.name,
-        })) || [],
-      summaryImage: question.summaryImage || "",
-    }));
+    const questions: IQuestion[] = data.map((question) => this.transformToQuestion(question));
 
     return questions.sort((a: any, b: any) =>
       a.title.localeCompare(b.title),

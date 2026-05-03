@@ -60,6 +60,63 @@ export type Database = {
         }
         Relationships: []
       }
+      QuestionnaireQuestions: {
+        Row: {
+          created_at: string
+          id: number
+          questionId: number
+          questionnaireId: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          questionId: number
+          questionnaireId: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          questionId?: number
+          questionnaireId?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "QuestionnaireQuestions_questionId_fkey"
+            columns: ["questionId"]
+            isOneToOne: false
+            referencedRelation: "Questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "QuestionnaireQuestions_questionnaireId_fkey"
+            columns: ["questionnaireId"]
+            isOneToOne: false
+            referencedRelation: "Questionnaires"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Questionnaires: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: number
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: number
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
       QuestionOptions: {
         Row: {
           created_at: string

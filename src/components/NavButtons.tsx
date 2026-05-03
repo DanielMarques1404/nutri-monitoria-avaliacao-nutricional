@@ -6,12 +6,12 @@ type NavButtonsProps = {
 };
 
 export const NavButtons = ({ handleOpenModal }: NavButtonsProps) => {
-  const { currentQuestion, prior, next, showAnswer } =
+  const { currentQuestion, currentQuestionIndex, prior, next, showAnswer } =
     useQuestionnaireContext();
 
   return (
     <nav className="flex items-center justify-center gap-2 w-full my-2">
-      {currentQuestion!.index > 1 && (
+      {currentQuestionIndex > 1 && (
         <Button
           label={"Anterior"}
           onClick={prior}
@@ -26,7 +26,7 @@ export const NavButtons = ({ handleOpenModal }: NavButtonsProps) => {
         }}
         classname="bg-light-green rounded-md px-3 py-2 text-white m-1"
       />
-      {currentQuestion!.index < 10 ? (
+      {currentQuestionIndex < 9 ? (
         <Button
           label={"Próxima"}
           onClick={next}
