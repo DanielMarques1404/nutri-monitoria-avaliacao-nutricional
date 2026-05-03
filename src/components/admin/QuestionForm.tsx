@@ -1,5 +1,6 @@
 import { IconArrowBigDownLines, IconPlusFilled } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import {
@@ -11,14 +12,17 @@ import {
 import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
 import { QuestionUseCases } from "../../domain/useCases/QuestionUseCases";
 import { QuestionSupabaseRepository } from "../../infra/supabase/QuestionSupabaseRepository";
+import { QuestionTagsSupabaseRepository } from "../../infra/supabase/QuestionTagsSupabaseRepository";
 import { SupabaseRepository } from "../../infra/supabase/SupabaseRepository";
 import { Table } from "../layout/Table";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-const ucQuestions = new QuestionUseCases(new QuestionSupabaseRepository());
+const ucQuestions = new QuestionUseCases(
+  new QuestionSupabaseRepository(),
+  new QuestionTagsSupabaseRepository(),
+);
 
 const ucTags = new GenericUseCases<ITag>(new SupabaseRepository("Tags"));
 const ucCategories = new GenericUseCases<ICategory>(
@@ -71,10 +75,18 @@ export const QuestionForm = () => {
     mutationFn: (question: IQuestion) => {
       return ucQuestions.createOrUpdate(question);
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["nutri-monitoria-questions"],
       });
+      toast.success(
+        `Pergunta "${variables.title}" ${variables.id ? "atualizada" : "criada"} com sucesso!`,
+      );
+      reset();
+    },
+    onError: () => {
+      console.error("Falha ao registrar Pergunta");
+      toast.error("Falha ao registrar Pergunta");
     },
   });
 
@@ -86,39 +98,24 @@ export const QuestionForm = () => {
       queryClient.invalidateQueries({
         queryKey: ["nutri-monitoria-questions"],
       });
+      toast.success("Pergunta excluída com sucesso!", {
+        position: "bottom-right",
+      });
     },
-  });  
+    onError: () => {
+      console.error("Falha ao excluir Pergunta");
+      toast.error("Falha ao excluir Pergunta", { position: "bottom-right" });
+    },
+  });
 
-  // const [questionsList, setQuestionsList] = useState<IQuestion[] | null>(null);
-  // const [tagsList, setTagsList] = useState<ITag[] | null>(null);
   const [selectedTagId, setSelectedTagId] = useState(0);
-  // const [categoriesList, setCategoriesList] = useState<ICategory[] | null>(
-  //   null,
-  // );
-
 
   const submit = async (data: IQuestion) => {
-    // try {
-    //   createUpdateMutation.mutate(data);
-    //   toast.success(
-    //     `Pergunta "${data.title}" ${data.id ? "atualizada" : "criada"} com sucesso!`,
-    //   );
-    //   reset();
-    // } catch (error) {
-    //   console.error("Falha ao registrar Pergunta", error);
-    //   toast.error("Falha ao registrar Pergunta");
-    // }
-    console.log(data);
+    createUpdateMutation.mutate(data);
   };
 
   const handleDelete = async (id: number) => {
-    try {
-      deleteMutation.mutate(id);
-      toast.success("Pergunta excluída com sucesso!", {position: "bottom-right"});
-    } catch (error) {
-      console.error("Falha ao excluir Pergunta", error);
-      toast.error("Falha ao excluir Pergunta", {position: "bottom-right"});
-    }
+    deleteMutation.mutate(id);
   };
 
   const handleUpdate = async (id: number) => {
@@ -126,7 +123,7 @@ export const QuestionForm = () => {
       (Question) => Question.id === id,
     );
     if (!QuestionToUpdate) {
-      toast.error("Pergunta não encontrada", {position: "bottom-right"});
+      toast.error("Pergunta não encontrada", { position: "bottom-right" });
       return;
     }
 
@@ -147,12 +144,12 @@ export const QuestionForm = () => {
   const addTagToQuestion = (tagId: number) => {
     const currentTags = watch("tags") || [];
     if (currentTags.find((t: ITag) => t.id === tagId)) {
-      toast.error("TAG já adicionada à pergunta", {position: "bottom-right"});
+      toast.error("TAG já adicionada à pergunta", { position: "bottom-right" });
       return;
     }
     const tagToAdd = tagsList?.find((tag) => tag.id === tagId);
     if (!tagToAdd) {
-      toast.error("TAG não encontrada", {position: "bottom-right"});
+      toast.error("TAG não encontrada", { position: "bottom-right" });
       return;
     }
     setValue("tags", [...currentTags, tagToAdd]);
@@ -222,7 +219,7 @@ export const QuestionForm = () => {
               name: category.name,
             })) || []
           }
-          onchange={() => setValue("categoryId", Number(watch("categoryId")))}
+          observechange={(value) => setValue("categoryId", value)}
           value={watch("categoryId")}
         />
 
@@ -233,7 +230,7 @@ export const QuestionForm = () => {
             items={
               tagsList?.map((tag) => ({ id: tag.id, name: tag.name })) || []
             }
-            onchange={setSelectedTagId}
+            observechange={setSelectedTagId}
           />
           <IconArrowBigDownLines
             size={32}
@@ -275,14 +272,22 @@ export const QuestionForm = () => {
             selectedOption={watch("correctOptionId")}
             highlightingOption
           />
-
         </div>
 
-        <Button
-          classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg ml-auto"
-          type="submit"
-          label="Salvar"
-        />
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
+            label="Limpar"
+            type="button"
+            onClick={() => reset()}
+          />
+
+          <Button
+            classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
+            type="submit"
+            label="Salvar"
+          />
+        </div>
       </form>
 
       <div className="border-2 border-dark-green my-3"></div>

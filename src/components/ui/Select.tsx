@@ -7,20 +7,20 @@ type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
   placeholder: string;
   items: { id: number; name: string }[];
   errors?: FieldError;
-  onchange?: (id: number) => void;
+  observechange?: (id: number) => void;
 };
 
-export const Select = (props: SelectProps) => {
+export const Select = ({label, placeholder, items, errors, observechange, ...props}: SelectProps) => {
   const [focus, setFocus] = useState(false);
   const { onFocus: propsOnFocus, onBlur: propsOnBlur } = props;
 
   return (
     <div className="flex flex-col items-start gap-1 p-2 rounded-md w-full">
       <div className="flex items-center justify-between w-full">
-        <label htmlFor={props.id}>{props.label}</label>
-        {props.errors && (
+        <label htmlFor={props.id}>{label}</label>
+        {errors && (
           <label className="text-Red-500 font-bold text-sm">
-            {props.errors.message}
+            {errors.message}
           </label>
         )}
       </div>
@@ -28,7 +28,7 @@ export const Select = (props: SelectProps) => {
         className={cn(
           "flex items-start border border-Grey-500 p-2 rounded-md w-full focus:border-Blue-300 ",
           focus ? "border-Blue-950 border-2" : "",
-          props.errors
+          errors
             ? "border-Red-500 border-2"
             : "hover:border-Blue-950 hover:border-2",
         )}
@@ -44,16 +44,10 @@ export const Select = (props: SelectProps) => {
             propsOnBlur?.(event);
             setFocus(false);
           }}
-          onChange={
-            props.onchange
-              ? (e) =>
-                  props.onchange &&
-                  props.onchange(Number(e.currentTarget.value))
-              : undefined
-          }
+          onChange={(e) => observechange?.(Number(e.currentTarget.value))}
         >
-          <option value="0">{props.placeholder}</option>
-          {props.items.map((item) => (
+          <option value="0">{placeholder}</option>
+          {items.map((item) => (
             <option key={item.id} value={item.id}>
               {item.name}
             </option>

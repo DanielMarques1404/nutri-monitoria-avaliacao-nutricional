@@ -1,14 +1,10 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  type ReactNode,
-} from "react";
+import { useQuery } from "@tanstack/react-query";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import type { IQuestion } from "../../domain/entities/entities";
 import { Questionnaire } from "../../domain/Questionnaire";
 import { QuestionUseCases } from "../../domain/useCases/QuestionUseCases";
 import { QuestionSupabaseRepository } from "../../infra/supabase/QuestionSupabaseRepository";
-import { useQuery } from "@tanstack/react-query";
+import { QuestionTagsSupabaseRepository } from "../../infra/supabase/QuestionTagsSupabaseRepository";
 
 type QuestionnaireContextType = {
   currentQuestion: IQuestion | null;
@@ -24,20 +20,24 @@ export const QuestionnaireContext = createContext<
   QuestionnaireContextType | undefined
 >(undefined);
 
-const ucQuestions = new QuestionUseCases(new QuestionSupabaseRepository());
+const ucQuestions = new QuestionUseCases(
+  new QuestionSupabaseRepository(),
+  new QuestionTagsSupabaseRepository(),
+);
 
 export const QuestionnaireProvider = ({
   children,
 }: {
   children: ReactNode;
 }) => {
-
   const { data: questionnaire } = useQuery({
-    queryKey: ['nutri-monitoria-quiz'],
+    queryKey: ["nutri-monitoria-quiz"],
     queryFn: async () => {
-      return await ucQuestions.listAll().then((questions) => questions && new Questionnaire(questions));
+      return await ucQuestions
+        .listAll()
+        .then((questions) => questions && new Questionnaire(questions));
     },
-  })
+  });
 
   const [currentQuestion, setCurrentQuestion] = useState<IQuestion | null>(
     questionnaire?.getCurrentQuestion() || null,
