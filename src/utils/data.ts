@@ -15,6 +15,10 @@ export const Professor: Person = {
 
 export const CURRENT_QUESTIONNAIRE = 1;
 
+export const REPOSITORY_SUPABASE = 1;
+
+export const CURRENT_TECH_REPOSITORY = REPOSITORY_SUPABASE;
+
 // export const data: Question[] = [
 //   {
 //     id: "caso-1",
