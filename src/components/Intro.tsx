@@ -1,8 +1,7 @@
-import { useQuestionnaireContext } from "../app/hooks/useQuestionnaireContext";
 import { Button } from "./ui/Button";
 
-export const Intro = () => {
-  const { next } = useQuestionnaireContext()
+export const Intro = ({ start }: { start: () => void}) => {
+
   return (
     <section className="text-gray-600 body-font">
       <div className="container mx-auto flex px-5 py-8 md:flex-row flex-col items-center">
@@ -28,7 +27,7 @@ export const Intro = () => {
             <Button
               classname="inline-flex text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
               label="Iniciar"
-              onClick={next}
+              onClick={start}
             />
           </div>
         </div>

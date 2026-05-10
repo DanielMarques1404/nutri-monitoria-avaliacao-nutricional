@@ -14,9 +14,7 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
     const { data, error } = await supabase
       .from("QuestionnaireQuestions")
       .select("*, Questionnaires(*), Questions(*)")
-      .eq("questionnaireId",id)
-    //   .select("*, Questions(*), Questionnaires(*)")
-    //   .eq("Questionnaires.id", id);
+      .eq("questionnaireId", id);
 
     if (error) {
       console.error(error);
@@ -24,19 +22,22 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
     }
 
     if (!data) return null;
-    
+
     return {
-        id: data[0].Questionnaires.id,
-        name: data[0].Questionnaires.name,
-        description: data[0].Questionnaires.description || "",
-        questions: await questionsRepository.listByIds(data.flatMap(item => item.Questions.id)) || [],
+      id: data[0].Questionnaires.id,
+      name: data[0].Questionnaires.name,
+      description: data[0].Questionnaires.description || "",
+      questions:
+        (await questionsRepository.listByIds(
+          data.flatMap((item) => item.Questions.id),
+        )) || [],
     };
   }
 
   createOrUpdate(obj: IQuestionnaire): Promise<void> {
-    throw new Error("Method not implemented.");
+    throw new Error(`"Method not implemented." ${obj}`);
   }
   delete(id: number): Promise<void> {
-    throw new Error("Method not implemented.");
+    throw new Error(`"Method not implemented." ${id}`);
   }
 }

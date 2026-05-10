@@ -34,3 +34,16 @@ export interface IQuestionnaire extends IGeneric {
   description: string;
   questions: IQuestion[];
 }
+
+export interface IQuestionAttempt {
+  selectedOptionId?: number;
+  isAnswerRevealed: boolean;
+}
+
+export interface IQuizAttempt {
+  quizId: number;
+  quizVersion: number;
+  answersByQuestionId: Record<string, IQuestionAttempt>;
+  startedAt?: string;
+  completedAt?: string;
+}
