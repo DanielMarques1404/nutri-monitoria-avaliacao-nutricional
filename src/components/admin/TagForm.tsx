@@ -3,12 +3,13 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import type { ITag } from "../../domain/entities/entities";
 import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
-import { SupabaseRepository } from "../../infra/supabase/SupabaseRepository";
 import { Table } from "../layout/Table";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
+import { RepositoryFactory } from "../../infra/factory/RepositoryFactory";
+import { CURRENT_TECH_REPOSITORY } from "../../utils/data";
 
-const ucTag = new GenericUseCases<ITag>(new SupabaseRepository("Tags"));
+const ucTag = new GenericUseCases<ITag>(RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createTagRepo());
 
 export const TagForm = () => {
   const { register, handleSubmit, reset, watch, setValue } = useForm<ITag>({

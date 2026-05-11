@@ -1,3 +1,5 @@
+import { Button } from "./ui/Button";
+
 type NavButtonsProps = {
   BOF: boolean;
   EOF: boolean;
@@ -6,30 +8,36 @@ type NavButtonsProps = {
   onRevealAnswer: () => void;
 };
 
-export function NavButtons({
+export const NavButtons = ({
   BOF,
   EOF,
   onPrevious,
   onNext,
   onRevealAnswer,
-}: NavButtonsProps) {
+}: NavButtonsProps) => {
   return (
-    <nav style={{ display: "flex", gap: 8, marginTop: 24 }}>
+    <nav className="flex items-center justify-center gap-2 w-full my-2">
       {!BOF && (
-        <button type="button" onClick={onPrevious}>
-          Anterior
-        </button>
+        <Button
+          label="Anterior"
+          onClick={onPrevious}
+          classname="bg-light-green rounded-md px-3 py-2 text-white m-1"
+        />
       )}
 
-      <button type="button" onClick={onRevealAnswer}>
-        Ver resposta
-      </button>
+      <Button
+        label="Ver Resposta"
+        onClick={onRevealAnswer}
+        classname="bg-light-green rounded-md px-3 py-2 text-white m-1"
+      />
 
       {!EOF && (
-        <button type="button" onClick={onNext}>
-          Próxima
-        </button>
+        <Button
+          label="Próxima"
+          onClick={onNext}
+          classname="bg-light-green rounded-md px-3 py-2 text-white m-1"
+        />
       )}
     </nav>
   );
-}
+};

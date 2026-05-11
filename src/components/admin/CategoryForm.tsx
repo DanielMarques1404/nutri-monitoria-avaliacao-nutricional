@@ -3,13 +3,14 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import type { ICategory } from "../../domain/entities/entities";
 import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
-import { SupabaseRepository } from "../../infra/supabase/SupabaseRepository";
 import { Table } from "../layout/Table";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
+import { RepositoryFactory } from "../../infra/factory/RepositoryFactory";
+import { CURRENT_TECH_REPOSITORY } from "../../utils/data";
 
 const ucCategory = new GenericUseCases<ICategory>(
-  new SupabaseRepository("Categories"),
+  RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createCategoryRepo()
 );
 
 export const CategoryForm = () => {

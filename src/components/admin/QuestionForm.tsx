@@ -11,23 +11,21 @@ import {
 } from "../../domain/entities/entities";
 import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
 import { QuestionUseCases } from "../../domain/useCases/QuestionUseCases";
-import { QuestionSupabaseRepository } from "../../infra/supabase/QuestionSupabaseRepository";
-import { QuestionTagsSupabaseRepository } from "../../infra/supabase/QuestionTagsSupabaseRepository";
-import { SupabaseRepository } from "../../infra/supabase/SupabaseRepository";
 import { Table } from "../layout/Table";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
+import { RepositoryFactory } from "../../infra/factory/RepositoryFactory";
+import { CURRENT_TECH_REPOSITORY } from "../../utils/data";
 
 const ucQuestions = new QuestionUseCases(
-  new QuestionSupabaseRepository(),
-  new QuestionTagsSupabaseRepository(),
+  RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuetionsRepo(),
+  RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuestionTagsRepo(),
 );
 
-const ucTags = new GenericUseCases<ITag>(new SupabaseRepository("Tags"));
-const ucCategories = new GenericUseCases<ICategory>(
-  new SupabaseRepository("Categories"),
-);
+const ucTags = new GenericUseCases<ITag>(RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createTagRepo());
+const ucCategories = new GenericUseCases<ICategory>(RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createCategoryRepo());
+
 
 export const QuestionForm = () => {
   const { register, handleSubmit, reset, watch, setValue } = useForm<IQuestion>(
