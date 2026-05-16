@@ -30,50 +30,6 @@ export const Login = () => {
     };
 
     return (
-        // <>
-        //     <Figure>
-        //         <Image src="/imgs/login.png" />
-        //     </Figure>
-        //     <div>
-        //         <Heading>
-        //             Login
-        //         </Heading>
-        //         <p>Preencha os dados do login.</p>
-        //         <Form onSubmit={loginUser}>
-        //             <Fieldset>
-        //                 <FormLabel>
-        //                     Email
-        //                 </FormLabel>
-        //                 <TextField
-        //                     name="email"
-        //                     type="email"
-        //                     placeholder="Digite seu email"
-        //                     value={credentials.email}
-        //                     onChange={handleChange}
-        //                     required
-        //                 />
-        //             </Fieldset>
-        //             <Fieldset>
-        //                 <FormLabel>
-        //                     Senha
-        //                 </FormLabel>
-        //                 <TextField
-        //                     name="password"
-        //                     type="password"
-        //                     placeholder="Digite sua senha"
-        //                     value={credentials.password}
-        //                     onChange={handleChange}
-        //                     required
-        //                 />
-        //             </Fieldset>
-        //             <FormActions>
-        //                 <Button type="submit">
-        //                     Efetuar login
-        //                 </Button>
-        //             </FormActions>
-        //         </Form>
-        //     </div>
-        // </>
         <div className="flex items-center justify-center min-h-screen">
             <form className="flex flex-col gap-2 border border-blue-500 p-4 rounded-md" onSubmit={loginUser}>
                 <h2 className="text-xl font-bold">Login</h2>

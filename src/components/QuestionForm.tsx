@@ -12,6 +12,7 @@ export function QuestionForm({
   attemptForQuestion,
   onSelectOption,
 }: QuestionFormProps) {
+  const letter = ["A", "B", "C", "D", "E"]
   if (!question) return <div>Sem questão para exibir</div>;
 
   return (
@@ -32,11 +33,12 @@ export function QuestionForm({
           <ul
             style={{ display: "flex", gap: 16, flexWrap: "wrap", padding: 0 }}
           >
-            {question.options?.map((option) => (
+            {question.options?.map((option, idx) => (
               <li key={option.id} style={{ listStyle: "none" }}>
                 <Answer
                   questionId={question.id}
                   option={option}
+                  letter={letter[idx]}
                   selectedOptionId={attemptForQuestion?.selectedOptionId}
                   isAnswerRevealed={
                     attemptForQuestion?.isAnswerRevealed ?? false

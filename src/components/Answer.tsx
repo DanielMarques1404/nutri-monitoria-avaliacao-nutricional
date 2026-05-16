@@ -4,6 +4,7 @@ import { cn } from "../utils/cn";
 type AnswerProps = {
   questionId: number;
   option: IOption;
+  letter: string;
   selectedOptionId?: number;
   isAnswerRevealed: boolean;
   correctOptionId: number;
@@ -13,6 +14,7 @@ type AnswerProps = {
 export function Answer({
   questionId,
   option,
+  letter,
   selectedOptionId,
   isAnswerRevealed,
   correctOptionId,
@@ -32,7 +34,7 @@ export function Answer({
       )}
     >
       <h1 className="text-sm text-center tracking-widest title-font mb-1 font-medium bg-light-green rounded-t-lg">
-        {option.id}
+        {letter}
       </h1>
       <span className="font-ubuntu text-dark-green text-sm mx-3 my-1 ">
         {option.description}
