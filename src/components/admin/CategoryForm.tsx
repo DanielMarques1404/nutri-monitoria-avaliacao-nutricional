@@ -3,14 +3,14 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import type { ICategory } from "../../domain/entities/entities";
 import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
+import { RepositoryFactory } from "../../infra/factory/RepositoryFactory";
+import { CURRENT_TECH_REPOSITORY } from "../../utils/data";
 import { Table } from "../layout/Table";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
-import { RepositoryFactory } from "../../infra/factory/RepositoryFactory";
-import { CURRENT_TECH_REPOSITORY } from "../../utils/data";
 
 const ucCategory = new GenericUseCases<ICategory>(
-  RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createCategoryRepo()
+  RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createCategoryRepo(),
 );
 
 export const CategoryForm = () => {
@@ -100,6 +100,7 @@ export const CategoryForm = () => {
         <Input
           label={"Categoria"}
           type="text"
+          id="firstInput"
           placeholder="Nome da Categoria"
           value={watch("name")}
           {...register("name")}
@@ -110,11 +111,24 @@ export const CategoryForm = () => {
           checked={watch("active")}
           {...register("active")}
         />
-        <Button
-          classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg ml-auto"
-          type="submit"
-          label="Salvar"
-        />
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
+            onClick={() => {
+              reset();
+              (
+                document.getElementById("firstInput") as HTMLInputElement | null
+              )?.focus();
+            }}
+            type="button"
+            label="Novo"
+          />
+          <Button
+            classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
+            type="submit"
+            label="Salvar"
+          />
+        </div>
       </form>
 
       <div className="border-2 border-dark-green my-2"></div>
