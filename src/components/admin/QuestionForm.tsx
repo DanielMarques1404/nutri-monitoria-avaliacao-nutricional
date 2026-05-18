@@ -11,23 +11,30 @@ import {
 } from "../../domain/entities/entities";
 import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
 import { QuestionUseCases } from "../../domain/useCases/QuestionUseCases";
+import { RepositoryFactory } from "../../infra/factory/RepositoryFactory";
+import { CURRENT_QUESTIONNAIRE, CURRENT_TECH_REPOSITORY } from "../../utils/data";
 import { Table } from "../layout/Table";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
-import { RepositoryFactory } from "../../infra/factory/RepositoryFactory";
-import { CURRENT_TECH_REPOSITORY } from "../../utils/data";
 
 const ucQuestions = new QuestionUseCases(
   RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuetionsRepo(),
   RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuestionTagsRepo(),
+  RepositoryFactory.getRepo(
+    CURRENT_TECH_REPOSITORY,
+  ).createQuestionOptionsRepo(),
 );
 
-const ucTags = new GenericUseCases<ITag>(RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createTagRepo());
-const ucCategories = new GenericUseCases<ICategory>(RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createCategoryRepo());
-
+const ucTags = new GenericUseCases<ITag>(
+  RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createTagRepo(),
+);
+const ucCategories = new GenericUseCases<ICategory>(
+  RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createCategoryRepo(),
+);
 
 export const QuestionForm = () => {
+  const [tempOptionId, setTempOptionId] = useState<number>(-1);
   const { register, handleSubmit, reset, watch, setValue } = useForm<IQuestion>(
     {
       defaultValues: {
@@ -65,7 +72,7 @@ export const QuestionForm = () => {
   const { data: questionsList } = useQuery({
     queryKey: ["nutri-monitoria-questions"],
     queryFn: async () => {
-      return await ucQuestions.listAll();
+      return await ucQuestions.listByQuestionnaireId(CURRENT_QUESTIONNAIRE);
     },
   });
 
@@ -75,7 +82,7 @@ export const QuestionForm = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["nutri-monitoria-questions", "nutri-monitoria-quiz"],
+        queryKey: ["nutri-monitoria-questions"],
       });
       toast.success(
         `Pergunta "${variables.title}" ${variables.id ? "atualizada" : "criada"} com sucesso!`,
@@ -153,6 +160,26 @@ export const QuestionForm = () => {
     setValue("tags", [...currentTags, tagToAdd]);
   };
 
+  const addOptionToQuestion = (elementId: string) => {
+    const currentOptions = watch("options") || [];
+    const minTempOptionId = Math.min(
+      tempOptionId,
+      ...currentOptions.map((co) => co.id),
+    );
+    const optionDescription = (
+      document.getElementById(elementId) as HTMLInputElement
+    ).value;
+    setValue("options", [
+      ...currentOptions,
+      {
+        id: minTempOptionId,
+        questionId: watch("id"),
+        description: optionDescription,
+      },
+    ]);
+    setTempOptionId((prev) => prev - 1);
+  };
+
   const handleSelectRightOption = (optionId: number) => {
     setValue("correctOptionId", optionId);
   };
@@ -220,6 +247,7 @@ export const QuestionForm = () => {
           }
           observechange={(value) => setValue("categoryId", value)}
           value={watch("categoryId")}
+          {...register("categoryId")}
         />
 
         <div className="flex gap-2 items-center cursor-pointer">
@@ -250,9 +278,17 @@ export const QuestionForm = () => {
           }
         />
 
+        <div className="flex gap-2 items-center cursor-pointer">
+          <Input label={"Item de resposta"} id="optionInput" />
+          <IconArrowBigDownLines
+            size={32}
+            className="mt-6"
+            onClick={() => addOptionToQuestion("optionInput")}
+          />
+        </div>
+
         <div className="flex flex-col gap-2 my-2">
           <Table
-            caption={"Opções de Resposta"}
             items={
               watch("options")?.map((option: IOption) => ({
                 id: option.id,

@@ -3,6 +3,28 @@ import type { IQuestionRepository } from "../../domain/repositories/IQuestionRep
 import { supabase } from "./config";
 
 export class QuestionSupabaseRepository implements IQuestionRepository {
+  async listByQuestionnaireId(
+    questionnaireId: number,
+  ): Promise<IQuestion[] | null> {
+    const { data, error } = await supabase
+      .from("QuestionnaireQuestions")
+      .select("*, Questions(*, QuestionTags(Tags(*)), QuestionOptions(*))")
+      .eq("questionnaireId", questionnaireId)
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    if (!data) return null;
+    const questions: IQuestion[] = data.map(q => q.Questions).map((question) =>
+      this.transformToQuestion(question),
+    );
+
+    return questions.sort((a: any, b: any) =>
+      a.title.localeCompare(b.title),
+    ) as IQuestion[];
+  }
 
   private transformToQuestion(question: any): IQuestion {
     return {
@@ -26,11 +48,11 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
           name: qt.Tags.name,
         })) || [],
       summaryImage: question.summaryImage || "",
-    }
+    };
   }
 
   async listByIds(ids: number[]): Promise<IQuestion[] | null> {
-        const { data, error } = await supabase
+    const { data, error } = await supabase
       .from("Questions")
       .select("*, QuestionTags(Tags(*)), QuestionOptions(*)")
       .in("id", ids);
@@ -44,31 +66,12 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
     return data.map((question) => this.transformToQuestion(question));
   }
 
-  async list(): Promise<IQuestion[] | null> {
-    const { data, error } = await supabase
-      .from("Questions")
-      .select("*, QuestionTags(Tags(*)), QuestionOptions(*)");
-
-    if (error) {
-      console.error(error);
-      return null;
-    }
-
-    if (!data) return null;
-
-    const questions: IQuestion[] = data.map((question) => this.transformToQuestion(question));
-
-    return questions.sort((a: any, b: any) =>
-      a.title.localeCompare(b.title),
-    ) as IQuestion[];
-  }
-
   async createOrUpdate(question: IQuestion): Promise<number> {
     if (question.id === 0) {
-      const { id, options, tags, ...questionWithoutId } = question;
+      const { id, options, tags, ...justAQuestion } = question;
       const { data, error } = await (supabase as any)
         .from("Questions")
-        .insert([questionWithoutId])
+        .insert([justAQuestion])
         .select("id");
 
       if (error) {

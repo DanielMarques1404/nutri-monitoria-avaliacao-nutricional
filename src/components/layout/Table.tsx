@@ -8,7 +8,7 @@ type ItemTable = {
 };
 
 type RegisterdItemProps = {
-  caption: string;
+  caption?: string;
   items: ItemTable[];
   selectedOption?: number;
   highlightingOption?: boolean;
@@ -36,7 +36,7 @@ export const Table = ({
 
   return (
     <table>
-      <caption className="w-full p-1 font-semibold">{caption}</caption>
+      {caption && <caption className="w-full p-1 font-semibold">{caption}</caption>}
       <tbody>
         {items?.map((item) => (
           <tr

@@ -1,10 +1,12 @@
 import type { ICategory, ITag } from "../../domain/entities/entities";
 import type { IQuestionnaireRepository } from "../../domain/repositories/IQuestionnaireRepository";
+import type { IQuestionOptionsRepository } from "../../domain/repositories/IQuestionOptionsRepository";
 import type { IQuestionRepository } from "../../domain/repositories/IQuestionRepository";
 import type { IQuestionTagsRepository } from "../../domain/repositories/IQuestionTagsRepository";
 import type { IRepository } from "../../domain/repositories/IRepository";
 import { REPOSITORY_SUPABASE } from "../../utils/data";
 import { QuestionnaireSupabaseRepository } from "../supabase/QuestionnaireSupabaseRepository";
+import { QuestionOptionsSupabaseRepository } from "../supabase/QuestionOptionsSupabaseRepository";
 import { QuestionSupabaseRepository } from "../supabase/QuestionSupabaseRepository";
 import { QuestionTagsSupabaseRepository } from "../supabase/QuestionTagsSupabaseRepository";
 import { SupabaseRepository } from "../supabase/SupabaseRepository";
@@ -16,10 +18,14 @@ interface IRepositoryFactory {
   createQuetionsRepo(): IQuestionRepository;
   createQuestionTagsRepo(): IQuestionTagsRepository;
   createQuestionnaireRepo(): IQuestionnaireRepository;
+  createQuestionOptionsRepo(): IQuestionOptionsRepository;
 }
 
 // Fábrica concreta - Supabase
 class SupabaseFactory implements IRepositoryFactory {
+  createQuestionOptionsRepo(): IQuestionOptionsRepository {
+    return new QuestionOptionsSupabaseRepository();
+  }
   createQuetionsRepo(): IQuestionRepository {
     return new QuestionSupabaseRepository();
   }
@@ -39,6 +45,9 @@ class SupabaseFactory implements IRepositoryFactory {
 
 // Próximas fábricas
 class NotImplementedFactory implements IRepositoryFactory {
+  createQuestionOptionsRepo(): IQuestionOptionsRepository {
+    throw new Error("Method not implemented.");
+  }
   createQuetionsRepo(): IQuestionRepository {
     throw new Error("Method not implemented.");
   }
@@ -49,10 +58,10 @@ class NotImplementedFactory implements IRepositoryFactory {
     throw new Error("Method not implemented.");
   }
   createQuestionTagsRepo(): IQuestionTagsRepository {
-    throw new Error('Not implemented yet')
+    throw new Error("Not implemented yet");
   }
   createQuestionnaireRepo(): IQuestionnaireRepository {
-    throw new Error('Not implemented yet')
+    throw new Error("Not implemented yet");
   }
 }
 
