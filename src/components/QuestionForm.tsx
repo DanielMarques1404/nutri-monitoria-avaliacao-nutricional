@@ -12,7 +12,7 @@ export function QuestionForm({
   attemptForQuestion,
   onSelectOption,
 }: QuestionFormProps) {
-  const letter = ["A", "B", "C", "D", "E"]
+  const letter = ["A", "B", "C", "D", "E"];
   if (!question) return <div>Sem questão para exibir</div>;
 
   return (
@@ -43,7 +43,7 @@ export function QuestionForm({
                   isAnswerRevealed={
                     attemptForQuestion?.isAnswerRevealed ?? false
                   }
-                  correctOptionId={question.correctOptionId}
+                  correctOption={question.correctOption}
                   onSelect={onSelectOption}
                 />
               </li>

@@ -3,17 +3,21 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import {
-  type ICategory,
-  type IOption,
-  type IQuestion,
-  type ITag,
+import type {
+  ICategory,
+  IOption,
+  IQuestion,
+  ITag,
 } from "../../domain/entities/entities";
 import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
 import { QuestionUseCases } from "../../domain/useCases/QuestionUseCases";
 import { RepositoryFactory } from "../../infra/factory/RepositoryFactory";
-import { CURRENT_QUESTIONNAIRE, CURRENT_TECH_REPOSITORY } from "../../utils/data";
+import {
+  CURRENT_QUESTIONNAIRE,
+  CURRENT_TECH_REPOSITORY,
+} from "../../utils/data";
 import { Table } from "../layout/Table";
+import { OptionItem } from "../OptionItem";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Select } from "../ui/Select";
@@ -29,36 +33,41 @@ const ucQuestions = new QuestionUseCases(
 const ucTags = new GenericUseCases<ITag>(
   RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createTagRepo(),
 );
+
 const ucCategories = new GenericUseCases<ICategory>(
   RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createCategoryRepo(),
 );
 
 export const QuestionForm = () => {
-  const [tempOptionId, setTempOptionId] = useState<number>(-1);
-  const { register, handleSubmit, reset, watch, setValue } = useForm<IQuestion>(
-    {
-      defaultValues: {
-        id: 0,
-        title: "",
-        statement: "",
-        question: "",
-        options: [],
-        correctOptionId: 0,
-        explanation: "",
-        categoryId: 0,
-        difficulty: "",
-        tags: [],
-        summaryImage: "",
-      },
+  const [selectedTagId, setSelectedTagId] = useState(0);
+  const [selectedOptionId, setSelectedOptionId] = useState(-1);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<IQuestion>({
+    defaultValues: {
+      id: 0,
+      title: "",
+      statement: "",
+      question: "",
+      options: [],
+      correctOption: "",
+      explanation: "",
+      categoryId: 0,
+      difficulty: "",
+      tags: [],
+      summaryImage: "",
     },
-  );
+  });
 
-  const queryClient = useQueryClient();
-
-  const { data: tagsList } = useQuery({
-    queryKey: ["nutri-monitoria-tags"],
+  const { data: questionsList } = useQuery({
+    queryKey: ["nutri-monitoria-questions"],
     queryFn: async () => {
-      return await ucTags.listAll();
+      return await ucQuestions.listByQuestionnaireId(CURRENT_QUESTIONNAIRE);
     },
   });
 
@@ -69,12 +78,14 @@ export const QuestionForm = () => {
     },
   });
 
-  const { data: questionsList } = useQuery({
-    queryKey: ["nutri-monitoria-questions"],
+  const { data: tagsList } = useQuery({
+    queryKey: ["nutri-monitoria-tags"],
     queryFn: async () => {
-      return await ucQuestions.listByQuestionnaireId(CURRENT_QUESTIONNAIRE);
+      return await ucTags.listAll();
     },
   });
+
+    const queryClient = useQueryClient();
 
   const createUpdateMutation = useMutation({
     mutationFn: (question: IQuestion) => {
@@ -95,42 +106,20 @@ export const QuestionForm = () => {
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => {
-      return ucQuestions.delete(id);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["nutri-monitoria-questions"],
-      });
-      toast.success("Pergunta excluída com sucesso!", {
-        position: "bottom-right",
-      });
-    },
-    onError: () => {
-      console.error("Falha ao excluir Pergunta");
-      toast.error("Falha ao excluir Pergunta", { position: "bottom-right" });
-    },
-  });
-
-  const [selectedTagId, setSelectedTagId] = useState(0);
-
-  const submit = async (data: IQuestion) => {
+  const submit = (data: IQuestion) => {
+    if (watch("correctOption") === "") {
+      alert("É necessário indicar uma resposta válida");
+      return;
+    }
     createUpdateMutation.mutate(data);
-  };
-
-  const handleDelete = async (id: number) => {
-    deleteMutation.mutate(id);
   };
 
   const handleUpdate = async (id: number) => {
     const QuestionToUpdate = questionsList?.find(
       (Question) => Question.id === id,
     );
-    if (!QuestionToUpdate) {
-      toast.error("Pergunta não encontrada", { position: "bottom-right" });
-      return;
-    }
+
+    if (!QuestionToUpdate) return;
 
     setValue("id", QuestionToUpdate.id);
     setValue("title", QuestionToUpdate.title);
@@ -142,8 +131,64 @@ export const QuestionForm = () => {
     setValue("difficulty", QuestionToUpdate.difficulty);
     setValue("summaryImage", QuestionToUpdate.summaryImage || "");
     setValue("options", QuestionToUpdate.options || []);
+    setValue("correctOption", QuestionToUpdate.correctOption);
 
-    handleSelectRightOption(QuestionToUpdate.correctOptionId);
+    setSelectedOptionId(
+      QuestionToUpdate.options?.find(
+        (op) => op.option === QuestionToUpdate.correctOption,
+      )?.id || -1,
+    );
+  };
+
+  const handleOptions = (
+    optionId: number,
+    action: "ADD" | "DELETE" | "MOVEUP" | "MOVEDOWN",
+  ) => {
+    let optionList = watch("options") || [];
+    let newList: IOption[] | undefined = [];
+    const optionsAvailable = ["A", "B", "C", "D"];
+
+    switch (action) {
+      case "DELETE":
+        newList = optionList?.filter((op) => op.id !== optionId);
+        if (selectedOptionId === optionId) {
+          setSelectedOptionId(-1);
+          setValue("correctOption", "");
+        }
+        break;
+
+      case "MOVEUP":
+        const i = optionList?.findIndex((op) => op.id === optionId);
+        if (i === 0) return;
+        [optionList[i], optionList[i - 1]] = [optionList[i - 1], optionList[i]];
+        newList = [...optionList];
+        break;
+
+      case "MOVEDOWN":
+        const d = optionList?.findIndex((op) => op.id === optionId);
+        if (d === optionList.length - 1) return;
+        [optionList[d], optionList[d + 1]] = [optionList[d + 1], optionList[d]];
+        newList = [...optionList];
+        break;
+
+      default:
+        break;
+    }
+
+    newList = newList.map((op, idx) => ({
+      ...op,
+      option: optionsAvailable[idx],
+    }));
+    setValue("options", newList);
+
+    const newCorrectOption = newList.find((op) => op.id === selectedOptionId);
+    if (!newCorrectOption) {
+      setSelectedOptionId(-1);
+      setValue("correctOption", "");
+    } else {
+      setSelectedOptionId(newCorrectOption.id);
+      setValue("correctOption", newCorrectOption.option);
+    }
   };
 
   const addTagToQuestion = (tagId: number) => {
@@ -157,83 +202,76 @@ export const QuestionForm = () => {
       toast.error("TAG não encontrada", { position: "bottom-right" });
       return;
     }
-    setValue("tags", [...currentTags, tagToAdd]);
-  };
-
-  const addOptionToQuestion = (elementId: string) => {
-    const currentOptions = watch("options") || [];
-    const minTempOptionId = Math.min(
-      tempOptionId,
-      ...currentOptions.map((co) => co.id),
-    );
-    const optionDescription = (
-      document.getElementById(elementId) as HTMLInputElement
-    ).value;
-    setValue("options", [
-      ...currentOptions,
-      {
-        id: minTempOptionId,
-        questionId: watch("id"),
-        description: optionDescription,
-      },
+    setValue("tags", [
+      ...currentTags,
+      { id: tagToAdd.id, name: tagToAdd.name },
     ]);
-    setTempOptionId((prev) => prev - 1);
   };
 
-  const handleSelectRightOption = (optionId: number) => {
-    setValue("correctOptionId", optionId);
+  const handleSelectRightOption = (option: IOption) => {
+    setValue("correctOption", option.option);
+    setSelectedOptionId(option.id);
   };
 
   return (
-    <section className="flex flex-col gap-2 w-1/2 border-2 border-mediumGrey p-4 rounded-md">
-      <form className="flex flex-col gap-2" onSubmit={handleSubmit(submit)}>
+    <section className="flex flex-col lg:grid lg:grid-cols-4 p-2 w-full gap-2">
+      <div className="border-2 border-mediumGrey p-2 rounded-md h-1/2">
+        <Table
+          caption={"Perguntas"}
+          items={
+            questionsList?.map((question) => ({
+              id: question.id,
+              name: question.title,
+            })) || []
+          }
+          updateAction={handleUpdate}
+        />
+      </div>
+
+      <form
+        className="flex flex-col lg:col-span-2 border-2 border-mediumGrey p-2 rounded-md"
+        onSubmit={handleSubmit(submit)}
+      >
         <Input
-          label={"Caso"}
-          type="text"
-          id="firstInput"
-          placeholder="Nome do Caso"
-          value={watch("title")}
-          {...register("title")}
+          label="Título"
+          placeholder="Título"
+          {...register("title", { required: "Este campo é obrigatório" })}
+          errors={errors.title}
         />
 
         <Input
-          label={"Contexto"}
-          type="text"
+          label="Contexto"
           placeholder="Contexto da Pergunta"
-          value={watch("statement")}
-          {...register("statement")}
+          {...register("statement", { required: "Este campo é obrigatório" })}
+          errors={errors.statement}
         />
 
         <Input
-          label={"Pergunta"}
-          type="text"
+          label="Pergunta"
           placeholder="Pergunta"
-          value={watch("question")}
-          {...register("question")}
+          {...register("question", { required: "Este campo é obrigatório" })}
+          errors={errors.question}
         />
 
         <Input
           label={"Explicação"}
-          type="text"
           placeholder="Explicação"
-          value={watch("explanation")}
           {...register("explanation")}
+          errors={errors.explanation}
         />
 
         <Input
           label={"Dificuldade"}
-          type="text"
           placeholder="Dificuldade"
-          value={watch("difficulty")}
           {...register("difficulty")}
+          errors={errors.difficulty}
         />
 
         <Input
           label={"Imagem associada - não finalizado"}
-          type="text"
           placeholder="Imagem associada"
-          value={watch("summaryImage")}
           {...register("summaryImage")}
+          errors={errors.summaryImage}
         />
 
         <Select
@@ -246,7 +284,6 @@ export const QuestionForm = () => {
             })) || []
           }
           observechange={(value) => setValue("categoryId", value)}
-          value={watch("categoryId")}
           {...register("categoryId")}
         />
 
@@ -267,82 +304,38 @@ export const QuestionForm = () => {
           <IconPlusFilled strokeWidth={225} size={32} className="mt-6" />
         </div>
 
-        <Table
-          caption={""}
-          items={watch("tags") || []}
-          deleteAction={(tagId) =>
-            setValue(
-              "tags",
-              watch("tags")?.filter((tag: ITag) => tag.id !== tagId) || [],
-            )
-          }
-        />
-
-        <div className="flex gap-2 items-center cursor-pointer">
-          <Input label={"Item de resposta"} id="optionInput" />
-          <IconArrowBigDownLines
-            size={32}
-            className="mt-6"
-            onClick={() => addOptionToQuestion("optionInput")}
-          />
-        </div>
-
-        <div className="flex flex-col gap-2 my-2">
+        <div className="p-2">
           <Table
-            items={
-              watch("options")?.map((option: IOption) => ({
-                id: option.id,
-                name: option.description,
-              })) || []
-            }
-            onSelectOption={handleSelectRightOption}
-            deleteAction={(optionId) =>
+            caption={""}
+            items={watch("tags") || []}
+            deleteAction={(tagId) =>
               setValue(
-                "options",
-                watch("options")?.filter(
-                  (option: IOption) => option.id !== optionId,
-                ) || [],
+                "tags",
+                watch("tags")?.filter((tag: ITag) => tag.id !== tagId) || [],
               )
             }
-            selectedOption={watch("correctOptionId")}
-            highlightingOption
           />
         </div>
 
-        <div className="flex items-center justify-end gap-2">
-          <Button
-            classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
-            label="Novo"
-            type="button"
-            onClick={() => {
-              reset();
-              (
-                document.getElementById("firstInput") as HTMLInputElement | null
-              )?.focus();
-            }}
-          />
-
-          <Button
-            classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
-            type="submit"
-            label="Salvar"
-          />
-        </div>
+        <Button
+          className="bg-dark-green text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg cursor-pointer ml-auto"
+          type="submit"
+          label="Salvar"
+        />
       </form>
 
-      <div className="border-2 border-dark-green my-3"></div>
-
-      <Table
-        caption={"Perguntas"}
-        items={
-          questionsList?.map((question) => ({
-            id: question.id,
-            name: question.title,
-          })) || []
-        }
-        deleteAction={(id) => handleDelete(id)}
-        updateAction={(id) => handleUpdate(id)}
-      />
+      <div className="flex flex-col gap-2 border-2 border-mediumGrey p-2 rounded-md">
+        {watch("options")?.sort((a, b) => a.option.localeCompare(b.option))?.map((op) => (
+          <OptionItem
+            option={op}
+            onDelete={(id) => handleOptions(id, "DELETE")}
+            onMoveUp={(id) => handleOptions(id, "MOVEUP")}
+            onMoveDown={(id) => handleOptions(id, "MOVEDOWN")}
+            onSelect={handleSelectRightOption}
+            selected={op.option === watch("correctOption")}
+          />
+        ))}
+      </div>
     </section>
   );
 };

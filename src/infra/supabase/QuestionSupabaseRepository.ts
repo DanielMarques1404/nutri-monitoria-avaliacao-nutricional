@@ -9,7 +9,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
     const { data, error } = await supabase
       .from("QuestionnaireQuestions")
       .select("*, Questions(*, QuestionTags(Tags(*)), QuestionOptions(*))")
-      .eq("questionnaireId", questionnaireId)
+      .eq("questionnaireId", questionnaireId);
 
     if (error) {
       console.error(error);
@@ -17,9 +17,9 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
     }
 
     if (!data) return null;
-    const questions: IQuestion[] = data.map(q => q.Questions).map((question) =>
-      this.transformToQuestion(question),
-    );
+    const questions: IQuestion[] = data
+      .map((q) => q.Questions)
+      .map((question) => this.transformToQuestion(question));
 
     return questions.sort((a: any, b: any) =>
       a.title.localeCompare(b.title),
@@ -37,8 +37,9 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
           id: qo.id,
           questionId: qo.questionId,
           description: qo.description,
+          option: qo.option,
         })) || [],
-      correctOptionId: question.correctOptionId || 0,
+      correctOption: question.correctOption || null,
       explanation: question.explanation || "",
       categoryId: question.categoryId || 0,
       difficulty: question.difficulty || "",
@@ -63,7 +64,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
     }
 
     if (!data) return null;
-    return data.map((question) => this.transformToQuestion(question));
+    return data.map((question) => this.transformToQuestion(question)).sort((a, b) => a.title.localeCompare(b.title)) as IQuestion[];
   }
 
   async createOrUpdate(question: IQuestion): Promise<number> {

@@ -3,6 +3,17 @@ import type { IQuestionOptionsRepository } from "../../domain/repositories/IQues
 import { supabase } from "./config";
 
 export class QuestionOptionsSupabaseRepository implements IQuestionOptionsRepository {
+  async listByQuestionId(questionId: number): Promise<IOption[] | null> {
+    const { data, error } = await supabase
+      .from("QuestionOptions")
+      .select("*")
+      .eq("questionId", questionId)
+    
+    if (error) throw error;
+
+    return data;
+  }
+  
   async deleteByQuestionId(questionId: number): Promise<void> {
     await supabase.from("QuestionOptions").delete().eq("questionId", questionId);
   }

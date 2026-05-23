@@ -9,12 +9,8 @@ export class QuestionnaireUseCase {
     this.repository = repository;
   }
 
-  listById = async (id: number): Promise<IQuestionnaire | null> => {
-    return await this.repository.listById(id);
-  };
-
   getCurrentQuestionnaire = async (): Promise<IQuestionnaire | null> => {
-    return await this.listById(CURRENT_QUESTIONNAIRE);
+    return await this.repository.listById(CURRENT_QUESTIONNAIRE);
   };
 
   getQuestions = async (

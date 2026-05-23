@@ -16,11 +16,6 @@ export default function App() {
   const [quiz, setQuiz] = useState<IQuestionnaire | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(-1);
 
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // const handleOpen = () => setIsModalOpen(true);
-  // const handleClose = () => setIsModalOpen(false);
-
   const [attempt, dispatch] = useReducer(
     quizAttemptReducer,
     createEmptyAttempt(0, 0),

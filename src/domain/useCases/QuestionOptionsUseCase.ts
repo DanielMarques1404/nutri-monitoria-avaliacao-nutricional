@@ -12,6 +12,10 @@ export class QuestionOptionsUseCase {
     return this.repository.list();
   }
 
+  async listByQuestionId(questionId: number): Promise<IOption[] | null> {
+    return this.repository.listByQuestionId(questionId);
+  }
+
   async create(option: IOption, questionId: number): Promise<number> {
     return this.repository.create(option, questionId);
   }

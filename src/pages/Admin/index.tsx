@@ -54,6 +54,7 @@ export const Admin = () => {
         {entity === "tag" && <TagForm />}
         {entity === "category" && <CategoryForm />}
         {entity === "question" && <QuestionForm />}
+        {/* {entity === "question" && <QForm />} */}
       </div>
     </section>
   );
