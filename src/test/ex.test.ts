@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { QuestionTagsUseCases } from "../domain/useCases/QuestionTagsUseCase";
 import { QuestionUseCases } from "../domain/useCases/QuestionUseCases";
 import { RepositoryFactory } from "../infra/factory/RepositoryFactory";
 import { CURRENT_QUESTIONNAIRE, CURRENT_TECH_REPOSITORY } from "../utils/data";
@@ -15,7 +14,6 @@ const questionRepo = RepositoryFactory.getRepo(
   CURRENT_TECH_REPOSITORY,
 ).createQuetionsRepo();
 
-const ucQTags = new QuestionTagsUseCases(questionTagsRepo);
 const ucQuestions = new QuestionUseCases(
   questionRepo,
   questionTagsRepo,
