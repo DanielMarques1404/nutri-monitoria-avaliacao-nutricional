@@ -27,10 +27,21 @@ export const CategoryForm = () => {
     mutationFn: (category: ICategory) => {
       return ucCategory.createOrUpdate(category);
     },
-    onSuccess: () => {
+    onSuccess: (_, variable) => {
       queryClient.invalidateQueries({
         queryKey: ["nutri-monitoria-categories"],
       });
+      toast.success(
+        `Categoria "${variable.name}" ${variable.id ? "atualizada" : "criada"} com sucesso!`,
+        {
+          position: "bottom-right",
+        },
+      );
+      reset();
+    },
+    onError: (error) => {
+      //console.error("Falha ao registrar Categoria", error);
+      toast.error("Falha ao registrar Categoria", { position: "bottom-right" });
     },
   });
 
@@ -42,10 +53,18 @@ export const CategoryForm = () => {
       queryClient.invalidateQueries({
         queryKey: ["nutri-monitoria-categories"],
       });
+      toast.success("Categoria excluída com sucesso!", {
+        position: "bottom-right",
+      });
+      reset();
+    },
+    onError: (error) => {
+      // console.error("Falha ao excluir Categoria", error);
+      toast.error("Falha ao excluir Categoria", { position: "bottom-right" });
     },
   });
 
-  const { register, handleSubmit, reset, watch, setValue } = useForm<ICategory>(
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm<ICategory>(
     {
       defaultValues: {
         id: 0,
@@ -55,29 +74,11 @@ export const CategoryForm = () => {
   );
 
   const submit = (data: ICategory) => {
-    try {
-      createUpdateMutation.mutate(data);
-      toast.success(
-        `Categoria "${data.name}" ${data.id ? "atualizada" : "criada"} com sucesso!`,
-        { position: "bottom-right" },
-      );
-      reset();
-    } catch (error) {
-      console.error("Falha ao registrar Categoria", error);
-      toast.error("Falha ao registrar Categoria", { position: "bottom-right" });
-    }
+    createUpdateMutation.mutate(data);
   };
 
   const handleDelete = async (id: number) => {
-    try {
-      deleteMutation.mutate(id);
-      toast.success("Categoria excluída com sucesso!", {
-        position: "bottom-right",
-      });
-    } catch (error) {
-      console.error("Falha ao excluir Categoria", error);
-      toast.error("Falha ao excluir Categoria", { position: "bottom-right" });
-    }
+    deleteMutation.mutate(id);
   };
 
   const handleUpdate = async (id: number) => {
@@ -103,7 +104,8 @@ export const CategoryForm = () => {
           id="firstInput"
           placeholder="Nome da Categoria"
           value={watch("name")}
-          {...register("name")}
+          {...register("name", { required: "Este campo é obrigatório" })}
+          errors={errors.name}
         />
         <Input
           label={"Ativa"}

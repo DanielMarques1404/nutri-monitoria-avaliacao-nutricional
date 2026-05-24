@@ -14,7 +14,7 @@ const ucTag = new GenericUseCases<ITag>(
 );
 
 export const TagForm = () => {
-  const { register, handleSubmit, reset, watch, setValue } = useForm<ITag>({
+  const { register, handleSubmit, reset, formState: { errors }, setValue, watch } = useForm<ITag>({
     defaultValues: {
       id: 0,
       name: "",
@@ -34,10 +34,21 @@ export const TagForm = () => {
     mutationFn: (tag: ITag) => {
       return ucTag.createOrUpdate(tag);
     },
-    onSuccess: () => {
+    onSuccess: (_, variable) => {
       queryClient.invalidateQueries({
         queryKey: ["nutri-monitoria-tags"],
       });
+      toast.success(
+        `TAG "${variable.name}" ${variable.id ? "atualizada" : "criada"} com sucesso!`,
+        {
+          position: "bottom-right",
+        },
+      );
+      reset();
+    },
+    onError: (error) => {
+      //console.error("Falha ao registrar TAG", error);
+      toast.error("Falha ao registrar TAG", { position: "bottom-right" });
     },
   });
 
@@ -49,31 +60,23 @@ export const TagForm = () => {
       queryClient.invalidateQueries({
         queryKey: ["nutri-monitoria-tags"],
       });
+      toast.success("TAG excluída com sucesso!", {
+        position: "bottom-right",
+      });
+      reset();
+    },
+    onError: (error) => {
+      // console.error("Falha ao excluir TAG", error);
+      toast.error("Falha ao excluir TAG", { position: "bottom-right" });
     },
   });
 
   const submit = async (data: ITag) => {
-    try {
-      createUpdateMutation.mutate(data);
-      toast.success(
-        `TAG "${data.name}" ${data.id ? "atualizada" : "criada"} com sucesso!`,
-        { position: "bottom-right" },
-      );
-      reset();
-    } catch (error) {
-      console.error("Falha ao registrar TAG", error);
-      toast.error("Falha ao registrar TAG", { position: "bottom-right" });
-    }
+    createUpdateMutation.mutate(data);
   };
 
   const handleDelete = async (id: number) => {
-    try {
-      deleteMutation.mutate(id);
-      toast.success("TAG excluída com sucesso!", { position: "bottom-right" });
-    } catch (error) {
-      console.error("Falha ao excluir TAG", error);
-      toast.error("Falha ao excluir TAG", { position: "bottom-right" });
-    }
+    deleteMutation.mutate(id);
   };
 
   const handleUpdate = async (id: number) => {
@@ -94,9 +97,10 @@ export const TagForm = () => {
           label={"TAG"}
           type="text"
           id="firstInput"
-          placeholder="Nome da TAG"
           value={watch("name")}
-          {...register("name")}
+          placeholder="Nome da TAG"
+          {...register("name", { required: "Este campo é obrigatório" })}
+          errors={errors.name}
         />
         <div className="flex items-center justify-end gap-2">
           <Button
