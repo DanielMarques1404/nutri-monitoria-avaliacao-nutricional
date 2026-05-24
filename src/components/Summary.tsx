@@ -14,7 +14,7 @@ export const Summary = ({ question, message, handleClose }: SummaryProps) => {
       </span>
       <img
         className="md:h-52 w-full object-cover object-center"
-        src={question.summaryImage}
+        //src={question.summaryImage}
         alt={`Imagem ${question.title}`}
       />
       <div className="flex flex-col gap-1 p-4">

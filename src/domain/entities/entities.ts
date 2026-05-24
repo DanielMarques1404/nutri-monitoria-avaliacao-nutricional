@@ -14,7 +14,6 @@ export interface IOption extends IGeneric {
 
 export interface ICategory extends IGeneric {
   name: string;
-  active: boolean;
 }
 
 export interface IQuestion extends IGeneric {
@@ -27,7 +26,6 @@ export interface IQuestion extends IGeneric {
   categoryId: number;
   difficulty: string;
   tags?: ITag[];
-  summaryImage?: string;
 }
 
 export interface IQuestionnaire extends IGeneric {

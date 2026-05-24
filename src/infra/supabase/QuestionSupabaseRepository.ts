@@ -48,7 +48,6 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
           id: qt.Tags.id,
           name: qt.Tags.name,
         })) || [],
-      summaryImage: question.summaryImage || "",
     };
   }
 

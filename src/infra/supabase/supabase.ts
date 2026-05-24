@@ -41,19 +41,16 @@ export type Database = {
     Tables: {
       Categories: {
         Row: {
-          active: boolean
           created_at: string
           id: number
           name: string
         }
         Insert: {
-          active: boolean
           created_at?: string
           id?: number
           name: string
         }
         Update: {
-          active?: boolean
           created_at?: string
           id?: number
           name?: string
@@ -159,7 +156,6 @@ export type Database = {
           id: number
           question: string
           statement: string
-          summaryImage: string | null
           title: string
         }
         Insert: {
@@ -171,7 +167,6 @@ export type Database = {
           id?: number
           question: string
           statement: string
-          summaryImage?: string | null
           title: string
         }
         Update: {
@@ -183,7 +178,6 @@ export type Database = {
           id?: number
           question?: string
           statement?: string
-          summaryImage?: string | null
           title?: string
         }
         Relationships: [

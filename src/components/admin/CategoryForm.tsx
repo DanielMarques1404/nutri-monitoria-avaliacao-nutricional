@@ -39,7 +39,7 @@ export const CategoryForm = () => {
       );
       reset();
     },
-    onError: (error) => {
+    onError: () => {
       //console.error("Falha ao registrar Categoria", error);
       toast.error("Falha ao registrar Categoria", { position: "bottom-right" });
     },
@@ -58,7 +58,7 @@ export const CategoryForm = () => {
       });
       reset();
     },
-    onError: (error) => {
+    onError: () => {
       // console.error("Falha ao excluir Categoria", error);
       toast.error("Falha ao excluir Categoria", { position: "bottom-right" });
     },
@@ -92,7 +92,6 @@ export const CategoryForm = () => {
 
     setValue("id", CategoryToUpdate.id);
     setValue("name", CategoryToUpdate.name);
-    setValue("active", CategoryToUpdate.active);
   };
 
   return (
@@ -107,12 +106,7 @@ export const CategoryForm = () => {
           {...register("name", { required: "Este campo é obrigatório" })}
           errors={errors.name}
         />
-        <Input
-          label={"Ativa"}
-          type="checkbox"
-          checked={watch("active")}
-          {...register("active")}
-        />
+
         <div className="flex items-center justify-end gap-2">
           <Button
             classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"

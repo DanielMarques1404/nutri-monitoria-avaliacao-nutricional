@@ -46,7 +46,7 @@ export const TagForm = () => {
       );
       reset();
     },
-    onError: (error) => {
+    onError: () => {
       //console.error("Falha ao registrar TAG", error);
       toast.error("Falha ao registrar TAG", { position: "bottom-right" });
     },
@@ -65,7 +65,7 @@ export const TagForm = () => {
       });
       reset();
     },
-    onError: (error) => {
+    onError: () => {
       // console.error("Falha ao excluir TAG", error);
       toast.error("Falha ao excluir TAG", { position: "bottom-right" });
     },

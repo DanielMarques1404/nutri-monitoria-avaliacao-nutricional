@@ -60,7 +60,6 @@ export const QuestionForm = () => {
       categoryId: 0,
       difficulty: "",
       tags: [],
-      summaryImage: "",
     },
   });
 
@@ -129,7 +128,6 @@ export const QuestionForm = () => {
     setValue("tags", QuestionToUpdate.tags || []);
     setValue("categoryId", QuestionToUpdate.categoryId || 0);
     setValue("difficulty", QuestionToUpdate.difficulty);
-    setValue("summaryImage", QuestionToUpdate.summaryImage || "");
     setValue("options", QuestionToUpdate.options || []);
     setValue("correctOption", QuestionToUpdate.correctOption);
 
@@ -265,13 +263,6 @@ export const QuestionForm = () => {
           placeholder="Dificuldade"
           {...register("difficulty")}
           errors={errors.difficulty}
-        />
-
-        <Input
-          label={"Imagem associada - não finalizado"}
-          placeholder="Imagem associada"
-          {...register("summaryImage")}
-          errors={errors.summaryImage}
         />
 
         <Select
