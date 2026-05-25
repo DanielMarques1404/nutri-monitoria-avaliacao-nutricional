@@ -26,7 +26,7 @@ export const NavButtons = ({
       )}
 
       <Button
-        label="Ver Resposta"
+        label="Confirmar Resposta"
         onClick={onRevealAnswer}
         classname="bg-light-green rounded-md px-3 py-2 text-white m-1"
       />
@@ -35,6 +35,14 @@ export const NavButtons = ({
         <Button
           label="Próxima"
           onClick={onNext}
+          classname="bg-light-green rounded-md px-3 py-2 text-white m-1"
+        />
+      )}
+
+      {EOF && (
+        <Button
+          label="Resumo"
+          // onClick={onNext}
           classname="bg-light-green rounded-md px-3 py-2 text-white m-1"
         />
       )}

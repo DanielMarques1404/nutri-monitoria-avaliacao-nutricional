@@ -10,11 +10,14 @@ import { NavButtons } from "./components/NavButtons";
 import { QuestionForm } from "./components/QuestionForm";
 import type { IQuestionnaire } from "./domain/entities/entities";
 import { useCurrentQuestionnaire } from "./hooks/useCurrentQuestionnaire";
+import Modal from "./components/layout/Modal";
+import { Summary } from "./components/Summary";
 
 export default function App() {
   const { data } = useCurrentQuestionnaire();
   const [quiz, setQuiz] = useState<IQuestionnaire | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(-1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [attempt, dispatch] = useReducer(
     quizAttemptReducer,
@@ -66,6 +69,8 @@ export default function App() {
       questionId: currentQuestion.id,
       value: true,
     });
+
+    setIsModalOpen(true);
   };
 
   const handleNext = () => {
@@ -108,21 +113,21 @@ export default function App() {
       {/* <pre>{JSON.stringify(attempt, null, 2)}</pre> */}
 
       <Footer />
-      {/* {isModalOpen && currentQuestion && (
+      {isModalOpen && currentQuestion && (
         <Modal isOpen={isModalOpen}>
           <Summary
-            handleClose={handleClose}
+            handleClose={() => setIsModalOpen(false)}
             question={currentQuestion}
-            message={
-              !currentUserAnswer
-                ? "Ainda não respondida"
-                : currentUserAnswer === currentQuestion.correctOptionId
-                  ? "PARABÉNS"
-                  : "Não foi dessa vez!"
+            kind={
+              !attemptForCurrentQuestion?.selectedOptionId
+                ? "abstention"
+                : currentQuestion.options?.find((o) => o.id === attemptForCurrentQuestion.selectedOptionId)?.option === currentQuestion.correctOption
+                  ? "success"
+                  : "error"
             }
           />
         </Modal>
-      )} */}
+      )}
     </div>
   );
 }
