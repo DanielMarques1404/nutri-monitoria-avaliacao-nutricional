@@ -1,4 +1,5 @@
 import type { IQuestion } from "../domain/entities/entities";
+import { Button } from "./ui/Button";
 
 type SummaryProps = {
   question: IQuestion;
@@ -18,13 +19,16 @@ export const Summary = ({ question, kind, handleClose }: SummaryProps) => {
       </span> */}
       <img
         className="md:h-72 w-full object-cover object-center"
-        src={kind === "success" ? "assets/images/resposta-certa.png" : kind === "error" ? "assets/images/resposta-errada.png" : "assets/images/resposta-ausente.png"}
+        src={
+          kind === "success"
+            ? "assets/images/resposta-certa.png"
+            : kind === "error"
+              ? "assets/images/resposta-errada.png"
+              : "assets/images/resposta-ausente.png"
+        }
         alt={`Imagem ${question.title}`}
       />
       <div className="flex flex-col gap-1 p-4">
-        <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1">
-          {question.title}
-        </h2>
         <ul className="flex flex-wrap gap-2">
           {question.tags?.map((tag) => (
             <li className="flex items-center justify-center h-6 bg-answer-user border border-dark-green p-1 text-dark-green">
@@ -33,24 +37,36 @@ export const Summary = ({ question, kind, handleClose }: SummaryProps) => {
           ))}
         </ul>
         <p className="leading-relaxed mb-3">{question.explanation}</p>
-        <div className="flex items-center flex-wrap ">
-          <a className="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0">
-            Aprender Mais
-            <svg
-              className="w-4 h-4 ml-2"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
-              fill="none"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+        <p className="text-dark-green font-bold">{`Resposta: ${question.correctOption}`}</p>
+        {question.urlLearnMore && (
+          <div className="flex items-center flex-wrap ">
+            <a
+              className="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0"
+              href={question.urlLearnMore}
+              target="_blank"
+              rel="noreferrer"
             >
-              <path d="M5 12h14"></path>
-              <path d="M12 5l7 7-7 7"></path>
-            </svg>
-          </a>
-        </div>
-        <button onClick={handleClose}>Fechar</button>
+              Aprender Mais
+              <svg
+                className="w-4 h-4 ml-2"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M5 12h14"></path>
+                <path d="M12 5l7 7-7 7"></path>
+              </svg>
+            </a>
+          </div>
+        )}
+        <Button
+          label="Fechar"
+          onClick={handleClose}
+          classname="bg-light-green rounded-md px-3 py-2 text-white m-auto"
+        />
       </div>
     </section>
   );

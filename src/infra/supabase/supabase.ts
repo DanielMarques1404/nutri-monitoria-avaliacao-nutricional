@@ -193,6 +193,7 @@ export type Database = {
           question: string
           statement: string
           title: string
+          url_learn_more: string | null
         }
         Insert: {
           category_id?: number | null
@@ -204,6 +205,7 @@ export type Database = {
           question: string
           statement: string
           title: string
+          url_learn_more?: string | null
         }
         Update: {
           category_id?: number | null
@@ -215,6 +217,7 @@ export type Database = {
           question?: string
           statement?: string
           title?: string
+          url_learn_more?: string | null
         }
         Relationships: [
           {

@@ -8,7 +8,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
   ): Promise<IQuestion[] | null> {
     const { data, error } = await supabase
       .from("questionnaire_questions")
-      .select("questions(id, title, statement, question, explanation, difficulty, correct_option, category_id, question_tags(tags(id, name)), question_options(id, description, option, question_id))")
+      .select("questions(id, title, statement, question, explanation, difficulty, correct_option, category_id, url_learn_more, question_tags(tags(id, name)), question_options(id, description, option, question_id))")
       .eq("questionnaire_id", questionnaireId)
       .order("title", { foreignTable: "questions", ascending: true });
 
@@ -36,6 +36,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
       explanation: question.explanation || "",
       categoryId: question.category_id || 0,
       difficulty: question.difficulty || "",
+      urlLearnMore: question.url_learn_more || "",
       tags:
         question.question_tags?.map((qt: any) => ({
           id: qt.tags.id,
@@ -47,7 +48,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
   async listByIds(ids: number[]): Promise<IQuestion[] | null> {
     const { data, error } = await supabase
       .from("questions")
-      .select("id, title, statement, question, explanation, difficulty, correct_option, category_id, question_tags(tags(id, name)), question_options(id, description, option, question_id)")
+      .select("id, title, statement, question, explanation, difficulty, correct_option, category_id, url_learn_more, question_tags(tags(id, name)), question_options(id, description, option, question_id)")
       .in("id", ids)
       .order("title", { ascending: true });
 
@@ -60,8 +61,13 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
 
   async createOrUpdate(question: IQuestion): Promise<number> {
     if (question.id === 0) {
-      const { id, options, tags, correctOption, categoryId, ...justAQuestion } = question;
-      const dbQuestion = { ...justAQuestion, correct_option: correctOption, category_id: categoryId };
+      const { id, options, tags, correctOption, categoryId, urlLearnMore, ...justAQuestion } = question;
+      const dbQuestion = {
+        ...justAQuestion,
+        correct_option: correctOption,
+        category_id: categoryId,
+        url_learn_more: urlLearnMore || null,
+      };
       const { data, error } = await supabase
         .from("questions")
         .insert([dbQuestion as any])
@@ -73,8 +79,13 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
 
       return data[0].id;
     } else {
-      const { options, tags, correctOption, categoryId, ...justAQuestion } = question;
-      const dbQuestion = { ...justAQuestion, correct_option: correctOption, category_id: categoryId };
+      const { options, tags, correctOption, categoryId, urlLearnMore, ...justAQuestion } = question;
+      const dbQuestion = {
+        ...justAQuestion,
+        correct_option: correctOption,
+        category_id: categoryId,
+        url_learn_more: urlLearnMore || null,
+      };
       const { error } = await supabase
         .from("questions")
         .update(dbQuestion)

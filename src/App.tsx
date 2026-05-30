@@ -40,6 +40,22 @@ export default function App() {
     });
   }, [quiz]);
 
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsModalOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isModalOpen]);
+
   const currentQuestion = useMemo(() => {
     if (!quiz || currentQuestionIndex < 0) return null;
     return quiz.questions[currentQuestionIndex] ?? null;
@@ -114,7 +130,7 @@ export default function App() {
 
       <Footer />
       {isModalOpen && currentQuestion && (
-        <Modal isOpen={isModalOpen}>
+        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
           <Summary
             handleClose={() => setIsModalOpen(false)}
             question={currentQuestion}

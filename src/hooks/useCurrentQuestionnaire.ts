@@ -8,7 +8,7 @@ const ucQuestionnaire = new QuestionnaireUseCase(
 );
 
 export const useCurrentQuestionnaire = () => {
-
+//qdo alterar uma questão devemos atualizar a lista de questões, mas o questionário em si não precisa ser atualizado, então podemos manter a queryKey fixa e usar o cache para evitar refetch desnecessário 
   return useQuery({
     queryKey: ["nutri-monitoria-quiz"],
     queryFn: async () => {

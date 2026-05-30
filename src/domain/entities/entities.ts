@@ -26,6 +26,7 @@ export interface IQuestion extends IGeneric {
   categoryId: number;
   difficulty: string;
   tags?: ITag[];
+  urlLearnMore?: string;
 }
 
 export interface IQuestionnaire extends IGeneric {
