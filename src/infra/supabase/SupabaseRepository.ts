@@ -50,13 +50,14 @@ export class SupabaseRepository<T extends IGeneric> implements IRepository<T> {
   async listAll(): Promise<T[] | null> {
     const { data, error } = await supabase
       .from(this.tableName)
-      .select("id, name");
+      .select("id, name")
+      .order("name", { ascending: true });
 
     if (error) throw error;
 
     if (!data) return null;
 
-    return data.sort((a: any, b: any) => a.name.localeCompare(b.name)) as unknown as T[];
+    return data as unknown as T[];
   }
 
   async listById(id: number): Promise<T | null> {
