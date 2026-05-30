@@ -16,10 +16,7 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
       .select("*, questionnaires(*), questions(*)")
       .eq("questionnaire_id", id);
 
-    if (error) {
-      console.error(error);
-      return null;
-    }
+    if (error) throw error;
 
     if (!data) return null;
 

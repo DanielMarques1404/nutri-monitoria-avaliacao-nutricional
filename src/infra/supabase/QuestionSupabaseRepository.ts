@@ -11,10 +11,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
       .select("*, questions(*, question_tags(tags(*)), question_options(*))")
       .eq("questionnaire_id", questionnaireId);
 
-    if (error) {
-      console.error(error);
-      return null;
-    }
+    if (error) throw error;
 
     if (!data) return null;
     const questions: IQuestion[] = data
@@ -57,10 +54,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
       .select("*, question_tags(tags(*)), question_options(*)")
       .in("id", ids);
 
-    if (error) {
-      console.error(error);
-      return null;
-    }
+    if (error) throw error;
 
     if (!data) return null;
     return data.map((question) => this.transformToQuestion(question)).sort((a, b) => a.title.localeCompare(b.title)) as IQuestion[];

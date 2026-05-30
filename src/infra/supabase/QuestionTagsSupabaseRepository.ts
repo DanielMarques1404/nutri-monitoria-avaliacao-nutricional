@@ -9,17 +9,15 @@ export class QuestionTagsSupabaseRepository implements IQuestionTagsRepository {
       .select("*, tags(*)")
       .eq("question_id", questionId);
 
-    if (error) {
-      console.error(error);
-      return null;
-    }
+    if (error) throw error;
 
     if (!data) return null;
     return data.map((d) => d.tags);
   }
 
   async deleteByQuestionId(questionId: number): Promise<void> {
-    await supabase.from("question_tags").delete().eq("question_id", questionId);
+    const { error } = await supabase.from("question_tags").delete().eq("question_id", questionId);
+    if (error) throw error;
   }
 
   async create(questionId: number, tagIds: number[]): Promise<void> {

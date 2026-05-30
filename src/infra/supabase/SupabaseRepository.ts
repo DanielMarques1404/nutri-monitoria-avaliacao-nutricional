@@ -52,10 +52,7 @@ export class SupabaseRepository<T extends IGeneric> implements IRepository<T> {
       .from(this.tableName)
       .select("*");
 
-    if (error) {
-      console.error(error);
-      return null;
-    }
+    if (error) throw error;
 
     if (!data) return null;
 
@@ -68,10 +65,7 @@ export class SupabaseRepository<T extends IGeneric> implements IRepository<T> {
       .select("*")
       .eq("id", id as any);
 
-    if (error) {
-      console.error(error);
-      return null;
-    }
+    if (error) throw error;
 
     if (!data) return null;
 

@@ -15,7 +15,8 @@ export class QuestionOptionsSupabaseRepository implements IQuestionOptionsReposi
   }
   
   async deleteByQuestionId(questionId: number): Promise<void> {
-    await supabase.from("question_options").delete().eq("question_id", questionId);
+    const { error } = await supabase.from("question_options").delete().eq("question_id", questionId);
+    if (error) throw error;
   }
 
   list(): Promise<IOption[] | null> {
