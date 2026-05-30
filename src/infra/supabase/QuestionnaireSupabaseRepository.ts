@@ -13,7 +13,7 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
   async listById(id: number): Promise<IQuestionnaire | null> {
     const { data, error } = await supabase
       .from("questionnaire_questions")
-      .select("*, questionnaires(*), questions(*)")
+      .select("questionnaires(id, name, description), questions(id)")
       .eq("questionnaire_id", id);
 
     if (error) throw error;

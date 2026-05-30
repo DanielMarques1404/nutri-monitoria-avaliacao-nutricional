@@ -50,7 +50,7 @@ export class SupabaseRepository<T extends IGeneric> implements IRepository<T> {
   async listAll(): Promise<T[] | null> {
     const { data, error } = await supabase
       .from(this.tableName)
-      .select("*");
+      .select("id, name");
 
     if (error) throw error;
 
@@ -62,7 +62,7 @@ export class SupabaseRepository<T extends IGeneric> implements IRepository<T> {
   async listById(id: number): Promise<T | null> {
     const { data, error } = await supabase
       .from(this.tableName)
-      .select("*")
+      .select("id, name")
       .eq("id", id as any);
 
     if (error) throw error;

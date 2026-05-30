@@ -6,7 +6,7 @@ export class QuestionOptionsSupabaseRepository implements IQuestionOptionsReposi
   async listByQuestionId(questionId: number): Promise<IOption[] | null> {
     const { data, error } = await supabase
       .from("question_options")
-      .select("*")
+      .select("id, description, option, question_id")
       .eq("question_id", questionId)
 
     if (error) throw error;

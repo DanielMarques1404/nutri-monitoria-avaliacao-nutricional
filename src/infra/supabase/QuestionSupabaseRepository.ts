@@ -8,7 +8,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
   ): Promise<IQuestion[] | null> {
     const { data, error } = await supabase
       .from("questionnaire_questions")
-      .select("*, questions(*, question_tags(tags(*)), question_options(*))")
+      .select("questions(id, title, statement, question, explanation, difficulty, correct_option, category_id, question_tags(tags(id, name)), question_options(id, description, option, question_id))")
       .eq("questionnaire_id", questionnaireId);
 
     if (error) throw error;
@@ -51,7 +51,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
   async listByIds(ids: number[]): Promise<IQuestion[] | null> {
     const { data, error } = await supabase
       .from("questions")
-      .select("*, question_tags(tags(*)), question_options(*)")
+      .select("id, title, statement, question, explanation, difficulty, correct_option, category_id, question_tags(tags(id, name)), question_options(id, description, option, question_id)")
       .in("id", ids);
 
     if (error) throw error;

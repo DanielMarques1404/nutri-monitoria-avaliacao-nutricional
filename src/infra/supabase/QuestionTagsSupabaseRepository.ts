@@ -6,7 +6,7 @@ export class QuestionTagsSupabaseRepository implements IQuestionTagsRepository {
   async listByQuestionId(questionId: number): Promise<ITag[] | null> {
     const { data, error } = await supabase
       .from("question_tags")
-      .select("*, tags(*)")
+      .select("tags(id, name)")
       .eq("question_id", questionId);
 
     if (error) throw error;
