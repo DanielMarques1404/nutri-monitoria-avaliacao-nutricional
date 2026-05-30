@@ -70,9 +70,9 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
     if (question.id === 0) {
       const { id, options, tags, correctOption, categoryId, ...justAQuestion } = question;
       const dbQuestion = { ...justAQuestion, correct_option: correctOption, category_id: categoryId };
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("questions")
-        .insert([dbQuestion])
+        .insert([dbQuestion as any])
         .select("id");
 
       if (error) {
