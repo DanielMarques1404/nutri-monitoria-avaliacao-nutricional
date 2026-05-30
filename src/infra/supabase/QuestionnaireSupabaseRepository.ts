@@ -12,9 +12,9 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
 
   async listById(id: number): Promise<IQuestionnaire | null> {
     const { data, error } = await supabase
-      .from("QuestionnaireQuestions")
-      .select("*, Questionnaires(*), Questions(*)")
-      .eq("questionnaireId", id);
+      .from("questionnaire_questions")
+      .select("*, questionnaires(*), questions(*)")
+      .eq("questionnaire_id", id);
 
     if (error) {
       console.error(error);
@@ -24,12 +24,12 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
     if (!data) return null;
 
     return {
-      id: data[0].Questionnaires.id,
-      name: data[0].Questionnaires.name,
-      description: data[0].Questionnaires.description || "",
+      id: data[0].questionnaires.id,
+      name: data[0].questionnaires.name,
+      description: data[0].questionnaires.description || "",
       questions:
         (await questionsRepository.listByIds(
-          data.flatMap((item) => item.Questions.id),
+          data.flatMap((item) => item.questions.id),
         )) || [],
     };
   }

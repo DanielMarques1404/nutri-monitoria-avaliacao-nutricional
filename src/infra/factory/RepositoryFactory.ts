@@ -30,10 +30,10 @@ class SupabaseFactory implements IRepositoryFactory {
     return new QuestionSupabaseRepository();
   }
   createCategoryRepo(): IRepository<ICategory> {
-    return new SupabaseRepository("Categories");
+    return new SupabaseRepository("categories");
   }
   createTagRepo(): IRepository<ITag> {
-    return new SupabaseRepository("Tags");
+    return new SupabaseRepository("tags");
   }
   createQuestionTagsRepo(): IQuestionTagsRepository {
     return new QuestionTagsSupabaseRepository();

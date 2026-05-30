@@ -39,7 +39,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      Categories: {
+      categories: {
         Row: {
           created_at: string
           id: number
@@ -57,43 +57,111 @@ export type Database = {
         }
         Relationships: []
       }
-      QuestionnaireQuestions: {
+      question_options: {
         Row: {
           created_at: string
+          description: string
           id: number
-          questionId: number
-          questionnaireId: number
+          option: string
+          question_id: number
         }
         Insert: {
           created_at?: string
+          description: string
           id?: number
-          questionId: number
-          questionnaireId: number
+          option: string
+          question_id: number
         }
         Update: {
           created_at?: string
+          description?: string
           id?: number
-          questionId?: number
-          questionnaireId?: number
+          option?: string
+          question_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "QuestionnaireQuestions_questionId_fkey"
-            columns: ["questionId"]
+            foreignKeyName: "question_options_question_id_fkey"
+            columns: ["question_id"]
             isOneToOne: false
-            referencedRelation: "Questions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "QuestionnaireQuestions_questionnaireId_fkey"
-            columns: ["questionnaireId"]
-            isOneToOne: false
-            referencedRelation: "Questionnaires"
+            referencedRelation: "questions"
             referencedColumns: ["id"]
           },
         ]
       }
-      Questionnaires: {
+      question_tags: {
+        Row: {
+          created_at: string
+          id: number
+          question_id: number
+          tag_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          question_id: number
+          tag_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          question_id?: number
+          tag_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_tags_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "question_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      questionnaire_questions: {
+        Row: {
+          created_at: string
+          id: number
+          question_id: number
+          questionnaire_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          question_id: number
+          questionnaire_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          question_id?: number
+          questionnaire_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questionnaire_questions_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "questionnaire_questions_questionnaire_id_fkey"
+            columns: ["questionnaire_id"]
+            isOneToOne: false
+            referencedRelation: "questionnaires"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      questionnaires: {
         Row: {
           created_at: string
           description: string | null
@@ -114,42 +182,10 @@ export type Database = {
         }
         Relationships: []
       }
-      QuestionOptions: {
+      questions: {
         Row: {
-          created_at: string
-          description: string
-          id: number
-          option: string
-          questionId: number
-        }
-        Insert: {
-          created_at?: string
-          description: string
-          id?: number
-          option: string
-          questionId: number
-        }
-        Update: {
-          created_at?: string
-          description?: string
-          id?: number
-          option?: string
-          questionId?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "QuestionOptions_questionId_fkey"
-            columns: ["questionId"]
-            isOneToOne: false
-            referencedRelation: "Questions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      Questions: {
-        Row: {
-          categoryId: number | null
-          correctOption: string | null
+          category_id: number | null
+          correct_option: string | null
           created_at: string
           difficulty: string | null
           explanation: string | null
@@ -159,8 +195,8 @@ export type Database = {
           title: string
         }
         Insert: {
-          categoryId?: number | null
-          correctOption?: string | null
+          category_id?: number | null
+          correct_option?: string | null
           created_at?: string
           difficulty?: string | null
           explanation?: string | null
@@ -170,8 +206,8 @@ export type Database = {
           title: string
         }
         Update: {
-          categoryId?: number | null
-          correctOption?: string | null
+          category_id?: number | null
+          correct_option?: string | null
           created_at?: string
           difficulty?: string | null
           explanation?: string | null
@@ -182,51 +218,15 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "Questions_categoryId_fkey"
-            columns: ["categoryId"]
+            foreignKeyName: "questions_category_id_fkey"
+            columns: ["category_id"]
             isOneToOne: false
-            referencedRelation: "Categories"
+            referencedRelation: "categories"
             referencedColumns: ["id"]
           },
         ]
       }
-      QuestionTags: {
-        Row: {
-          created_at: string
-          id: number
-          questionId: number
-          tagId: number
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-          questionId: number
-          tagId: number
-        }
-        Update: {
-          created_at?: string
-          id?: number
-          questionId?: number
-          tagId?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "QuestionsTags_questionId_fkey"
-            columns: ["questionId"]
-            isOneToOne: false
-            referencedRelation: "Questions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "QuestionsTags_tagId_fkey"
-            columns: ["tagId"]
-            isOneToOne: false
-            referencedRelation: "Tags"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      Tags: {
+      tags: {
         Row: {
           created_at: string
           id: number

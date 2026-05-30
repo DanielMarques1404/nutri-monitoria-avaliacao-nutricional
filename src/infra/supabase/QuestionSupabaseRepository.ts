@@ -7,9 +7,9 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
     questionnaireId: number,
   ): Promise<IQuestion[] | null> {
     const { data, error } = await supabase
-      .from("QuestionnaireQuestions")
-      .select("*, Questions(*, QuestionTags(Tags(*)), QuestionOptions(*))")
-      .eq("questionnaireId", questionnaireId);
+      .from("questionnaire_questions")
+      .select("*, questions(*, question_tags(tags(*)), question_options(*))")
+      .eq("questionnaire_id", questionnaireId);
 
     if (error) {
       console.error(error);
@@ -18,7 +18,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
 
     if (!data) return null;
     const questions: IQuestion[] = data
-      .map((q) => q.Questions)
+      .map((q) => q.questions)
       .map((question) => this.transformToQuestion(question));
 
     return questions.sort((a: any, b: any) =>
@@ -33,28 +33,28 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
       statement: question.statement,
       question: question.question,
       options:
-        question.QuestionOptions?.map((qo: any) => ({
+        question.question_options?.map((qo: any) => ({
           id: qo.id,
-          questionId: qo.questionId,
+          questionId: qo.question_id,
           description: qo.description,
           option: qo.option,
         })) || [],
-      correctOption: question.correctOption || null,
+      correctOption: question.correct_option || null,
       explanation: question.explanation || "",
-      categoryId: question.categoryId || 0,
+      categoryId: question.category_id || 0,
       difficulty: question.difficulty || "",
       tags:
-        question.QuestionTags?.map((qt: any) => ({
-          id: qt.Tags.id,
-          name: qt.Tags.name,
+        question.question_tags?.map((qt: any) => ({
+          id: qt.tags.id,
+          name: qt.tags.name,
         })) || [],
     };
   }
 
   async listByIds(ids: number[]): Promise<IQuestion[] | null> {
     const { data, error } = await supabase
-      .from("Questions")
-      .select("*, QuestionTags(Tags(*)), QuestionOptions(*)")
+      .from("questions")
+      .select("*, question_tags(tags(*)), question_options(*)")
       .in("id", ids);
 
     if (error) {
@@ -68,10 +68,11 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
 
   async createOrUpdate(question: IQuestion): Promise<number> {
     if (question.id === 0) {
-      const { id, options, tags, ...justAQuestion } = question;
+      const { id, options, tags, correctOption, categoryId, ...justAQuestion } = question;
+      const dbQuestion = { ...justAQuestion, correct_option: correctOption, category_id: categoryId };
       const { data, error } = await (supabase as any)
-        .from("Questions")
-        .insert([justAQuestion])
+        .from("questions")
+        .insert([dbQuestion])
         .select("id");
 
       if (error) {
@@ -80,10 +81,11 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
 
       return data[0].id;
     } else {
-      const { options, tags, ...justAQuestion } = question;
+      const { options, tags, correctOption, categoryId, ...justAQuestion } = question;
+      const dbQuestion = { ...justAQuestion, correct_option: correctOption, category_id: categoryId };
       const { error } = await supabase
-        .from("Questions")
-        .update(justAQuestion)
+        .from("questions")
+        .update(dbQuestion)
         .eq("id", question.id)
         .select();
 

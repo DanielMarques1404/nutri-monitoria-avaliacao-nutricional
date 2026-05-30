@@ -5,17 +5,17 @@ import { supabase } from "./config";
 export class QuestionOptionsSupabaseRepository implements IQuestionOptionsRepository {
   async listByQuestionId(questionId: number): Promise<IOption[] | null> {
     const { data, error } = await supabase
-      .from("QuestionOptions")
+      .from("question_options")
       .select("*")
-      .eq("questionId", questionId)
-    
+      .eq("question_id", questionId)
+
     if (error) throw error;
 
-    return data;
+    return data?.map((d) => ({ ...d, questionId: d.question_id })) || null;
   }
   
   async deleteByQuestionId(questionId: number): Promise<void> {
-    await supabase.from("QuestionOptions").delete().eq("questionId", questionId);
+    await supabase.from("question_options").delete().eq("question_id", questionId);
   }
 
   list(): Promise<IOption[] | null> {
@@ -23,9 +23,10 @@ export class QuestionOptionsSupabaseRepository implements IQuestionOptionsReposi
   }
   
   async create(option: IOption, questionId: number): Promise<number> {
+    const { questionId: _, ...optionData } = option;
     const { data, error } = await supabase
-      .from("QuestionOptions")
-      .insert({ ...option, id: option.id < 0 ? 0 : option.id, questionId: questionId })
+      .from("question_options")
+      .insert({ ...optionData, id: option.id < 0 ? 0 : option.id, question_id: questionId })
       .select("id");
 
     if (error) {
