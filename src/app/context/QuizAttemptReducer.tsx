@@ -21,6 +21,7 @@ type AttemptAction =
       type: "SET_REVEAL";
       questionId: number;
       value: boolean;
+      result: "correct" | "incorrect" | "revealed_without_answer";
     };
 
 export function createEmptyAttempt(
@@ -73,6 +74,7 @@ export const quizAttemptReducer = (
             selectedOptionId:
               state.answersByQuestionId[action.questionId]?.selectedOptionId,
             isAnswerRevealed: action.value,
+            result: action.result,
           },
         },
       };

@@ -160,10 +160,20 @@ export default function App() {
   const handleRevealAnswer = () => {
     if (!currentQuestion) return;
 
+    const selectedOption = currentQuestion.options?.find(
+      (option) => option.id === attemptForCurrentQuestion?.selectedOptionId,
+    );
+    const result = !selectedOption
+      ? "revealed_without_answer"
+      : selectedOption.option === currentQuestion.correctOption
+        ? "correct"
+        : "incorrect";
+
     dispatch({
       type: "SET_REVEAL",
       questionId: currentQuestion.id,
       value: true,
+      result,
     });
 
     setIsModalOpen(true);

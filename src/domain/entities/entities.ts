@@ -39,6 +39,7 @@ export interface IQuestionnaire extends IGeneric {
 export interface IQuestionAttempt {
   selectedOptionId?: number;
   isAnswerRevealed: boolean;
+  result?: "correct" | "incorrect" | "revealed_without_answer";
 }
 
 export interface IQuizAttempt {
