@@ -3,17 +3,19 @@ import type { Person } from "../types/person";
 export const Student: Person = {
   prefix: "Monitora:",
   name: "Emanuella Alves Monteiro Marques",
+  foto: "assets/images/monitora-emanuella.jpg",
   instagram: "https://www.instagram.com/emanuellanutri/",
 };
 
 export const Professor: Person = {
   prefix: "Professor:",
   name: "Leonardo Furtado de Oliveira",
+  foto: "assets/images/professor-leonardo.jpg",
   instagram: "https://www.instagram.com/leofnutricionista/",
   email: "leonardo.oliveira@professor.unifametro.edu.br",
 };
 
-export const CURRENT_QUESTIONNAIRE = 4;
+export const CURRENT_QUESTIONNAIRE = 5;
 
 export const REPOSITORY_SUPABASE = 1;
 

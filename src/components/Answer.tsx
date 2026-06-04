@@ -27,7 +27,7 @@ export function Answer({
     <div
       onClick={() => onSelect(questionId, option.id)}
       className={cn(
-        "flex flex-col w-52 h-52 bg-white rounded-xl cursor-pointer border border-medium-green",
+        "flex flex-col w-48 h-48 bg-white rounded-xl cursor-pointer border border-medium-green",
         !isSelected && "hover:border-4 hover:border-dark-green",
         isAnswerRevealed && isCorrect && "card",
         isSelected && "border-4 border-answer-user ",

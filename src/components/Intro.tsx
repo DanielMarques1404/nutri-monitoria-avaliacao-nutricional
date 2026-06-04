@@ -57,7 +57,7 @@ export const Intro = ({
             )}
           </div>
 
-          <div className="flex justify-center ml-auto">
+          <div className="flex justify-center m-auto md:mr-0">
             <Button
               classname="inline-flex text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
               label="Iniciar"

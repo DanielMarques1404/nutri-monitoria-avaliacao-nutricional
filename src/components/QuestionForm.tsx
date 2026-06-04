@@ -18,7 +18,7 @@ export function QuestionForm({
   return (
     <section className="text-gray-600 body-font overflow-hidden">
       <div className="container p-2 mx-auto">
-        <div className="flex flex-col text-center w-full mb-2">
+        <div className="flex flex-col text-center w-full mb-2 gap-2">
           <h1 className="sm:text-4xl text-3xl font-medium title-font mb-2 text-dark-green">
             {question.title}
           </h1>
@@ -30,9 +30,7 @@ export function QuestionForm({
           </p>
         </div>
         <div className="flex items-center justify-center">
-          <ul
-            style={{ display: "flex", gap: 16, flexWrap: "wrap", padding: 0 }}
-          >
+          <ul className="flex flex-wrap gap-4 p-0 items-center justify-center">
             {question.options?.map((option, idx) => (
               <li key={option.id} style={{ listStyle: "none" }}>
                 <Answer
