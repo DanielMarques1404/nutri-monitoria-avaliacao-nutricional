@@ -3,15 +3,15 @@ import {
   createEmptyAttempt,
   quizAttemptReducer,
 } from "./app/context/QuizAttemptReducer";
+import { useCurrentQuestionnaire } from "./app/hooks/useCurrentQuestionnaire";
 import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
 import { Intro } from "./components/Intro";
+import Modal from "./components/layout/Modal";
 import { NavButtons } from "./components/NavButtons";
 import { QuestionForm } from "./components/QuestionForm";
-import type { IQuestionnaire, IQuizAttempt } from "./domain/entities/entities";
-import { useCurrentQuestionnaire } from "./hooks/useCurrentQuestionnaire";
-import Modal from "./components/layout/Modal";
 import { Summary } from "./components/Summary";
+import type { IQuestionnaire, IQuizAttempt } from "./domain/entities/entities";
 
 const getAttemptStorageKey = (questionnaireId: number) =>
   `quiz-attempt:${questionnaireId}`;
@@ -171,7 +171,10 @@ export default function App() {
             kind={
               !attemptForCurrentQuestion?.selectedOptionId
                 ? "abstention"
-                : currentQuestion.options?.find((o) => o.id === attemptForCurrentQuestion.selectedOptionId)?.option === currentQuestion.correctOption
+                : currentQuestion.options?.find(
+                      (o) =>
+                        o.id === attemptForCurrentQuestion.selectedOptionId,
+                    )?.option === currentQuestion.correctOption
                   ? "success"
                   : "error"
             }
