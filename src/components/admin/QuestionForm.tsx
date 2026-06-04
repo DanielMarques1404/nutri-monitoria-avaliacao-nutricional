@@ -146,7 +146,7 @@ export const QuestionForm = () => {
   ) => {
     let optionList = watch("options") || [];
     let newList: IOption[] | undefined = [];
-    const optionsAvailable = ["A", "B", "C", "D"];
+    const optionsAvailable = ["A", "B", "C", "D", "E"];
 
     switch (action) {
       case "DELETE":

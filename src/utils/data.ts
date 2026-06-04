@@ -13,7 +13,7 @@ export const Professor: Person = {
   email: "leonardo.oliveira@professor.unifametro.edu.br",
 };
 
-export const CURRENT_QUESTIONNAIRE = 1;
+export const CURRENT_QUESTIONNAIRE = 4;
 
 export const REPOSITORY_SUPABASE = 1;
 

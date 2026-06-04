@@ -10,13 +10,6 @@ type SummaryProps = {
 export const Summary = ({ question, kind, handleClose }: SummaryProps) => {
   return (
     <section className="h-full p-2 border-2 border-gray-200 border-opacity-60 rounded-lg overflow-hidden">
-      {/* <span className="flex justify-center font-ubuntu font-bold text-3xl text-red-600 uppercase mb-2">
-        {kind === "abstention"
-          ? "Ainda não respondida"
-          : kind === "success"
-            ? "PARABÉNS"
-            : "Não foi dessa vez!"}
-      </span> */}
       <img
         className="md:h-72 w-full object-cover object-center"
         src={
