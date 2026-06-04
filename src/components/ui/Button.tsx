@@ -12,7 +12,9 @@ export const Button = ({ label, classname, ...buttonProps }: ButtonProps) => {
       className={cn(
         "bg-dark-green hover:bg-medium-green cursor-pointer select-none",
         classname,
+        buttonProps.disabled && "cursor-not-allowed",
       )}
+      disabled={buttonProps.disabled}
       {...buttonProps}
     >
       {label}
