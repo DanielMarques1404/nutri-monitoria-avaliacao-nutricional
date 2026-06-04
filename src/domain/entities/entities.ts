@@ -32,6 +32,7 @@ export interface IQuestion extends IGeneric {
 export interface IQuestionnaire extends IGeneric {
   name: string;
   description: string;
+  active: boolean;
   questions: IQuestion[];
 }
 

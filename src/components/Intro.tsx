@@ -1,9 +1,25 @@
+import type { IQuestionnaire } from "../domain/entities/entities";
 import { Button } from "./ui/Button";
+import { QuestionnaireSelector } from "./ui/QuestionnaireSelector";
 
-export const Intro = ({ start }: { start: () => void }) => {
+type IntroProps = {
+  start: () => void;
+  questionnaires: IQuestionnaire[];
+  selectedQuestionnaireId: number | null;
+  onSelectQuestionnaire: (questionnaire: IQuestionnaire) => void;
+  canStart: boolean;
+};
+
+export const Intro = ({
+  start,
+  questionnaires,
+  selectedQuestionnaireId,
+  onSelectQuestionnaire,
+  canStart,
+}: IntroProps) => {
   return (
     <section className="text-gray-600 body-font">
-      <div className="container mx-auto flex px-5 py-8 md:flex-row flex-col items-center">
+      <div className="container mx-auto flex px-5 py-8 lg:px-12 md:flex-row flex-col items-center">
         <div className="lg:max-w-lg lg:w-full md:w-1/2 w-5/6 mb-10 md:mb-0">
           <img
             className="object-cover object-center rounded"
@@ -11,18 +27,42 @@ export const Intro = ({ start }: { start: () => void }) => {
             src="/assets/images/capa-quiz.jpeg"
           />
         </div>
-        <div className="lg:grow md:w-1/2 lg:pl-24 md:pl-16 flex flex-col md:items-start md:text-left items-center text-center">
-          <h1 className="title-font sm:text-4xl text-3xl mb-4 font-medium text-gray-900">
-            MONITORIA EM AVALIAÇÃO NUTRICIONAL
-          </h1>
-          <p className="mb-8 leading-relaxed">
-            PROGRAMA DE MONITORIA E INICIAÇÃO CIENTÍFICA – PROMIC
-          </p>
-          <div className="flex justify-center">
+
+        <div className="lg:grow md:w-1/2 lg:pl-20 md:pl-14 flex flex-col md:items-start md:text-left items-center text-center gap-2">
+          <div>
+            <h1 className="title-font sm:text-4xl text-3xl mb-4 font-medium text-gray-900">
+              MONITORIA EM AVALIAÇÃO NUTRICIONAL
+            </h1>
+            <p className="leading-relaxed">
+              PROGRAMA DE MONITORIA E INICIAÇÃO CIENTÍFICA – PROMIC
+            </p>
+          </div>
+
+          <div className="w-full my-4">
+            {questionnaires.length === 0 ? (
+              <p className="text-sm text-gray-500">
+                Nenhum questionário ativo disponível.
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 gap-2 items-center justify-center w-full">
+                {questionnaires.map((questionnaire) => (
+                  <QuestionnaireSelector
+                    key={questionnaire.id}
+                    questionnaire={questionnaire}
+                    selected={selectedQuestionnaireId === questionnaire.id}
+                    onSelect={onSelectQuestionnaire}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-center ml-auto">
             <Button
               classname="inline-flex text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
               label="Iniciar"
               onClick={start}
+              disabled={!canStart}
             />
           </div>
         </div>

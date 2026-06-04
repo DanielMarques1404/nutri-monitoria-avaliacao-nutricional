@@ -3,7 +3,10 @@ import {
   createEmptyAttempt,
   quizAttemptReducer,
 } from "./app/context/QuizAttemptReducer";
-import { useCurrentQuestionnaire } from "./app/hooks/useCurrentQuestionnaire";
+import {
+  useActiveQuestionnaires,
+  useQuestionnaire,
+} from "./app/hooks/useCurrentQuestionnaire";
 import { Footer } from "./components/Footer";
 import { Header } from "./components/Header";
 import { Intro } from "./components/Intro";
@@ -15,9 +18,26 @@ import type { IQuestionnaire, IQuizAttempt } from "./domain/entities/entities";
 
 const getAttemptStorageKey = (questionnaireId: number) =>
   `quiz-attempt:${questionnaireId}`;
+const SELECTED_QUESTIONNAIRE_STORAGE_KEY = "selected-questionnaire-id";
+
+const getInitialSelectedQuestionnaireId = () => {
+  const savedQuestionnaireId = localStorage.getItem(
+    SELECTED_QUESTIONNAIRE_STORAGE_KEY,
+  );
+
+  if (!savedQuestionnaireId) return null;
+
+  const parsedQuestionnaireId = Number(savedQuestionnaireId);
+
+  return Number.isNaN(parsedQuestionnaireId) ? null : parsedQuestionnaireId;
+};
 
 export default function App() {
-  const { data } = useCurrentQuestionnaire();
+  const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState<
+    number | null
+  >(getInitialSelectedQuestionnaireId);
+  const { data } = useQuestionnaire(selectedQuestionnaireId);
+  const { data: activeQuestionnaires } = useActiveQuestionnaires();
   const [quiz, setQuiz] = useState<IQuestionnaire | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(-1);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,8 +48,23 @@ export default function App() {
   );
 
   useEffect(() => {
-    if (data) setQuiz(data);
+    setQuiz(data ?? null);
   }, [data]);
+
+  useEffect(() => {
+    if (!selectedQuestionnaireId || !activeQuestionnaires) return;
+
+    const selectedQuestionnaireIsActive = activeQuestionnaires.some(
+      (questionnaire) => questionnaire.id === selectedQuestionnaireId,
+    );
+
+    if (selectedQuestionnaireIsActive) return;
+
+    localStorage.removeItem(SELECTED_QUESTIONNAIRE_STORAGE_KEY);
+    setSelectedQuestionnaireId(null);
+    setQuiz(null);
+    setCurrentQuestionIndex(-1);
+  }, [activeQuestionnaires, selectedQuestionnaireId]);
 
   useEffect(() => {
     if (!quiz) return;
@@ -100,7 +135,18 @@ export default function App() {
     : undefined;
 
   const handleStart = () => {
+    if (!quiz) return;
+
     setCurrentQuestionIndex(0);
+  };
+
+  const handleSelectQuestionnaire = (questionnaire: IQuestionnaire) => {
+    localStorage.setItem(
+      SELECTED_QUESTIONNAIRE_STORAGE_KEY,
+      String(questionnaire.id),
+    );
+    setSelectedQuestionnaireId(questionnaire.id);
+    setCurrentQuestionIndex(-1);
   };
 
   const handleSelectOption = (questionId: number, optionId: number) => {
@@ -134,14 +180,18 @@ export default function App() {
     setCurrentQuestionIndex((prev) => Math.max(prev - 1, 0));
   };
 
-  if (!quiz) return <div>Carregando...</div>;
-
   return (
     <div className="flex flex-col justify-between min-h-screen">
-      <Header questionnaireName={quiz.name} />
+      <Header questionnaireName={quiz?.name ?? ""} />
 
-      {currentQuestionIndex === -1 ? (
-        <Intro start={handleStart} />
+      {currentQuestionIndex === -1 || !quiz ? (
+        <Intro
+          start={handleStart}
+          questionnaires={activeQuestionnaires ?? []}
+          selectedQuestionnaireId={selectedQuestionnaireId}
+          onSelectQuestionnaire={handleSelectQuestionnaire}
+          canStart={!!quiz}
+        />
       ) : (
         <>
           <QuestionForm

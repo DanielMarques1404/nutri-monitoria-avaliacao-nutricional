@@ -7,15 +7,31 @@ const ucQuestionnaire = new QuestionnaireUseCase(
   RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuestionnaireRepo(),
 );
 
-export const useCurrentQuestionnaire = () => {
-  //qdo alterar uma questão devemos atualizar a lista de questões, mas o questionário em si não precisa ser atualizado, então podemos manter a queryKey fixa e usar o cache para evitar refetch desnecessário
+export const useQuestionnaire = (questionnaireId: number | null) => {
   return useQuery({
-    queryKey: ["nutri-monitoria-quiz"],
+    queryKey: ["nutri-monitoria-quiz", questionnaireId],
     queryFn: async () => {
-      return await ucQuestionnaire.getCurrentQuestionnaire();
+      if (!questionnaireId) return null;
+
+      return await ucQuestionnaire.getQuestionnaireById(questionnaireId);
     },
-    staleTime: 1000 * 60 * 30, // exemplo: 30 min
-    gcTime: 1000 * 60 * 60 * 24, // manter em cache por mais tempo
+    enabled: questionnaireId !== null,
+    staleTime: 1000 * 60 * 30,
+    gcTime: 1000 * 60 * 60 * 24,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+    refetchOnMount: false,
+  });
+};
+
+export const useActiveQuestionnaires = () => {
+  return useQuery({
+    queryKey: ["nutri-monitoria-active-questionnaires"],
+    queryFn: async () => {
+      return await ucQuestionnaire.getActiveQuestionnaires();
+    },
+    staleTime: 1000 * 60 * 30,
+    gcTime: 1000 * 60 * 60 * 24,
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
     refetchOnMount: false,

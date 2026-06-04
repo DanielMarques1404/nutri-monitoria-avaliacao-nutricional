@@ -6,6 +6,25 @@ import { QuestionSupabaseRepository } from "./QuestionSupabaseRepository";
 const questionsRepository = new QuestionSupabaseRepository();
 
 export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository {
+  async listActives(): Promise<IQuestionnaire[] | null> {
+    const { data, error } = await supabase
+      .from("questionnaires")
+      .select("id, name, description, active")
+      .eq("active", true);
+
+    if (error) throw error;
+
+    if (!data) return null;
+
+    return data.map((item) => ({
+      id: item.id,
+      name: item.name,
+      description: item.description || "",
+      active: item.active,
+      questions: [],
+    }));
+  }
+
   listAll(): Promise<IQuestionnaire[] | null> {
     throw new Error("Method not implemented.");
   }
@@ -13,7 +32,7 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
   async listById(id: number): Promise<IQuestionnaire | null> {
     const { data, error } = await supabase
       .from("questionnaire_questions")
-      .select("questionnaires(id, name, description), questions(id)")
+      .select("questionnaires(id, name, description, active), questions(id)")
       .eq("questionnaire_id", id);
 
     if (error) throw error;
@@ -24,6 +43,7 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
       id: data[0].questionnaires.id,
       name: data[0].questionnaires.name,
       description: data[0].questionnaires.description || "",
+      active: data[0].questionnaires.active,
       questions:
         (await questionsRepository.listByIds(
           data.flatMap((item) => item.questions.id),

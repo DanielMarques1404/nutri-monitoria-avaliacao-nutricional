@@ -24,7 +24,7 @@ p {
 }
 
 h1 {
-  @apply font-ubuntu text-dark-green text-3xl font-bold;
+  @apply font-ubuntu text-dark-green text-3xl font-bold mb-0;
 }
 
 h2 {
