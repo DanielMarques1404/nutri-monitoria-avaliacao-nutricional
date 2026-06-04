@@ -182,7 +182,7 @@ export default function App() {
 
   return (
     <div className="flex flex-col justify-between min-h-screen">
-      <Header questionnaireName={quiz?.name ?? ""} />
+      <Header questionnaireName={quiz?.name ?? ""} showBackButton={currentQuestionIndex !== -1 && !!quiz} />
 
       {currentQuestionIndex === -1 || !quiz ? (
         <Intro

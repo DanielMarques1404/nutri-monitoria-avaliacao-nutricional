@@ -1,8 +1,23 @@
-export const Header = ({ questionnaireName }: { questionnaireName: string }) => {
+import { IconArrowBigLeftLines } from "@tabler/icons-react";
+
+type HeaderProps = {
+  questionnaireName: string;
+  showBackButton?: boolean;
+};
+
+export const Header = ({ questionnaireName, showBackButton }: HeaderProps) => {
 
   return (
-    <header className="text-gray-600 body-font border-b border-dark-green">
-      <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center justify-center gap-2">
+    <header className="text-gray-600 body-font border-b-2 border-dark-green">
+      <div className="container mx-auto flex flex-wrap px-5 py-2 flex-col md:flex-row items-center justify-center gap-2">
+        {showBackButton && (
+          <a
+            href="/"
+            className="flex items-center gap-1 text-light-green hover:text-dark-green rounded-full p-2 transition-colors bg-lighter-green"
+          >
+            <IconArrowBigLeftLines />
+          </a>
+        )}
         <a
           className="flex title-font font-medium items-center mb-4 md:mb-0"
           href="https://unifametro.edu.br/"
