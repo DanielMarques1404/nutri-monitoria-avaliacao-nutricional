@@ -163,22 +163,28 @@ export type Database = {
       }
       questionnaires: {
         Row: {
+          active: boolean
           created_at: string
           description: string | null
           id: number
           name: string
+          url: string | null
         }
         Insert: {
+          active?: boolean
           created_at?: string
           description?: string | null
           id?: number
           name: string
+          url?: string | null
         }
         Update: {
+          active?: boolean
           created_at?: string
           description?: string | null
           id?: number
           name?: string
+          url?: string | null
         }
         Relationships: []
       }

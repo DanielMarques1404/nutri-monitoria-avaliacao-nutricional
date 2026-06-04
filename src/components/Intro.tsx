@@ -1,6 +1,3 @@
-import { QuestionnaireUseCase } from "../domain/useCases/QuestionnaireUseCase";
-import { RepositoryFactory } from "../infra/factory/RepositoryFactory";
-import { CURRENT_TECH_REPOSITORY } from "../utils/data";
 import { Button } from "./ui/Button";
 
 export const Intro = ({ start }: { start: () => void }) => {

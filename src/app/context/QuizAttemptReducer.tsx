@@ -4,9 +4,13 @@ type AttemptAction =
   | {
       type: "INIT";
       payload: {
-        quizId: number;
+        questionnaireId: number;
         quizVersion: number;
       };
+    }
+  | {
+      type: "HYDRATE";
+      payload: IQuizAttempt;
     }
   | {
       type: "SELECT_OPTION";
@@ -20,11 +24,11 @@ type AttemptAction =
     };
 
 export function createEmptyAttempt(
-  quizId: number,
+  questionnaireId: number,
   quizVersion: number,
 ): IQuizAttempt {
   return {
-    quizId,
+    questionnaireId,
     quizVersion,
     answersByQuestionId: {},
   };
@@ -37,9 +41,12 @@ export const quizAttemptReducer = (
   switch (action.type) {
     case "INIT":
       return createEmptyAttempt(
-        action.payload.quizId,
+        action.payload.questionnaireId,
         action.payload.quizVersion,
       );
+
+    case "HYDRATE":
+      return action.payload;
 
     case "SELECT_OPTION":
       return {

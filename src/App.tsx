@@ -8,10 +8,13 @@ import { Header } from "./components/Header";
 import { Intro } from "./components/Intro";
 import { NavButtons } from "./components/NavButtons";
 import { QuestionForm } from "./components/QuestionForm";
-import type { IQuestionnaire } from "./domain/entities/entities";
+import type { IQuestionnaire, IQuizAttempt } from "./domain/entities/entities";
 import { useCurrentQuestionnaire } from "./hooks/useCurrentQuestionnaire";
 import Modal from "./components/layout/Modal";
 import { Summary } from "./components/Summary";
+
+const getAttemptStorageKey = (questionnaireId: number) =>
+  `quiz-attempt:${questionnaireId}`;
 
 export default function App() {
   const { data } = useCurrentQuestionnaire();
@@ -31,14 +34,45 @@ export default function App() {
   useEffect(() => {
     if (!quiz) return;
 
+    const storageKey = getAttemptStorageKey(quiz.id);
+    const savedAttempt = localStorage.getItem(storageKey);
+
+    if (savedAttempt) {
+      try {
+        const parsedAttempt = JSON.parse(savedAttempt) as IQuizAttempt;
+
+        if (
+          parsedAttempt.questionnaireId === quiz.id &&
+          parsedAttempt.quizVersion === 0
+        ) {
+          dispatch({
+            type: "HYDRATE",
+            payload: parsedAttempt,
+          });
+          return;
+        }
+      } catch {
+        localStorage.removeItem(storageKey);
+      }
+    }
+
     dispatch({
       type: "INIT",
       payload: {
-        quizId: quiz.id,
+        questionnaireId: quiz.id,
         quizVersion: 0, //quiz.version,
       },
     });
   }, [quiz]);
+
+  useEffect(() => {
+    if (attempt.questionnaireId <= 0) return;
+
+    localStorage.setItem(
+      getAttemptStorageKey(attempt.questionnaireId),
+      JSON.stringify(attempt),
+    );
+  }, [attempt]);
 
   useEffect(() => {
     if (!isModalOpen) return;
@@ -104,7 +138,7 @@ export default function App() {
 
   return (
     <div className="flex flex-col justify-between min-h-screen">
-      <Header />
+      <Header questionnaireName={quiz.name} />
 
       {currentQuestionIndex === -1 ? (
         <Intro start={handleStart} />

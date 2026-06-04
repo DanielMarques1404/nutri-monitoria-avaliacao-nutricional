@@ -1,15 +1,4 @@
-import { QuestionnaireUseCase } from "../domain/useCases/QuestionnaireUseCase";
-import { RepositoryFactory } from "../infra/factory/RepositoryFactory";
-import { CURRENT_TECH_REPOSITORY } from "../utils/data";
-
-const questionnarieUC = new QuestionnaireUseCase(RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuestionnaireRepo());
-
-export const Header = () => {
-
-  const getQuestionnaireName = async () => {
-    const questionnaire = await questionnarieUC.getCurrentQuestionnaire();
-    return questionnaire ? questionnaire.name : "Quiz";
-  }
+export const Header = ({ questionnaireName }: { questionnaireName: string }) => {
 
   return (
     <header className="text-gray-600 body-font border-b border-dark-green">
@@ -26,8 +15,7 @@ export const Header = () => {
           />
         </a>
         <div className="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
-          {/* <h1>{getQuestionnaireName()}</h1> */}
-          
+          <h1>{questionnaireName}</h1>
         </div>
       </div>
     </header>

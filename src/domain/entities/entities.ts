@@ -41,7 +41,7 @@ export interface IQuestionAttempt {
 }
 
 export interface IQuizAttempt {
-  quizId: number;
+  questionnaireId: number;
   quizVersion: number;
   answersByQuestionId: Record<string, IQuestionAttempt>;
   startedAt?: string;
