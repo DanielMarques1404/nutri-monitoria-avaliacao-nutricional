@@ -34,6 +34,7 @@ export interface IQuestionnaire extends IGeneric {
   description: string;
   active: boolean;
   questions: IQuestion[];
+  questionCount?: number;
 }
 
 export interface IQuestionAttempt {

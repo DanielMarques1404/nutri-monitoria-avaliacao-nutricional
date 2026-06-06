@@ -9,7 +9,7 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
   async listActives(): Promise<IQuestionnaire[] | null> {
     const { data, error } = await supabase
       .from("questionnaires")
-      .select("id, name, description, active")
+      .select("id, name, description, active, questionnaire_questions(question_id)")
       .eq("active", true);
 
     if (error) throw error;
@@ -22,6 +22,7 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
       description: item.description || "",
       active: item.active,
       questions: [],
+      questionCount: item.questionnaire_questions.length,
     }));
   }
 
@@ -48,6 +49,7 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
         (await questionsRepository.listByIds(
           data.flatMap((item) => item.questions.id),
         )) || [],
+      questionCount: data.length,
     };
   }
 

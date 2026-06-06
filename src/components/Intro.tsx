@@ -1,6 +1,6 @@
 import type { IQuestionnaire } from "../domain/entities/entities";
 import { Button } from "./ui/Button";
-import { QuestionnaireSelector } from "./ui/QuestionnaireSelector";
+import { QuestionnaireCard } from "./ui/QuestionnaireCard";
 
 type IntroProps = {
   start: () => void;
@@ -46,7 +46,7 @@ export const Intro = ({
             ) : (
               <div className="grid grid-cols-2 gap-2 items-center justify-center w-full">
                 {questionnaires.map((questionnaire) => (
-                  <QuestionnaireSelector
+                  <QuestionnaireCard
                     key={questionnaire.id}
                     questionnaire={questionnaire}
                     selected={selectedQuestionnaireId === questionnaire.id}
