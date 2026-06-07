@@ -36,13 +36,15 @@ export const Table = ({
 
   return (
     <table>
-      {caption && <caption className="w-full p-1 font-semibold">{caption}</caption>}
+      {caption && (
+        <caption className="w-full p-1 font-semibold">{caption}</caption>
+      )}
       <tbody>
         {items?.map((item) => (
           <tr
             key={item.id}
             className={cn("cursor-pointer hover:font-semibold", {
-              "border-4 border-answer-user":
+              "border-4 border-orange":
                 highlightingOption && selectedItem === item.id,
             })}
             onClick={() => {

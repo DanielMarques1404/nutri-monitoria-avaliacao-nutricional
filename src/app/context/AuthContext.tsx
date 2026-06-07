@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return (
     <AuthContext.Provider value={{ session, logout, login }}>
-      {isLoading ? "carregando..." : children}
+      {isLoading ? <section className="flex items-center justify-center min-h-screen">Carregando...</section> : children}
     </AuthContext.Provider>
   );
 };

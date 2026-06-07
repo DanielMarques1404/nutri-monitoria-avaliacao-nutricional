@@ -26,7 +26,7 @@ export const OptionItem = (props: OptionItemProps) => {
       className={cn(
         "grid grid-cols-12 items-center border border-dark-green rounded-md overflow-hidden select-none h-auto cursor-pointer min-h-14",
         {
-          "border-4 border-answer-user": props.selected,
+          "border-4 border-orange": props.selected,
         },
       )}
     >

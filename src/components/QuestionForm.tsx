@@ -16,7 +16,7 @@ export function QuestionForm({
   if (!question) return <div>Sem questão para exibir</div>;
 
   return (
-    <section className="text-gray-600 body-font overflow-hidden">
+    <section className="text-gray-600 body-font">
       <div className="container p-2 mx-auto">
         <div className="flex flex-col text-center w-full mb-2 gap-2">
           <h1 className="sm:text-4xl text-3xl font-medium title-font mb-2 text-dark-green">

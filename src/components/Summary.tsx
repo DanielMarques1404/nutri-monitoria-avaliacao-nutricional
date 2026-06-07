@@ -24,7 +24,7 @@ export const Summary = ({ question, kind, handleClose }: SummaryProps) => {
       <div className="flex flex-col gap-1 p-4">
         <ul className="flex flex-wrap gap-2">
           {question.tags?.map((tag) => (
-            <li className="flex items-center justify-center h-6 bg-answer-user border border-dark-green p-1 text-dark-green">
+            <li className="flex items-center justify-center h-6 bg-orange border border-dark-green p-1 text-dark-green">
               {tag.name}
             </li>
           ))}

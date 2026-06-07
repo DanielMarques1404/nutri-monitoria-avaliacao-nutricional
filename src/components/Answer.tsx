@@ -31,11 +31,13 @@ export function Answer({
         onSelect(questionId, option.id);
       }}
       className={cn(
-        "flex flex-col w-48 h-48 bg-white rounded-xl border border-medium-green",
+        "flex flex-col w-52 h-52 bg-white rounded-xl border border-medium-green",
         isAnswerRevealed ? "cursor-default" : "cursor-pointer",
-        !isAnswerRevealed && !isSelected && "hover:border-4 hover:border-dark-green",
+        !isAnswerRevealed &&
+          !isSelected &&
+          "hover:border-4 hover:border-dark-green",
         isAnswerRevealed && isCorrect && "card",
-        isSelected && "border-4 border-answer-user ",
+        isSelected && "border-4 border-orange ",
       )}
     >
       <h1 className="text-sm text-center tracking-widest title-font mb-1 font-medium bg-light-green rounded-t-lg">
