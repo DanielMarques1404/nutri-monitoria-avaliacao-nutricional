@@ -1,9 +1,6 @@
 import type { IQuestionnaire } from "../../domain/entities/entities";
 import type { IQuestionnaireRepository } from "../../domain/repositories/IQuestionnaireRepository";
 import { supabase } from "./config";
-import { QuestionSupabaseRepository } from "./QuestionSupabaseRepository";
-
-const questionsRepository = new QuestionSupabaseRepository();
 
 export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository {
   async listActives(): Promise<IQuestionnaire[] | null> {
@@ -33,22 +30,43 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
   async listById(id: number): Promise<IQuestionnaire | null> {
     const { data, error } = await supabase
       .from("questionnaire_questions")
-      .select("questionnaires(id, name, description, active), questions(id)")
+      .select(
+        "questionnaires(id, name, description, active), questions(id, title, statement, question, explanation, difficulty, correct_option, category_id, url_learn_more, question_tags(tags(id, name)), question_options(id, description, option, question_id))",
+      )
       .eq("questionnaire_id", id);
 
     if (error) throw error;
 
-    if (!data) return null;
+    if (!data || data.length === 0) return null;
 
     return {
       id: data[0].questionnaires.id,
       name: data[0].questionnaires.name,
       description: data[0].questionnaires.description || "",
       active: data[0].questionnaires.active,
-      questions:
-        (await questionsRepository.listByIds(
-          data.flatMap((item) => item.questions.id),
-        )) || [],
+      questions: data.map((item) => ({
+        id: item.questions.id,
+        title: item.questions.title,
+        statement: item.questions.statement,
+        question: item.questions.question,
+        options:
+          item.questions.question_options?.map((option) => ({
+            id: option.id,
+            questionId: option.question_id,
+            description: option.description,
+            option: option.option,
+          })) || [],
+        correctOption: item.questions.correct_option || "",
+        explanation: item.questions.explanation || "",
+        categoryId: item.questions.category_id || 0,
+        difficulty: item.questions.difficulty || "",
+        urlLearnMore: item.questions.url_learn_more || "",
+        tags:
+          item.questions.question_tags?.map((questionTag) => ({
+            id: questionTag.tags.id,
+            name: questionTag.tags.name,
+          })) || [],
+      })),
       questionCount: data.length,
     };
   }
