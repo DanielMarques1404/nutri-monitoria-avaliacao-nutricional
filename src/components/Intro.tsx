@@ -6,7 +6,9 @@ type IntroProps = {
   start: () => void;
   questionnaires: IQuestionnaire[];
   selectedQuestionnaireId: number | null;
+  attemptStorageVersion: number;
   onSelectQuestionnaire: (questionnaire: IQuestionnaire) => void;
+  onResetQuestionnaireAttempt: (questionnaireId: number) => void;
   canStart: boolean;
 };
 
@@ -14,7 +16,9 @@ export const Intro = ({
   start,
   questionnaires,
   selectedQuestionnaireId,
+  attemptStorageVersion,
   onSelectQuestionnaire,
+  onResetQuestionnaireAttempt,
   canStart,
 }: IntroProps) => {
   return (
@@ -47,10 +51,11 @@ export const Intro = ({
               <div className="grid grid-cols-2 gap-2 items-center justify-center w-full">
                 {questionnaires.map((questionnaire) => (
                   <QuestionnaireCard
-                    key={questionnaire.id}
+                    key={`${questionnaire.id}:${attemptStorageVersion}`}
                     questionnaire={questionnaire}
                     selected={selectedQuestionnaireId === questionnaire.id}
                     onSelect={onSelectQuestionnaire}
+                    onResetAttempt={onResetQuestionnaireAttempt}
                   />
                 ))}
               </div>

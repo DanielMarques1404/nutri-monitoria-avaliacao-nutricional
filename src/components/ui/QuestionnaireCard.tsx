@@ -1,13 +1,26 @@
 import type { IQuestionnaire, IQuizAttempt } from "../../domain/entities/entities";
+import { getAttemptStorageKey } from "../../utils/attemptStorage";
 
 type QuestionnaireCardProps = {
   questionnaire: IQuestionnaire | null;
   selected?: boolean;
   onSelect?: (questionnaire: IQuestionnaire) => void;
+  onResetAttempt?: (questionnaireId: number) => void;
 };
 
-const getAttemptStorageKey = (questionnaireId: number) =>
-  `quiz-attempt:${questionnaireId}`;
+const getSavedAttempt = (questionnaire: IQuestionnaire) => {
+  const savedAttempt = localStorage.getItem(getAttemptStorageKey(questionnaire.id));
+
+  if (!savedAttempt) return null;
+
+  try {
+    const attempt = JSON.parse(savedAttempt) as IQuizAttempt;
+
+    return attempt.questionnaireId === questionnaire.id ? attempt : null;
+  } catch {
+    return null;
+  }
+};
 
 const getQuestionnaireProgress = (questionnaire: IQuestionnaire) => {
   const totalQuestions = questionnaire.questionCount ?? questionnaire.questions.length;
@@ -16,20 +29,13 @@ const getQuestionnaireProgress = (questionnaire: IQuestionnaire) => {
     return null;
   }
 
-  const savedAttempt = localStorage.getItem(getAttemptStorageKey(questionnaire.id));
+  const attempt = getSavedAttempt(questionnaire);
 
-  if (!savedAttempt) {
+  if (!attempt) {
     return null;
   }
 
-  try {
-    const attempt = JSON.parse(savedAttempt) as IQuizAttempt;
-
-    if (attempt.questionnaireId !== questionnaire.id) {
-      return null;
-    }
-
-    const answers = Object.values(attempt.answersByQuestionId);
+  const answers = Object.values(attempt.answersByQuestionId);
     const correct = answers.filter((answer) => answer.result === "correct").length;
     const wrong = answers.filter(
       (answer) =>
@@ -47,17 +53,18 @@ const getQuestionnaireProgress = (questionnaire: IQuestionnaire) => {
       wrongPercent: (wrong / totalQuestions) * 100,
       unansweredPercent: (unanswered / totalQuestions) * 100,
     };
-  } catch {
-    return null;
-  }
 };
 
 export const QuestionnaireCard = ({
   questionnaire,
   selected,
   onSelect,
+  onResetAttempt,
 }: QuestionnaireCardProps) => {
   if (!questionnaire) return "";
+  const savedAttempt = getSavedAttempt(questionnaire);
+  const hasSavedProgress =
+    !!savedAttempt && Object.keys(savedAttempt.answersByQuestionId).length > 0;
   const progress = getQuestionnaireProgress(questionnaire);
 
   return (
@@ -89,6 +96,24 @@ export const QuestionnaireCard = ({
           </div>
         )}
       </div>
+
+      {hasSavedProgress && (
+        <button
+          className="mt-2 text-xs text-gray-500 underline-offset-2 hover:text-orange hover:underline cursor-pointer"
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+
+            if (!confirm("Deseja limpar seu progresso neste questionário?")) {
+              return;
+            }
+
+            onResetAttempt?.(questionnaire.id);
+          }}
+        >
+          Limpar progresso
+        </button>
+      )}
     </div>
   );
 };

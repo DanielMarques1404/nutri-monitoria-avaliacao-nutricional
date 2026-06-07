@@ -6,9 +6,8 @@
   --color-dark-green: #024221;
   --color-medium-green: #024e46;
   --color-light-green: #01a368;
-  --color-answer-user: #ff7900;
+  --color-orange: #ff7900;
   --color-lighter-green: #c0deaf;
-
 }
 
 * {
@@ -39,7 +38,8 @@ h3 {
   position: relative;
 }
 
-.card::after, .card::before {
+.card::after,
+.card::before {
   --angle: 0deg;
   content: "";
   position: absolute;
@@ -48,7 +48,14 @@ h3 {
   top: 50%;
   left: 50%;
   translate: -50% -50%;
-  background-image: conic-gradient(from var(--angle), var(--color-answer-user), var(--color-dark-green), var(--color-light-green), var(--color-dark-green), var(--color-answer-user));
+  background-image: conic-gradient(
+    from var(--angle),
+    var(--color-orange),
+    var(--color-dark-green),
+    var(--color-light-green),
+    var(--color-dark-green),
+    var(--color-orange)
+  );
   border-radius: 100%;
   z-index: -1;
   animation: 2s spin linear infinite;

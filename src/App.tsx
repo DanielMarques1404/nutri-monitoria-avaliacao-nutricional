@@ -15,9 +15,8 @@ import { NavButtons } from "./components/NavButtons";
 import { QuestionForm } from "./components/QuestionForm";
 import { Summary } from "./components/Summary";
 import type { IQuestionnaire, IQuizAttempt } from "./domain/entities/entities";
+import { getAttemptStorageKey } from "./utils/attemptStorage";
 
-const getAttemptStorageKey = (questionnaireId: number) =>
-  `quiz-attempt:${questionnaireId}`;
 const SELECTED_QUESTIONNAIRE_STORAGE_KEY = "selected-questionnaire-id";
 
 const getInitialSelectedQuestionnaireId = () => {
@@ -41,6 +40,7 @@ export default function App() {
   const [quiz, setQuiz] = useState<IQuestionnaire | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(-1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [attemptStorageVersion, setAttemptStorageVersion] = useState(0);
 
   const [attempt, dispatch] = useReducer(
     quizAttemptReducer,
@@ -103,8 +103,15 @@ export default function App() {
   useEffect(() => {
     if (attempt.questionnaireId <= 0) return;
 
+    const storageKey = getAttemptStorageKey(attempt.questionnaireId);
+
+    if (Object.keys(attempt.answersByQuestionId).length === 0) {
+      localStorage.removeItem(storageKey);
+      return;
+    }
+
     localStorage.setItem(
-      getAttemptStorageKey(attempt.questionnaireId),
+      storageKey,
       JSON.stringify(attempt),
     );
   }, [attempt]);
@@ -147,6 +154,23 @@ export default function App() {
     );
     setSelectedQuestionnaireId(questionnaire.id);
     setCurrentQuestionIndex(-1);
+  };
+
+  const handleResetQuestionnaireAttempt = (questionnaireId: number) => {
+    localStorage.removeItem(getAttemptStorageKey(questionnaireId));
+    setAttemptStorageVersion((version) => version + 1);
+
+    if (quiz?.id !== questionnaireId) return;
+
+    dispatch({
+      type: "INIT",
+      payload: {
+        questionnaireId: quiz.id,
+        quizVersion: 0, //quiz.version,
+      },
+    });
+    setCurrentQuestionIndex(-1);
+    setIsModalOpen(false);
   };
 
   const handleSelectOption = (questionId: number, optionId: number) => {
@@ -201,7 +225,9 @@ export default function App() {
           start={handleStart}
           questionnaires={activeQuestionnaires ?? []}
           selectedQuestionnaireId={selectedQuestionnaireId}
+          attemptStorageVersion={attemptStorageVersion}
           onSelectQuestionnaire={handleSelectQuestionnaire}
+          onResetQuestionnaireAttempt={handleResetQuestionnaireAttempt}
           canStart={!!quiz}
         />
       ) : (
