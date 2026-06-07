@@ -150,6 +150,8 @@ export default function App() {
   };
 
   const handleSelectOption = (questionId: number, optionId: number) => {
+    if (attempt.answersByQuestionId[questionId]?.isAnswerRevealed) return;
+
     dispatch({
       type: "SELECT_OPTION",
       questionId,

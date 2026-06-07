@@ -25,10 +25,15 @@ export function Answer({
 
   return (
     <div
-      onClick={() => onSelect(questionId, option.id)}
+      onClick={() => {
+        if (isAnswerRevealed) return;
+
+        onSelect(questionId, option.id);
+      }}
       className={cn(
-        "flex flex-col w-48 h-48 bg-white rounded-xl cursor-pointer border border-medium-green",
-        !isSelected && "hover:border-4 hover:border-dark-green",
+        "flex flex-col w-48 h-48 bg-white rounded-xl border border-medium-green",
+        isAnswerRevealed ? "cursor-default" : "cursor-pointer",
+        !isAnswerRevealed && !isSelected && "hover:border-4 hover:border-dark-green",
         isAnswerRevealed && isCorrect && "card",
         isSelected && "border-4 border-answer-user ",
       )}

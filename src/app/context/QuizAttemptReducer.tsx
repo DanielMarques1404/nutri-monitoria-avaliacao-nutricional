@@ -50,6 +50,10 @@ export const quizAttemptReducer = (
       return action.payload;
 
     case "SELECT_OPTION":
+      if (state.answersByQuestionId[action.questionId]?.isAnswerRevealed) {
+        return state;
+      }
+
       return {
         ...state,
         answersByQuestionId: {
