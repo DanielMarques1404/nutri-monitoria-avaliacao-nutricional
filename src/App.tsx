@@ -15,7 +15,7 @@ import { NavButtons } from "./components/NavButtons";
 import { QuestionForm } from "./components/QuestionForm";
 import { Summary } from "./components/Summary";
 import type { IQuestionnaire, IQuizAttempt } from "./domain/entities/entities";
-import { getAttemptStorageKey } from "./utils/attemptStorage";
+import { getAttemptStorageKey } from "./utils/data";
 
 const SELECTED_QUESTIONNAIRE_STORAGE_KEY = "selected-questionnaire-id";
 

@@ -1,5 +1,5 @@
 import type { IQuestionnaire, IQuizAttempt } from "../../domain/entities/entities";
-import { getAttemptStorageKey } from "../../utils/attemptStorage";
+import { getAttemptStorageKey } from "../../utils/data";
 
 type QuestionnaireCardProps = {
   questionnaire: IQuestionnaire | null;

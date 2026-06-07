@@ -1,5 +1,5 @@
 import { IconBrandInstagram, IconMail } from "@tabler/icons-react";
-import type { Person } from "../../types/person";
+import type { Person } from "../../utils/data";
 
 export const PersonCard = ({ person }: { person: Person }) => {
   return (
