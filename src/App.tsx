@@ -218,7 +218,7 @@ export default function App() {
 
   return (
     <div className="flex flex-col justify-between min-h-screen">
-      <Header questionnaireName={quiz?.name ?? ""} showBackButton={currentQuestionIndex !== -1 && !!quiz} />
+      <Header questionnaireName={currentQuestionIndex > -1 ? quiz?.name : undefined} showBackButton={currentQuestionIndex !== -1 && !!quiz} />
 
       {currentQuestionIndex === -1 || !quiz ? (
         <Intro
@@ -247,8 +247,6 @@ export default function App() {
           />
         </>
       )}
-
-      {/* <pre>{JSON.stringify(attempt, null, 2)}</pre> */}
 
       <Footer />
       {isModalOpen && currentQuestion && (

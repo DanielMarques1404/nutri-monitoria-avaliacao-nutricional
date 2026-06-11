@@ -33,14 +33,6 @@ export const Intro = ({
         </div>
 
         <div className="lg:grow md:w-1/2 lg:pl-20 md:pl-14 flex flex-col md:items-start md:text-left items-center text-center gap-2">
-          <div>
-            <h1 className="title-font sm:text-4xl text-3xl mb-4 font-medium text-gray-900">
-              MONITORIA EM AVALIAÇÃO NUTRICIONAL
-            </h1>
-            <p className="leading-relaxed">
-              PROGRAMA DE MONITORIA E INICIAÇÃO CIENTÍFICA – PROMIC
-            </p>
-          </div>
 
           <div className="w-full my-4">
             {questionnaires.length === 0 ? (
