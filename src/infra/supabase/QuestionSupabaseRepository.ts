@@ -8,7 +8,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
   ): Promise<IQuestion[] | null> {
     const { data, error } = await supabase
       .from("questionnaire_questions")
-      .select("questions(id, title, statement, question, explanation, difficulty, correct_option, category_id, url_learn_more, question_tags(tags(id, name)), question_options(id, description, option, question_id))")
+      .select("questions(id, title, statement, question, explanation, difficulty, correct_option, category_id, url_learn_more, question_tags(tags(id, name)), question_options(id, description, question_id))")
       .eq("questionnaire_id", questionnaireId)
       .order("title", { foreignTable: "questions", ascending: true });
 
@@ -30,9 +30,8 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
           id: qo.id,
           questionId: qo.question_id,
           description: qo.description,
-          option: qo.option,
         })) || [],
-      correctOption: question.correct_option || null,
+      correctOption: question.correct_option || 0,
       explanation: question.explanation || "",
       categoryId: question.category_id || 0,
       difficulty: question.difficulty || "",
@@ -48,7 +47,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
   async listByIds(ids: number[]): Promise<IQuestion[] | null> {
     const { data, error } = await supabase
       .from("questions")
-      .select("id, title, statement, question, explanation, difficulty, correct_option, category_id, url_learn_more, question_tags(tags(id, name)), question_options(id, description, option, question_id)")
+      .select("id, title, statement, question, explanation, difficulty, correct_option, category_id, url_learn_more, question_tags(tags(id, name)), question_options(id, description, question_id)")
       .in("id", ids)
       .order("title", { ascending: true });
 
@@ -64,7 +63,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
       const { id, options, tags, correctOption, categoryId, urlLearnMore, ...justAQuestion } = question;
       const dbQuestion = {
         ...justAQuestion,
-        correct_option: correctOption,
+        correct_option: correctOption > 0 ? correctOption : null,
         category_id: categoryId,
         url_learn_more: urlLearnMore || null,
       };
@@ -82,7 +81,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
       const { options, tags, correctOption, categoryId, urlLearnMore, ...justAQuestion } = question;
       const dbQuestion = {
         ...justAQuestion,
-        correct_option: correctOption,
+        correct_option: correctOption > 0 ? correctOption : null,
         category_id: categoryId,
         url_learn_more: urlLearnMore || null,
       };
@@ -97,6 +96,20 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
       }
 
       return question.id;
+    }
+  }
+
+  async updateCorrectOption(
+    questionId: number,
+    correctOptionId: number,
+  ): Promise<void> {
+    const { error } = await supabase
+      .from("questions")
+      .update({ correct_option: correctOptionId })
+      .eq("id", questionId);
+
+    if (error) {
+      throw error;
     }
   }
 

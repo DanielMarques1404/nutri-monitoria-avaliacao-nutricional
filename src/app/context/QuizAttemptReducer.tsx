@@ -32,6 +32,7 @@ export function createEmptyAttempt(
     questionnaireId,
     quizVersion,
     answersByQuestionId: {},
+    optionOrderByQuestionId: {},
   };
 }
 

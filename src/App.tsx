@@ -14,10 +14,73 @@ import Modal from "./components/layout/Modal";
 import { NavButtons } from "./components/NavButtons";
 import { QuestionForm } from "./components/QuestionForm";
 import { Summary } from "./components/Summary";
-import type { IQuestionnaire, IQuizAttempt } from "./domain/entities/entities";
+import type {
+  IOption,
+  IQuestionnaire,
+  IQuizAttempt,
+} from "./domain/entities/entities";
 import { getAttemptStorageKey } from "./utils/data";
 
 const SELECTED_QUESTIONNAIRE_STORAGE_KEY = "selected-questionnaire-id";
+
+const shuffleOptionIds = (options: IOption[] = []) => {
+  const optionIds = options.map((option) => option.id);
+
+  for (let index = optionIds.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [optionIds[index], optionIds[randomIndex]] = [
+      optionIds[randomIndex],
+      optionIds[index],
+    ];
+  }
+
+  return optionIds;
+};
+
+const getOptionOrderByQuestionId = (
+  quiz: IQuestionnaire,
+  attempt?: IQuizAttempt,
+) => {
+  const optionOrderByQuestionId = {
+    ...(attempt?.optionOrderByQuestionId ?? {}),
+  };
+
+  quiz.questions.forEach((question) => {
+    const questionKey = String(question.id);
+    const optionIds = question.options?.map((option) => option.id) ?? [];
+    const savedOrder = optionOrderByQuestionId[questionKey];
+    const savedOrderIsValid =
+      savedOrder?.length === optionIds.length &&
+      optionIds.every((optionId) => savedOrder.includes(optionId));
+
+    if (!savedOrderIsValid) {
+      optionOrderByQuestionId[questionKey] = shuffleOptionIds(question.options);
+    }
+  });
+
+  return optionOrderByQuestionId;
+};
+
+const normalizeAttempt = (
+  quiz: IQuestionnaire,
+  attempt?: IQuizAttempt,
+): IQuizAttempt => ({
+  ...(attempt ?? createEmptyAttempt(quiz.id, 0)),
+  questionnaireId: quiz.id,
+  quizVersion: 0,
+  optionOrderByQuestionId: getOptionOrderByQuestionId(quiz, attempt),
+});
+
+const getOrderedOptions = (options: IOption[] = [], optionOrder: number[] = []) => {
+  if (optionOrder.length === 0) return options;
+
+  const optionsById = new Map(options.map((option) => [option.id, option]));
+  const orderedOptions = optionOrder
+    .map((optionId) => optionsById.get(optionId))
+    .filter((option): option is IOption => !!option);
+
+  return orderedOptions.length === options.length ? orderedOptions : options;
+};
 
 const getInitialSelectedQuestionnaireId = () => {
   const savedQuestionnaireId = localStorage.getItem(
@@ -82,7 +145,7 @@ export default function App() {
         ) {
           dispatch({
             type: "HYDRATE",
-            payload: parsedAttempt,
+            payload: normalizeAttempt(quiz, parsedAttempt),
           });
           return;
         }
@@ -92,11 +155,8 @@ export default function App() {
     }
 
     dispatch({
-      type: "INIT",
-      payload: {
-        questionnaireId: quiz.id,
-        quizVersion: 0, //quiz.version,
-      },
+      type: "HYDRATE",
+      payload: normalizeAttempt(quiz),
     });
   }, [quiz]);
 
@@ -105,7 +165,10 @@ export default function App() {
 
     const storageKey = getAttemptStorageKey(attempt.questionnaireId);
 
-    if (Object.keys(attempt.answersByQuestionId).length === 0) {
+    if (
+      Object.keys(attempt.answersByQuestionId).length === 0 &&
+      Object.keys(attempt.optionOrderByQuestionId).length === 0
+    ) {
       localStorage.removeItem(storageKey);
       return;
     }
@@ -140,6 +203,12 @@ export default function App() {
   const attemptForCurrentQuestion = currentQuestion
     ? attempt.answersByQuestionId[currentQuestion.id]
     : undefined;
+  const currentQuestionOptions = currentQuestion
+    ? getOrderedOptions(
+        currentQuestion.options,
+        attempt.optionOrderByQuestionId[currentQuestion.id],
+      )
+    : [];
 
   const handleStart = () => {
     if (!quiz) return;
@@ -163,11 +232,8 @@ export default function App() {
     if (quiz?.id !== questionnaireId) return;
 
     dispatch({
-      type: "INIT",
-      payload: {
-        questionnaireId: quiz.id,
-        quizVersion: 0, //quiz.version,
-      },
+      type: "HYDRATE",
+      payload: normalizeAttempt(quiz),
     });
     setCurrentQuestionIndex(-1);
     setIsModalOpen(false);
@@ -191,7 +257,7 @@ export default function App() {
     );
     const result = !selectedOption
       ? "revealed_without_answer"
-      : selectedOption.option === currentQuestion.correctOption
+      : selectedOption.id === currentQuestion.correctOption
         ? "correct"
         : "incorrect";
 
@@ -234,6 +300,7 @@ export default function App() {
         <>
           <QuestionForm
             question={currentQuestion}
+            options={currentQuestionOptions}
             attemptForQuestion={attemptForCurrentQuestion}
             onSelectOption={handleSelectOption}
           />
@@ -254,13 +321,14 @@ export default function App() {
           <Summary
             handleClose={() => setIsModalOpen(false)}
             question={currentQuestion}
+            options={currentQuestionOptions}
             kind={
               !attemptForCurrentQuestion?.selectedOptionId
                 ? "abstention"
                 : currentQuestion.options?.find(
                       (o) =>
                         o.id === attemptForCurrentQuestion.selectedOptionId,
-                    )?.option === currentQuestion.correctOption
+                    )?.id === currentQuestion.correctOption
                   ? "success"
                   : "error"
             }

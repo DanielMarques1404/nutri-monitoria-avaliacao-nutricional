@@ -9,7 +9,6 @@ export interface ITag extends IGeneric {
 export interface IOption extends IGeneric {
   questionId: number;
   description: string;
-  option: string;
 }
 
 export interface ICategory extends IGeneric {
@@ -21,7 +20,7 @@ export interface IQuestion extends IGeneric {
   statement: string;
   question: string;
   options?: IOption[];
-  correctOption: string;
+  correctOption: number;
   explanation: string;
   categoryId: number;
   difficulty: string;
@@ -47,6 +46,7 @@ export interface IQuizAttempt {
   questionnaireId: number;
   quizVersion: number;
   answersByQuestionId: Record<string, IQuestionAttempt>;
+  optionOrderByQuestionId: Record<string, number[]>;
   startedAt?: string;
   completedAt?: string;
 }

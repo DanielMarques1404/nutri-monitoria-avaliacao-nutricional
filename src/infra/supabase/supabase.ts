@@ -62,21 +62,18 @@ export type Database = {
           created_at: string
           description: string
           id: number
-          option: string
           question_id: number
         }
         Insert: {
           created_at?: string
           description: string
           id?: number
-          option: string
           question_id: number
         }
         Update: {
           created_at?: string
           description?: string
           id?: number
-          option?: string
           question_id?: number
         }
         Relationships: [
@@ -191,7 +188,7 @@ export type Database = {
       questions: {
         Row: {
           category_id: number | null
-          correct_option: string | null
+          correct_option: number | null
           created_at: string
           difficulty: string | null
           explanation: string | null
@@ -203,7 +200,7 @@ export type Database = {
         }
         Insert: {
           category_id?: number | null
-          correct_option?: string | null
+          correct_option?: number | null
           created_at?: string
           difficulty?: string | null
           explanation?: string | null
@@ -215,7 +212,7 @@ export type Database = {
         }
         Update: {
           category_id?: number | null
-          correct_option?: string | null
+          correct_option?: number | null
           created_at?: string
           difficulty?: string | null
           explanation?: string | null

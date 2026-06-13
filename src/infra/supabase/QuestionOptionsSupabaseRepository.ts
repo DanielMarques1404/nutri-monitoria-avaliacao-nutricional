@@ -6,7 +6,7 @@ export class QuestionOptionsSupabaseRepository implements IQuestionOptionsReposi
   async listByQuestionId(questionId: number): Promise<IOption[] | null> {
     const { data, error } = await supabase
       .from("question_options")
-      .select("id, description, option, question_id")
+      .select("id, description, question_id")
       .eq("question_id", questionId)
 
     if (error) throw error;
@@ -24,10 +24,15 @@ export class QuestionOptionsSupabaseRepository implements IQuestionOptionsReposi
   }
   
   async create(option: IOption, questionId: number): Promise<number> {
-    const { questionId: _, ...optionData } = option;
+    const { id, questionId: _, ...optionData } = option;
+    const dbOption = {
+      ...optionData,
+      ...(id > 0 ? { id } : {}),
+      question_id: questionId,
+    };
     const { data, error } = await supabase
       .from("question_options")
-      .insert({ ...optionData, id: option.id < 0 ? 0 : option.id, question_id: questionId })
+      .insert(dbOption)
       .select("id");
 
     if (error) {

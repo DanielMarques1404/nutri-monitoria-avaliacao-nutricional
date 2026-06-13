@@ -7,7 +7,7 @@ type AnswerProps = {
   letter: string;
   selectedOptionId?: number;
   isAnswerRevealed: boolean;
-  correctOption: string;
+  correctOption: number;
   onSelect: (questionId: number, optionId: number) => void;
 };
 
@@ -21,7 +21,7 @@ export function Answer({
   onSelect,
 }: AnswerProps) {
   const isSelected = selectedOptionId === option.id;
-  const isCorrect = correctOption === option.option;
+  const isCorrect = correctOption === option.id;
 
   return (
     <div

@@ -26,6 +26,7 @@ export class QuestionUseCases {
 
   async createOrUpdate(obj: IQuestion): Promise<void> {
     const questionId = await this.repository.createOrUpdate(obj);
+    let persistedCorrectOptionId = obj.correctOption;
 
     await this.tagsRepository.deleteByQuestionId(questionId);
     if (obj.tags) {
@@ -39,8 +40,22 @@ export class QuestionUseCases {
     if (obj.options) {
       await Promise.all(
         obj.options.map(async (option) => {
-          await this.optionsRepository.create(option, questionId);
+          const persistedOptionId = await this.optionsRepository.create(
+            option,
+            questionId,
+          );
+
+          if (option.id === obj.correctOption) {
+            persistedCorrectOptionId = persistedOptionId;
+          }
         })
+      );
+    }
+
+    if (persistedCorrectOptionId > 0) {
+      await this.repository.updateCorrectOption(
+        questionId,
+        persistedCorrectOptionId,
       );
     }
   }

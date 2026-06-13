@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { IQuestion } from "../domain/entities/entities";
+import type { IOption, IQuestion } from "../domain/entities/entities";
 import { Button } from "./ui/Button";
 
 const imageSuffixByKind = {
@@ -16,15 +16,23 @@ const labelByKind = {
 
 type SummaryProps = {
   question: IQuestion;
+  options: IOption[];
   kind: "success" | "error" | "abstention";
   handleClose: () => void;
 };
 
-export const Summary = ({ question, kind, handleClose }: SummaryProps) => {
+export const Summary = ({ question, options, kind, handleClose }: SummaryProps) => {
   const [imageCharacter] = useState(() =>
     Math.random() < 0.5 ? "monitora" : "professor",
   );
   const imageSrc = `assets/images/${imageCharacter}-${imageSuffixByKind[kind]}.jpg`;
+  const correctOptionIndex = options.findIndex(
+    (option) => option.id === question.correctOption,
+  );
+  const correctOptionLetter =
+    correctOptionIndex < 0
+      ? "-"
+      : ["A", "B", "C", "D", "E"][correctOptionIndex];
 
   return (
     <section className="h-full p-2 border-2 border-gray-200 border-opacity-60 rounded-lg overflow-hidden">
@@ -47,7 +55,7 @@ export const Summary = ({ question, kind, handleClose }: SummaryProps) => {
           ))}
         </ul>
         <p className="leading-relaxed mb-3">{question.explanation}</p>
-        <p className="text-dark-green font-bold">{`Resposta correta: ${question.correctOption}`}</p>
+        <p className="text-dark-green font-bold">{`Resposta correta: ${correctOptionLetter}`}</p>
         {question.urlLearnMore && (
           <div className="flex items-center flex-wrap ">
             <a

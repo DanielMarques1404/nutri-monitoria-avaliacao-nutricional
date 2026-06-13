@@ -1,14 +1,20 @@
-import type { IQuestion, IQuestionAttempt } from "../domain/entities/entities";
+import type {
+  IOption,
+  IQuestion,
+  IQuestionAttempt,
+} from "../domain/entities/entities";
 import { Answer } from "./Answer";
 
 type QuestionFormProps = {
   question: IQuestion | null;
+  options: IOption[];
   attemptForQuestion?: IQuestionAttempt;
   onSelectOption: (questionId: number, optionId: number) => void;
 };
 
 export function QuestionForm({
   question,
+  options,
   attemptForQuestion,
   onSelectOption,
 }: QuestionFormProps) {
@@ -31,7 +37,7 @@ export function QuestionForm({
         </div>
         <div className="flex items-center justify-center">
           <ul className="flex flex-wrap gap-4 p-0 items-center justify-center">
-            {question.options?.map((option, idx) => (
+            {options.map((option, idx) => (
               <li key={option.id} style={{ listStyle: "none" }}>
                 <Answer
                   questionId={question.id}

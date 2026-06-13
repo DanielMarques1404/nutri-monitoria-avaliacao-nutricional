@@ -55,7 +55,7 @@ export const QuestionForm = () => {
       statement: "",
       question: "",
       options: [],
-      correctOption: "",
+      correctOption: 0,
       explanation: "",
       categoryId: 0,
       difficulty: "",
@@ -107,7 +107,7 @@ export const QuestionForm = () => {
   });
 
   const submit = (data: IQuestion) => {
-    if (watch("correctOption") === "") {
+    if (watch("correctOption") === 0) {
       alert("É necessário indicar uma resposta válida");
       return;
     }
@@ -135,59 +135,40 @@ export const QuestionForm = () => {
 
     setSelectedOptionId(
       QuestionToUpdate.options?.find(
-        (op) => op.option === QuestionToUpdate.correctOption,
+        (op) => op.id === QuestionToUpdate.correctOption,
       )?.id || -1,
     );
   };
 
   const handleOptions = (
     optionId: number,
-    action: "ADD" | "DELETE" | "MOVEUP" | "MOVEDOWN",
+    action: "DELETE",
   ) => {
     let optionList = watch("options") || [];
     let newList: IOption[] | undefined = [];
-    const optionsAvailable = ["A", "B", "C", "D", "E"];
 
     switch (action) {
       case "DELETE":
         newList = optionList?.filter((op) => op.id !== optionId);
         if (selectedOptionId === optionId) {
           setSelectedOptionId(-1);
-          setValue("correctOption", "");
+          setValue("correctOption", 0);
         }
-        break;
-
-      case "MOVEUP":
-        const i = optionList?.findIndex((op) => op.id === optionId);
-        if (i === 0) return;
-        [optionList[i], optionList[i - 1]] = [optionList[i - 1], optionList[i]];
-        newList = [...optionList];
-        break;
-
-      case "MOVEDOWN":
-        const d = optionList?.findIndex((op) => op.id === optionId);
-        if (d === optionList.length - 1) return;
-        [optionList[d], optionList[d + 1]] = [optionList[d + 1], optionList[d]];
-        newList = [...optionList];
         break;
 
       default:
         break;
     }
 
-    newList = newList.map((op, idx) => ({
-      ...op,
-      option: optionsAvailable[idx],
-    }));
     setValue("options", newList);
 
     const newCorrectOption = newList.find((op) => op.id === selectedOptionId);
     if (!newCorrectOption) {
       setSelectedOptionId(-1);
-      setValue("correctOption", "");
+      setValue("correctOption", 0);
     } else {
       setSelectedOptionId(newCorrectOption.id);
-      setValue("correctOption", newCorrectOption.option);
+      setValue("correctOption", newCorrectOption.id);
     }
   };
 
@@ -209,7 +190,7 @@ export const QuestionForm = () => {
   };
 
   const handleSelectRightOption = (option: IOption) => {
-    setValue("correctOption", option.option);
+    setValue("correctOption", option.id);
     setSelectedOptionId(option.id);
   };
 
@@ -326,14 +307,12 @@ export const QuestionForm = () => {
       </form>
 
       <div className="flex flex-col gap-2 border-2 border-mediumGrey p-2 rounded-md">
-        {watch("options")?.sort((a, b) => a.option.localeCompare(b.option))?.map((op) => (
+        {watch("options")?.map((op) => (
           <OptionItem
             option={op}
             onDelete={(id) => handleOptions(id, "DELETE")}
-            onMoveUp={(id) => handleOptions(id, "MOVEUP")}
-            onMoveDown={(id) => handleOptions(id, "MOVEDOWN")}
             onSelect={handleSelectRightOption}
-            selected={op.option === watch("correctOption")}
+            selected={op.id === watch("correctOption")}
           />
         ))}
       </div>

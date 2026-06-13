@@ -64,7 +64,9 @@ export const QuestionnaireCard = ({
   if (!questionnaire) return "";
   const savedAttempt = getSavedAttempt(questionnaire);
   const hasSavedProgress =
-    !!savedAttempt && Object.keys(savedAttempt.answersByQuestionId).length > 0;
+    !!savedAttempt &&
+    (Object.keys(savedAttempt.answersByQuestionId).length > 0 ||
+      Object.keys(savedAttempt.optionOrderByQuestionId ?? {}).length > 0);
   const progress = getQuestionnaireProgress(questionnaire);
 
   return (

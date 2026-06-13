@@ -31,7 +31,7 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
     const { data, error } = await supabase
       .from("questionnaire_questions")
       .select(
-        "questionnaires(id, name, description, active), questions(id, title, statement, question, explanation, difficulty, correct_option, category_id, url_learn_more, question_tags(tags(id, name)), question_options(id, description, option, question_id))",
+        "questionnaires(id, name, description, active), questions(id, title, statement, question, explanation, difficulty, correct_option, category_id, url_learn_more, question_tags(tags(id, name)), question_options(id, description, question_id))",
       )
       .eq("questionnaire_id", id);
 
@@ -54,9 +54,8 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
             id: option.id,
             questionId: option.question_id,
             description: option.description,
-            option: option.option,
           })) || [],
-        correctOption: item.questions.correct_option || "",
+        correctOption: item.questions.correct_option || 0,
         explanation: item.questions.explanation || "",
         categoryId: item.questions.category_id || 0,
         difficulty: item.questions.difficulty || "",
