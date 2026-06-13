@@ -74,7 +74,7 @@ export const QuestionnaireCard = ({
       }`}
       onClick={() => onSelect?.(questionnaire)}
     >
-      <span className="text-sm text-dark-green transition-transform group-hover:font-semibold">
+      <span className="text-sm text-dark-green">
         {questionnaire?.name || "Sem questionário disponível"}
       </span>
 

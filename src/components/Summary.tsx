@@ -1,5 +1,18 @@
+import { useState } from "react";
 import type { IQuestion } from "../domain/entities/entities";
 import { Button } from "./ui/Button";
+
+const imageSuffixByKind = {
+  success: "right-answer",
+  error: "wrong-answer",
+  abstention: "no-answer",
+} as const;
+
+const labelByKind = {
+  success: "PARABÉNS! VOCÊ ACERTOU!",
+  error: "OPS... TENTE NOVAMENTE!",
+  abstention: "QUESTÃO NÃO RESPONDIDA",
+} as const;
 
 type SummaryProps = {
   question: IQuestion;
@@ -8,19 +21,23 @@ type SummaryProps = {
 };
 
 export const Summary = ({ question, kind, handleClose }: SummaryProps) => {
+  const [imageCharacter] = useState(() =>
+    Math.random() < 0.5 ? "monitora" : "professor",
+  );
+  const imageSrc = `assets/images/${imageCharacter}-${imageSuffixByKind[kind]}.jpg`;
+
   return (
     <section className="h-full p-2 border-2 border-gray-200 border-opacity-60 rounded-lg overflow-hidden">
-      <img
-        className="md:h-72 w-full object-cover object-center"
-        src={
-          kind === "success"
-            ? "assets/images/resposta-certa.png"
-            : kind === "error"
-              ? "assets/images/resposta-errada.png"
-              : "assets/images/resposta-ausente.png"
-        }
-        alt={`Imagem ${question.title}`}
-      />
+      <div className="relative h-72 w-full bg-white">
+        <div className="absolute top-0 left-0 z-10 w-full bg-dark-green/90 px-3 py-2 text-center text-sm font-bold tracking-wide text-white md:text-base">
+          {labelByKind[kind]}
+        </div>
+        <img
+          className="h-full w-full object-contain object-center pt-10"
+          src={imageSrc}
+          alt={`Imagem ${question.title}`}
+        />
+      </div>
       <div className="flex flex-col gap-1 p-4">
         <ul className="flex flex-wrap gap-2">
           {question.tags?.map((tag) => (
@@ -30,7 +47,7 @@ export const Summary = ({ question, kind, handleClose }: SummaryProps) => {
           ))}
         </ul>
         <p className="leading-relaxed mb-3">{question.explanation}</p>
-        <p className="text-dark-green font-bold">{`Resposta: ${question.correctOption}`}</p>
+        <p className="text-dark-green font-bold">{`Resposta correta: ${question.correctOption}`}</p>
         {question.urlLearnMore && (
           <div className="flex items-center flex-wrap ">
             <a
