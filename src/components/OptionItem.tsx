@@ -11,41 +11,39 @@ type OptionItemProps = {
 
 export const OptionItem = (props: OptionItemProps) => {
   return (
-    <div
-      className={cn(
-        "grid grid-cols-12 items-center border border-dark-green rounded-md overflow-hidden select-none h-auto cursor-pointer min-h-14",
-        {
-          "border-4 border-orange": props.selected,
-        },
-      )}
-      onClick={() => props.onSelect && props.onSelect(props.option)}
-    >
-      <span
-        className={cn(
-          "px-2 py-1",
-          props.onDelete && props.selected && "col-span-10",
-          props.onDelete && !props.selected && "col-span-11",
-          !props.onDelete && props.selected && "col-span-11",
-          !props.onDelete && !props.selected && "col-span-12",
-        )}
-      >
-        {props.option.description}
-      </span>
+    <div>
       {props.selected && (
-        <span className="col-span-1 text-center text-xs font-bold text-dark-green">
-          Correta
-        </span>
+        <span className="text-sm font-bold text-dark-green">Correta</span>
       )}
-      {props.onDelete && (
-        <div
-          className="flex items-center justify-center"
-          onClick={(event) => event.stopPropagation()}
+      <div
+        className={cn(
+          "grid grid-cols-12 items-center border border-dark-green rounded-md overflow-hidden select-none h-auto cursor-pointer min-h-14",
+          {
+            "border-4 border-orange": props.selected,
+          },
+        )}
+        onClick={() => props.onSelect && props.onSelect(props.option)}
+      >
+        <span
+          className={cn(
+            "px-2 py-1",
+            !props.onDelete && !props.selected ? "col-span-12" : "col-span-11",
+          )}
         >
-          <IconTrash
-            onClick={() => props.onDelete && props.onDelete(props.option.id)}
-          />
-        </div>
-      )}
+          {props.option.description}
+        </span>
+
+        {props.onDelete && (
+          <div
+            className="flex items-center justify-center"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <IconTrash
+              onClick={() => props.onDelete && props.onDelete(props.option.id)}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

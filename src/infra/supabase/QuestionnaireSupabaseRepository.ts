@@ -23,8 +23,24 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
     }));
   }
 
-  listAll(): Promise<IQuestionnaire[] | null> {
-    throw new Error("Method not implemented.");
+  async listAll(): Promise<IQuestionnaire[] | null> {
+        const { data, error } = await supabase
+      .from("questionnaires")
+      .select("id, name, description, active, questionnaire_questions(question_id)")
+      .order("name", { ascending: true });
+      
+    if (error) throw error;
+
+    if (!data) return null;
+
+    return data.map((item) => ({
+      id: item.id,
+      name: item.name,
+      description: item.description || "",
+      active: item.active,
+      questions: [],
+      questionCount: item.questionnaire_questions.length,
+    }));
   }
 
   async listById(id: number): Promise<IQuestionnaire | null> {

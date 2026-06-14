@@ -10,12 +10,10 @@ import type {
   ITag,
 } from "../../domain/entities/entities";
 import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
+import { QuestionnaireUseCase } from "../../domain/useCases/QuestionnaireUseCase";
 import { QuestionUseCases } from "../../domain/useCases/QuestionUseCases";
 import { RepositoryFactory } from "../../infra/factory/RepositoryFactory";
-import {
-  CURRENT_QUESTIONNAIRE,
-  CURRENT_TECH_REPOSITORY,
-} from "../../utils/data";
+import { CURRENT_TECH_REPOSITORY } from "../../utils/data";
 import { Table } from "../layout/Table";
 import { OptionItem } from "../OptionItem";
 import { Button } from "../ui/Button";
@@ -38,9 +36,14 @@ const ucCategories = new GenericUseCases<ICategory>(
   RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createCategoryRepo(),
 );
 
+const ucQuestionnaires = new QuestionnaireUseCase(
+  RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuestionnaireRepo(),
+);
+
 export const QuestionForm = () => {
   const [selectedTagId, setSelectedTagId] = useState(0);
   const [selectedOptionId, setSelectedOptionId] = useState(-1);
+  const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState(0);
   const {
     register,
     handleSubmit,
@@ -65,10 +68,11 @@ export const QuestionForm = () => {
   });
 
   const { data: questionsList } = useQuery({
-    queryKey: ["nutri-monitoria-questions"],
+    queryKey: ["nutri-monitoria-questions", selectedQuestionnaireId],
     queryFn: async () => {
-      return await ucQuestions.listByQuestionnaireId(CURRENT_QUESTIONNAIRE);
+      return await ucQuestions.listByQuestionnaireId(selectedQuestionnaireId);
     },
+    enabled: !!selectedQuestionnaireId,
   });
 
   const { data: categoriesList } = useQuery({
@@ -85,7 +89,14 @@ export const QuestionForm = () => {
     },
   });
 
-    const queryClient = useQueryClient();
+  const { data: questionnairesList } = useQuery({
+    queryKey: ["nutri-monitoria-questionnaires"],
+    queryFn: async () => {
+      return await ucQuestionnaires.listAll();
+    },
+  });
+
+  const queryClient = useQueryClient();
 
   const createUpdateMutation = useMutation({
     mutationFn: (question: IQuestion) => {
@@ -140,10 +151,7 @@ export const QuestionForm = () => {
     );
   };
 
-  const handleOptions = (
-    optionId: number,
-    action: "DELETE",
-  ) => {
+  const handleOptions = (optionId: number, action: "DELETE") => {
     let optionList = watch("options") || [];
     let newList: IOption[] | undefined = [];
 
@@ -194,9 +202,23 @@ export const QuestionForm = () => {
     setSelectedOptionId(option.id);
   };
 
+  function handleUpdateQuestionnaire(id: number): void {
+    setSelectedQuestionnaireId(id);
+    reset();
+  }
+
   return (
     <section className="flex flex-col lg:grid lg:grid-cols-4 p-2 w-full gap-2">
-      <div className="border-2 border-mediumGrey p-2 rounded-md h-1/2">
+      <div className="border-2 border-mediumGrey p-2 rounded-md">
+        <Table
+          caption="Questionários"
+          items={
+            questionnairesList?.map((q) => ({ id: q.id, name: q.name })) || []
+          }
+          updateAction={handleUpdateQuestionnaire}
+        />
+      </div>
+      <div className="border-2 border-mediumGrey p-2 rounded-md">
         <Table
           caption={"Perguntas"}
           items={
@@ -307,6 +329,9 @@ export const QuestionForm = () => {
       </form>
 
       <div className="flex flex-col gap-2 border-2 border-mediumGrey p-2 rounded-md">
+        <caption className="w-full p-1 font-semibold">
+          Itens de Resposta
+        </caption>
         {watch("options")?.map((op) => (
           <OptionItem
             option={op}

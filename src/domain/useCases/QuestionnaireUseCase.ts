@@ -8,6 +8,10 @@ export class QuestionnaireUseCase {
     this.repository = repository;
   }
 
+  async listAll(): Promise<IQuestionnaire[] | null> {
+    return await this.repository.listAll();
+  }
+
   getQuestionnaireById = async (
     questionnaireId: number,
   ): Promise<IQuestionnaire | null> => {
