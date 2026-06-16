@@ -9,16 +9,8 @@ export const Header = ({ questionnaireName, showBackButton }: HeaderProps) => {
   return (
     <header className="text-gray-600 body-font border-b-2 border-dark-green">
       <div className="container mx-auto flex flex-wrap px-5 py-2 flex-col md:flex-row items-center justify-center gap-2">
-        {showBackButton && (
-          <a
-            href="/"
-            className="flex items-center gap-1 text-light-green hover:text-dark-green rounded-full p-2 transition-colors bg-lighter-green"
-          >
-            <IconArrowBigLeftLines />
-          </a>
-        )}
         <a
-          className="flex title-font font-medium items-center mb-4 md:mb-0"
+          className="flex title-font font-medium items-center mb-4 md:mb-0 select-none"
           href="https://unifametro.edu.br/"
           target="blank"
         >
@@ -44,6 +36,15 @@ export const Header = ({ questionnaireName, showBackButton }: HeaderProps) => {
             )}
           </h1>
         </div>
+        {showBackButton && (
+          <a
+            href="/"
+            className="flex items-center justify-center gap-1 rounded-md p-2 bg-dark-green hover:bg-medium-green text-white cursor-pointer select-none"
+          >
+            <IconArrowBigLeftLines />
+            <span>Voltar</span>
+          </a>
+        )}
       </div>
     </header>
   );

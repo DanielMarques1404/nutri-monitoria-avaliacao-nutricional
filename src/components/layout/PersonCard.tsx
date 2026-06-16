@@ -7,7 +7,7 @@ export const PersonCard = ({ person }: { person: Person }) => {
       <img
         src={person.foto}
         alt={`foto-${person.name}`}
-        className="w-16 h-16 rounded-full object-cover border border-light-green mr-2 p-1"
+        className="w-16 h-16 rounded-full object-cover border border-light-green mr-2 p-1 select-none"
       />
       <div className="flex flex-col items-start justify-start">
         <span className="text-dark-green font-medium">{person.name}</span>

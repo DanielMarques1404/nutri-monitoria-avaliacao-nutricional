@@ -37,11 +37,11 @@ export const Summary = ({ question, options, kind, handleClose }: SummaryProps) 
   return (
     <section className="h-full p-2 border-2 border-gray-200 border-opacity-60 rounded-lg overflow-hidden">
       <div className="relative h-72 w-full bg-white">
-        <div className="absolute top-0 left-0 z-10 w-full bg-dark-green/90 px-3 py-2 text-center text-sm font-bold tracking-wide text-white md:text-base">
+        <div className="absolute top-0 left-0 z-10 w-full bg-dark-green/90 px-3 py-2 text-center text-sm font-bold tracking-wide text-white md:text-base select-none">
           {labelByKind[kind]}
         </div>
         <img
-          className="h-full w-full object-contain object-center pt-10"
+          className="h-full w-full object-contain object-center pt-10 select-none"
           src={imageSrc}
           alt={`Imagem ${question.title}`}
         />

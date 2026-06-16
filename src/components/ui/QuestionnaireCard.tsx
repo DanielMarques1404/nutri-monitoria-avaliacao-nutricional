@@ -101,7 +101,7 @@ export const QuestionnaireCard = ({
 
       {hasSavedProgress && (
         <button
-          className="mt-2 text-xs text-gray-500 underline-offset-2 hover:text-orange hover:underline cursor-pointer"
+          className="mt-2 text-xs text-gray-500 underline-offset-2 hover:text-orange hover:underline cursor-pointer select-none"
           type="button"
           onClick={(event) => {
             event.stopPropagation();
