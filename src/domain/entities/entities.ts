@@ -27,7 +27,7 @@ export interface IQuestion extends IGeneric {
   tags?: ITag[];
 }
 
-export interface IUrlQuestionnaire {
+export interface IUrlQuestionnaire extends IGeneric {
   questionnaireId: number;
   url: string;
 }

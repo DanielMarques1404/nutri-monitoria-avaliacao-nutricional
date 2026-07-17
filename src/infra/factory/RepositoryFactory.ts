@@ -1,11 +1,13 @@
 import type { ICategory, ITag } from "../../domain/entities/entities";
 import type { IQuestionnaireRepository } from "../../domain/repositories/IQuestionnaireRepository";
+import type { IQuestionnaireUrlsRepository } from "../../domain/repositories/IQuestionnaireUrlsRepository";
 import type { IQuestionOptionsRepository } from "../../domain/repositories/IQuestionOptionsRepository";
 import type { IQuestionRepository } from "../../domain/repositories/IQuestionRepository";
 import type { IQuestionTagsRepository } from "../../domain/repositories/IQuestionTagsRepository";
 import type { IRepository } from "../../domain/repositories/IRepository";
 import { REPOSITORY_SUPABASE } from "../../utils/data";
 import { QuestionnaireSupabaseRepository } from "../supabase/QuestionnaireSupabaseRepository";
+import { QuestionnaireUrlsSupabaseRepository } from "../supabase/QuestionnaireUrlsSupabaseRepository";
 import { QuestionOptionsSupabaseRepository } from "../supabase/QuestionOptionsSupabaseRepository";
 import { QuestionSupabaseRepository } from "../supabase/QuestionSupabaseRepository";
 import { QuestionTagsSupabaseRepository } from "../supabase/QuestionTagsSupabaseRepository";
@@ -18,6 +20,7 @@ interface IRepositoryFactory {
   createQuetionsRepo(): IQuestionRepository;
   createQuestionTagsRepo(): IQuestionTagsRepository;
   createQuestionnaireRepo(): IQuestionnaireRepository;
+  createQuestionnaireUrlsRepo(): IQuestionnaireUrlsRepository;
   createQuestionOptionsRepo(): IQuestionOptionsRepository;
 }
 
@@ -41,6 +44,9 @@ class SupabaseFactory implements IRepositoryFactory {
   createQuestionnaireRepo(): IQuestionnaireRepository {
     return new QuestionnaireSupabaseRepository();
   }
+  createQuestionnaireUrlsRepo(): IQuestionnaireUrlsRepository {
+    return new QuestionnaireUrlsSupabaseRepository();
+  }
 }
 
 // Próximas fábricas
@@ -61,6 +67,9 @@ class NotImplementedFactory implements IRepositoryFactory {
     throw new Error("Not implemented yet");
   }
   createQuestionnaireRepo(): IQuestionnaireRepository {
+    throw new Error("Not implemented yet");
+  }
+  createQuestionnaireUrlsRepo(): IQuestionnaireUrlsRepository {
     throw new Error("Not implemented yet");
   }
 }
