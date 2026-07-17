@@ -25,7 +25,11 @@ export interface IQuestion extends IGeneric {
   categoryId: number;
   difficulty: string;
   tags?: ITag[];
-  urlLearnMore?: string;
+}
+
+export interface IUrlQuestionnaire {
+  questionnaireId: number;
+  url: string;
 }
 
 export interface IQuestionnaire extends IGeneric {
@@ -34,7 +38,10 @@ export interface IQuestionnaire extends IGeneric {
   active: boolean;
   questions: IQuestion[];
   questionCount?: number;
+  urls: IUrlQuestionnaire[];
 }
+
+
 
 export interface IQuestionAttempt {
   selectedOptionId?: number;

@@ -63,7 +63,6 @@ export const QuestionForm = () => {
       categoryId: 0,
       difficulty: "",
       tags: [],
-      urlLearnMore: "",
     },
   });
 
@@ -140,7 +139,6 @@ export const QuestionForm = () => {
     setValue("tags", QuestionToUpdate.tags || []);
     setValue("categoryId", QuestionToUpdate.categoryId || 0);
     setValue("difficulty", QuestionToUpdate.difficulty);
-    setValue("urlLearnMore", QuestionToUpdate.urlLearnMore || "");
     setValue("options", QuestionToUpdate.options || []);
     setValue("correctOption", QuestionToUpdate.correctOption);
 
@@ -268,14 +266,6 @@ export const QuestionForm = () => {
           placeholder="Dificuldade"
           {...register("difficulty")}
           errors={errors.difficulty}
-        />
-
-        <Input
-          label={"URL para aprender mais"}
-          placeholder="https://..."
-          type="url"
-          {...register("urlLearnMore")}
-          errors={errors.urlLearnMore}
         />
 
         <Select
