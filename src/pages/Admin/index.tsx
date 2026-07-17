@@ -2,13 +2,16 @@ import { useState } from "react";
 import { useAuthContext } from "../../app/hooks/useAuthContext";
 import { CategoryForm } from "../../components/admin/CategoryForm";
 import { QuestionForm } from "../../components/admin/QuestionForm";
+import { QuestionnaireForm } from "../../components/admin/QuestionnaireForm";
 import { TagForm } from "../../components/admin/TagForm";
 import { Button } from "../../components/ui/Button";
 import { useNavigate } from "react-router";
 
 export const Admin = () => {
   const { logout } = useAuthContext();
-  const [entity, setEntity] = useState<"tag" | "category" | "question">("tag");
+  const [entity, setEntity] = useState<
+    "tag" | "category" | "questionnaire" | "question"
+  >("tag");
   const navigate = useNavigate();
 
   return (
@@ -33,7 +36,7 @@ export const Admin = () => {
         </div>
       </div>
 
-      <nav className="grid grid-cols-3 gap-2 text-white">
+      <nav className="grid grid-cols-4 gap-2 text-white">
         <Button
           classname={`${entity === "tag" ? "bg-light-green text-white" : "bg-dark-green text-white"}`}
           label="TAGs"
@@ -45,6 +48,11 @@ export const Admin = () => {
           onClick={() => setEntity("category")}
         />
         <Button
+          classname={`${entity === "questionnaire" ? "bg-light-green text-white" : "bg-dark-green text-white"}`}
+          label="Questionários"
+          onClick={() => setEntity("questionnaire")}
+        />
+        <Button
           classname={`${entity === "question" ? "bg-light-green text-white" : "bg-dark-green text-white"}`}
           label="Questões"
           onClick={() => setEntity("question")}
@@ -53,6 +61,7 @@ export const Admin = () => {
       <div className="flex items-center justify-center py-2 px-6 w-full">
         {entity === "tag" && <TagForm />}
         {entity === "category" && <CategoryForm />}
+        {entity === "questionnaire" && <QuestionnaireForm />}
         {entity === "question" && <QuestionForm />}
         {/* {entity === "question" && <QForm />} */}
       </div>

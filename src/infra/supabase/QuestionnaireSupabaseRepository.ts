@@ -44,7 +44,7 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
   private normalizeUrls(questionnaire: IQuestionnaire): IUrlQuestionnaire[] {
     const urlsByValue = new Map<string, IUrlQuestionnaire>();
 
-    questionnaire.urls
+    (questionnaire.urls ?? [])
       .map((item) => ({ ...item, url: item.url.trim() }))
       .filter((item) => item.url.length > 0)
       .forEach((item) => urlsByValue.set(item.url, item));
@@ -152,6 +152,7 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
   }
 
   async createOrUpdate(questionnaire: IQuestionnaire): Promise<void> {
+    const questionnaireId = questionnaire.id ?? 0;
     const urls = this.normalizeUrls(questionnaire);
     const dbQuestionnaire = {
       name: questionnaire.name,
@@ -159,7 +160,7 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
       active: questionnaire.active,
     };
 
-    if (questionnaire.id === 0) {
+    if (questionnaireId === 0) {
       const { data, error } = await supabase
         .from("questionnaires")
         .insert(dbQuestionnaire)
@@ -175,11 +176,11 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
     const { error } = await supabase
       .from("questionnaires")
       .update(dbQuestionnaire)
-      .eq("id", questionnaire.id);
+      .eq("id", questionnaireId);
 
     if (error) throw error;
 
-    await this.replaceUrls(questionnaire.id, urls);
+    await this.replaceUrls(questionnaireId, urls);
   }
 
   async delete(id: number): Promise<void> {
