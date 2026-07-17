@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import type { IQuestionnaire } from "../../domain/entities/entities";
@@ -24,6 +25,8 @@ const defaultQuestionnaire: IQuestionnaire = {
 
 export const QuestionnaireForm = () => {
   const queryClient = useQueryClient();
+  const [urlInput, setUrlInput] = useState("");
+  const [editingUrlId, setEditingUrlId] = useState<number | null>(null);
   const {
     register,
     handleSubmit,
@@ -58,6 +61,7 @@ export const QuestionnaireForm = () => {
         { position: "bottom-right" },
       );
       reset(defaultQuestionnaire);
+      resetUrlForm();
     },
     onError: (error) => {
       console.error("Falha ao registrar Questionário", error);
@@ -99,6 +103,73 @@ export const QuestionnaireForm = () => {
     });
   };
 
+  const resetUrlForm = () => {
+    setUrlInput("");
+    setEditingUrlId(null);
+  };
+
+  const handleSaveUrl = () => {
+    const url = urlInput.trim();
+    const currentUrls = watch("urls") ?? [];
+
+    if (!url) {
+      toast.error("Informe uma URL válida", { position: "bottom-right" });
+      return;
+    }
+
+    const duplicatedUrl = currentUrls.some(
+      (item) => item.url === url && item.id !== editingUrlId,
+    );
+
+    if (duplicatedUrl) {
+      toast.error("URL já adicionada ao questionário", {
+        position: "bottom-right",
+      });
+      return;
+    }
+
+    if (editingUrlId !== null) {
+      setValue(
+        "urls",
+        currentUrls.map((item) =>
+          item.id === editingUrlId ? { ...item, url } : item,
+        ),
+      );
+      resetUrlForm();
+      return;
+    }
+
+    const nextTemporaryId = Math.min(0, ...currentUrls.map((item) => item.id)) - 1;
+
+    setValue("urls", [
+      ...currentUrls,
+      {
+        id: nextTemporaryId,
+        questionnaireId: watch("id") ?? 0,
+        url,
+      },
+    ]);
+    resetUrlForm();
+  };
+
+  const handleEditUrl = (id: number) => {
+    const urlToUpdate = watch("urls")?.find((item) => item.id === id);
+
+    if (!urlToUpdate) return;
+
+    setUrlInput(urlToUpdate.url);
+    setEditingUrlId(urlToUpdate.id);
+  };
+
+  const handleDeleteUrl = (id: number) => {
+    setValue(
+      "urls",
+      watch("urls")?.filter((item) => item.id !== id) || [],
+    );
+
+    if (editingUrlId === id) resetUrlForm();
+  };
+
   const handleDelete = (id: number) => {
     deleteMutation.mutate(id);
   };
@@ -120,6 +191,7 @@ export const QuestionnaireForm = () => {
     setValue("questions", questionnaireToUpdate.questions || []);
     setValue("questionCount", questionnaireToUpdate.questionCount);
     setValue("urls", questionnaireToUpdate.urls || []);
+    resetUrlForm();
   };
 
   return (
@@ -149,11 +221,49 @@ export const QuestionnaireForm = () => {
           Questionário ativo
         </label>
 
+        <div className="flex flex-col gap-2 border border-mediumGrey rounded-md p-2">
+          <span className="font-semibold">URLs do Questionário</span>
+          <div className="flex items-end gap-2">
+            <Input
+              label="URL"
+              type="url"
+              placeholder="https://..."
+              value={urlInput}
+              onChange={(event) => setUrlInput(event.target.value)}
+            />
+            <Button
+              classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg mb-2"
+              type="button"
+              label={editingUrlId === null ? "Adicionar" : "Atualizar"}
+              onClick={handleSaveUrl}
+            />
+            {editingUrlId !== null && (
+              <Button
+                classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg mb-2"
+                type="button"
+                label="Cancelar"
+                onClick={resetUrlForm}
+              />
+            )}
+          </div>
+
+          <Table
+            caption=""
+            items={(watch("urls") || []).map((item) => ({
+              id: item.id,
+              name: item.url,
+            }))}
+            updateAction={handleEditUrl}
+            deleteAction={handleDeleteUrl}
+          />
+        </div>
+
         <div className="flex items-center justify-end gap-2">
           <Button
             classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
             onClick={() => {
               reset(defaultQuestionnaire);
+              resetUrlForm();
               (
                 document.getElementById("firstInput") as HTMLInputElement | null
               )?.focus();
