@@ -56,30 +56,6 @@ export const Summary = ({ question, options, kind, handleClose }: SummaryProps) 
         </ul>
         <p className="leading-relaxed mb-3">{question.explanation}</p>
         <p className="text-dark-green font-bold">{`Resposta correta: ${correctOptionLetter}`}</p>
-        {question.urlLearnMore && (
-          <div className="flex items-center flex-wrap ">
-            <a
-              className="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0"
-              href={question.urlLearnMore}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Aprender Mais
-              <svg
-                className="w-4 h-4 ml-2"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5 12h14"></path>
-                <path d="M12 5l7 7-7 7"></path>
-              </svg>
-            </a>
-          </div>
-        )}
         <Button
           label="Fechar"
           onClick={handleClose}
