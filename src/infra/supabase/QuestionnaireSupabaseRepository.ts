@@ -41,6 +41,40 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
     };
   }
 
+  private normalizeUrls(questionnaire: IQuestionnaire): IUrlQuestionnaire[] {
+    const urlsByValue = new Map<string, IUrlQuestionnaire>();
+
+    questionnaire.urls
+      .map((item) => ({ ...item, url: item.url.trim() }))
+      .filter((item) => item.url.length > 0)
+      .forEach((item) => urlsByValue.set(item.url, item));
+
+    return Array.from(urlsByValue.values());
+  }
+
+  private async replaceUrls(
+    questionnaireId: number,
+    urls: IUrlQuestionnaire[],
+  ): Promise<void> {
+    const { error: deleteError } = await supabase
+      .from("questionnaire_urls")
+      .delete()
+      .eq("questionnaire_id", questionnaireId);
+
+    if (deleteError) throw deleteError;
+
+    if (urls.length === 0) return;
+
+    const { error: insertError } = await supabase.from("questionnaire_urls").insert(
+      urls.map((item) => ({
+        questionnaire_id: questionnaireId,
+        url: item.url,
+      })),
+    );
+
+    if (insertError) throw insertError;
+  }
+
   async listActives(): Promise<IQuestionnaire[] | null> {
     const { data, error } = await supabase
       .from("questionnaires")
@@ -118,6 +152,7 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
   }
 
   async createOrUpdate(questionnaire: IQuestionnaire): Promise<void> {
+    const urls = this.normalizeUrls(questionnaire);
     const dbQuestionnaire = {
       name: questionnaire.name,
       description: questionnaire.description || null,
@@ -125,11 +160,15 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
     };
 
     if (questionnaire.id === 0) {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("questionnaires")
-        .insert(dbQuestionnaire);
+        .insert(dbQuestionnaire)
+        .select("id")
+        .single();
 
       if (error) throw error;
+
+      await this.replaceUrls(data.id, urls);
       return;
     }
 
@@ -139,9 +178,18 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
       .eq("id", questionnaire.id);
 
     if (error) throw error;
+
+    await this.replaceUrls(questionnaire.id, urls);
   }
 
   async delete(id: number): Promise<void> {
+    const { error: urlsError } = await supabase
+      .from("questionnaire_urls")
+      .delete()
+      .eq("questionnaire_id", id);
+
+    if (urlsError) throw urlsError;
+
     const { error } = await supabase.from("questionnaires").delete().eq("id", id);
 
     if (error) throw error;
