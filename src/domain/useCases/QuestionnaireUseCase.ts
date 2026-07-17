@@ -12,6 +12,14 @@ export class QuestionnaireUseCase {
     return await this.repository.listAll();
   }
 
+  async createOrUpdate(questionnaire: IQuestionnaire): Promise<void> {
+    return await this.repository.createOrUpdate(questionnaire);
+  }
+
+  async delete(id: number): Promise<void> {
+    return await this.repository.delete(id);
+  }
+
   getQuestionnaireById = async (
     questionnaireId: number,
   ): Promise<IQuestionnaire | null> => {

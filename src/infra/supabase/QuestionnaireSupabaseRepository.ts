@@ -117,10 +117,33 @@ export class QuestionnaireSupabaseRepository implements IQuestionnaireRepository
     };
   }
 
-  createOrUpdate(obj: IQuestionnaire): Promise<void> {
-    throw new Error(`"Method not implemented." ${obj}`);
+  async createOrUpdate(questionnaire: IQuestionnaire): Promise<void> {
+    const dbQuestionnaire = {
+      name: questionnaire.name,
+      description: questionnaire.description || null,
+      active: questionnaire.active,
+    };
+
+    if (questionnaire.id === 0) {
+      const { error } = await supabase
+        .from("questionnaires")
+        .insert(dbQuestionnaire);
+
+      if (error) throw error;
+      return;
+    }
+
+    const { error } = await supabase
+      .from("questionnaires")
+      .update(dbQuestionnaire)
+      .eq("id", questionnaire.id);
+
+    if (error) throw error;
   }
-  delete(id: number): Promise<void> {
-    throw new Error(`"Method not implemented." ${id}`);
+
+  async delete(id: number): Promise<void> {
+    const { error } = await supabase.from("questionnaires").delete().eq("id", id);
+
+    if (error) throw error;
   }
 }
