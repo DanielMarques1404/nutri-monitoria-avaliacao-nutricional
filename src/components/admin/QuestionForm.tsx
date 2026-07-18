@@ -42,6 +42,10 @@ const ucCategories = new GenericUseCases<ICategory>(
 
 const ucQuestionnaires = new QuestionnaireUseCase(
   RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuestionnaireRepo(),
+  RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuestionnaireUrlsRepo(),
+  RepositoryFactory.getRepo(
+    CURRENT_TECH_REPOSITORY,
+  ).createQuestionnaireQuestionsRepo(),
 );
 
 const ucQuestionnaireQuestions = new QuestionnaireQuestionsUseCase(
@@ -121,10 +125,11 @@ export const QuestionForm = () => {
   };
 
   const createUpdateMutation = useMutation({
-    mutationFn: async (question: IQuestion) => {
-      const questionId = await ucQuestions.createOrUpdate(question);
-      await ucQuestionnaireQuestions.create(selectedQuestionnaireId, questionId);
-    },
+    mutationFn: (question: IQuestion) =>
+      ucQuestions.createOrUpdateForQuestionnaire(
+        question,
+        selectedQuestionnaireId,
+      ),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["nutri-monitoria-questions"],

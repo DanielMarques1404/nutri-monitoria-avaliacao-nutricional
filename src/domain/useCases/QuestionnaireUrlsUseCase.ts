@@ -18,6 +18,13 @@ export class QuestionnaireUrlsUseCase {
     return this.repository.createOrUpdate(url);
   }
 
+  async replaceByQuestionnaireId(
+    questionnaireId: number,
+    urls: IUrlQuestionnaire[],
+  ): Promise<void> {
+    return this.repository.replaceByQuestionnaireId(questionnaireId, urls);
+  }
+
   async delete(id: number): Promise<void> {
     return this.repository.delete(id);
   }

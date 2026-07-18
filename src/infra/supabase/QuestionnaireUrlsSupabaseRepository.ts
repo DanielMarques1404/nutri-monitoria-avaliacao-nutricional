@@ -46,6 +46,24 @@ export class QuestionnaireUrlsSupabaseRepository
     if (error) throw error;
   }
 
+  async replaceByQuestionnaireId(
+    questionnaireId: number,
+    urls: IUrlQuestionnaire[],
+  ): Promise<void> {
+    await this.deleteByQuestionnaireId(questionnaireId);
+
+    if (urls.length === 0) return;
+
+    const { error } = await supabase.from("questionnaire_urls").insert(
+      urls.map((item) => ({
+        questionnaire_id: questionnaireId,
+        url: item.url,
+      })),
+    );
+
+    if (error) throw error;
+  }
+
   async delete(id: number): Promise<void> {
     const { error } = await supabase
       .from("questionnaire_urls")

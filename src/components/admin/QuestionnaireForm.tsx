@@ -12,6 +12,10 @@ import { Input } from "../ui/Input";
 
 const ucQuestionnaire = new QuestionnaireUseCase(
   RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuestionnaireRepo(),
+  RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuestionnaireUrlsRepo(),
+  RepositoryFactory.getRepo(
+    CURRENT_TECH_REPOSITORY,
+  ).createQuestionnaireQuestionsRepo(),
 );
 
 const defaultQuestionnaire: IQuestionnaire = {

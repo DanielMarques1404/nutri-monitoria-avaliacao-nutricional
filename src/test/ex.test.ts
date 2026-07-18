@@ -6,6 +6,10 @@ import { QuestionnaireUseCase } from "../domain/useCases/QuestionnaireUseCase";
 
 const ucQuestionnaires = new QuestionnaireUseCase(
   RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuestionnaireRepo(),
+  RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuestionnaireUrlsRepo(),
+  RepositoryFactory.getRepo(
+    CURRENT_TECH_REPOSITORY,
+  ).createQuestionnaireQuestionsRepo(),
 );
 
 // describe('Recuperar Tags', () => {

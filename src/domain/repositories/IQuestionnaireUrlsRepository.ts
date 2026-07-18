@@ -5,6 +5,10 @@ export interface IQuestionnaireUrlsRepository {
     questionnaireId: number,
   ): Promise<IUrlQuestionnaire[] | null>;
   createOrUpdate(url: IUrlQuestionnaire): Promise<void>;
+  replaceByQuestionnaireId(
+    questionnaireId: number,
+    urls: IUrlQuestionnaire[],
+  ): Promise<void>;
   delete(id: number): Promise<void>;
   deleteByQuestionnaireId(questionnaireId: number): Promise<void>;
 }

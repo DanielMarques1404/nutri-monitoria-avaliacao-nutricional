@@ -62,6 +62,15 @@ export class QuestionUseCases {
     return questionId;
   }
 
+  async createOrUpdateForQuestionnaire(
+    obj: IQuestion,
+    questionnaireId: number,
+  ): Promise<number> {
+    const questionId = await this.createOrUpdate(obj);
+    await this.questionnaireQuestionsRepository.create(questionnaireId, questionId);
+    return questionId;
+  }
+
   async delete(id: number): Promise<void> {
     try {
       await this.repository.updateCorrectOption(id, null);
