@@ -10,6 +10,7 @@ import type {
   ITag,
 } from "../../domain/entities/entities";
 import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
+import { QuestionnaireQuestionsUseCase } from "../../domain/useCases/QuestionnaireQuestionsUseCase";
 import { QuestionnaireUseCase } from "../../domain/useCases/QuestionnaireUseCase";
 import { QuestionUseCases } from "../../domain/useCases/QuestionUseCases";
 import { RepositoryFactory } from "../../infra/factory/RepositoryFactory";
@@ -38,6 +39,12 @@ const ucCategories = new GenericUseCases<ICategory>(
 
 const ucQuestionnaires = new QuestionnaireUseCase(
   RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuestionnaireRepo(),
+);
+
+const ucQuestionnaireQuestions = new QuestionnaireQuestionsUseCase(
+  RepositoryFactory.getRepo(
+    CURRENT_TECH_REPOSITORY,
+  ).createQuestionnaireQuestionsRepo(),
 );
 
 export const QuestionForm = () => {
@@ -98,8 +105,9 @@ export const QuestionForm = () => {
   const queryClient = useQueryClient();
 
   const createUpdateMutation = useMutation({
-    mutationFn: (question: IQuestion) => {
-      return ucQuestions.createOrUpdate(question);
+    mutationFn: async (question: IQuestion) => {
+      const questionId = await ucQuestions.createOrUpdate(question);
+      await ucQuestionnaireQuestions.create(selectedQuestionnaireId, questionId);
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
@@ -117,6 +125,11 @@ export const QuestionForm = () => {
   });
 
   const submit = (data: IQuestion) => {
+    if (selectedQuestionnaireId === 0) {
+      toast.error("Selecione um questionário antes de salvar a pergunta");
+      return;
+    }
+
     if (watch("correctOption") === 0) {
       alert("É necessário indicar uma resposta válida");
       return;

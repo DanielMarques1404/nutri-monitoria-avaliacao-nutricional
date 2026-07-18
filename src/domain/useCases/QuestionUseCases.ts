@@ -24,7 +24,7 @@ export class QuestionUseCases {
     return this.repository.listByQuestionnaireId(questionnaireId);
   }
 
-  async createOrUpdate(obj: IQuestion): Promise<void> {
+  async createOrUpdate(obj: IQuestion): Promise<number> {
     const questionId = await this.repository.createOrUpdate(obj);
     let persistedCorrectOptionId = obj.correctOption;
 
@@ -58,6 +58,8 @@ export class QuestionUseCases {
         persistedCorrectOptionId,
       );
     }
+
+    return questionId;
   }
 
   async delete(id: number): Promise<void> {
