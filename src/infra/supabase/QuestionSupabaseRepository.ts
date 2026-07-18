@@ -98,7 +98,7 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
 
   async updateCorrectOption(
     questionId: number,
-    correctOptionId: number,
+    correctOptionId: number | null,
   ): Promise<void> {
     const { error } = await supabase
       .from("questions")

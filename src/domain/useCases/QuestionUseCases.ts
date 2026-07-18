@@ -26,7 +26,8 @@ export class QuestionUseCases {
 
   async createOrUpdate(obj: IQuestion): Promise<number> {
     const questionId = await this.repository.createOrUpdate(obj);
-    let persistedCorrectOptionId = obj.correctOption;
+    let persistedCorrectOptionId: number | null =
+      obj.correctOption > 0 ? obj.correctOption : null;
 
     await this.tagsRepository.deleteByQuestionId(questionId);
     if (obj.tags) {
@@ -52,12 +53,7 @@ export class QuestionUseCases {
       );
     }
 
-    if (persistedCorrectOptionId > 0) {
-      await this.repository.updateCorrectOption(
-        questionId,
-        persistedCorrectOptionId,
-      );
-    }
+    await this.repository.updateCorrectOption(questionId, persistedCorrectOptionId);
 
     return questionId;
   }
