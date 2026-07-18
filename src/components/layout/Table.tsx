@@ -56,7 +56,12 @@ export const Table = ({
             <td className="p-2">{item.name}</td>
             <td className="flex items-center justify-end gap-2 p-2">
               {deleteAction && (
-                <IconTrash onClick={() => deleteAction(item.id)} />
+                <IconTrash
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    deleteAction(item.id);
+                  }}
+                />
               )}
             </td>
           </tr>

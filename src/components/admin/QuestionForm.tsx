@@ -27,6 +27,9 @@ const ucQuestions = new QuestionUseCases(
   RepositoryFactory.getRepo(
     CURRENT_TECH_REPOSITORY,
   ).createQuestionOptionsRepo(),
+  RepositoryFactory.getRepo(
+    CURRENT_TECH_REPOSITORY,
+  ).createQuestionnaireQuestionsRepo(),
 );
 
 const ucTags = new GenericUseCases<ITag>(
@@ -106,6 +109,12 @@ export const QuestionForm = () => {
 
   const queryClient = useQueryClient();
 
+  const resetQuestionForm = () => {
+    reset();
+    setSelectedOptionId(-1);
+    resetOptionForm();
+  };
+
   const resetOptionForm = () => {
     setOptionDescription("");
     setEditingOptionId(null);
@@ -123,13 +132,60 @@ export const QuestionForm = () => {
       toast.success(
         `Pergunta "${variables.title}" ${variables.id ? "atualizada" : "criada"} com sucesso!`,
       );
-      reset();
-      setSelectedOptionId(-1);
-      resetOptionForm();
+      resetQuestionForm();
     },
     onError: () => {
       console.error("Falha ao registrar Pergunta");
       toast.error("Falha ao registrar Pergunta");
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (questionId: number) => {
+      return ucQuestions.delete(questionId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-questions"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-questionnaires"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-active-questionnaires"],
+      });
+      toast.success("Pergunta excluída com sucesso!");
+      resetQuestionForm();
+    },
+    onError: (error) => {
+      console.error("Falha ao excluir Pergunta", error);
+      toast.error("Falha ao excluir Pergunta");
+    },
+  });
+
+  const unlinkMutation = useMutation({
+    mutationFn: (questionId: number) => {
+      return ucQuestionnaireQuestions.deleteByQuestionnaireAndQuestion(
+        selectedQuestionnaireId,
+        questionId,
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-questions"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-questionnaires"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-active-questionnaires"],
+      });
+      toast.success("Pergunta removida do questionário com sucesso!");
+      resetQuestionForm();
+    },
+    onError: (error) => {
+      console.error("Falha ao remover Pergunta do Questionário", error);
+      toast.error("Falha ao remover Pergunta do Questionário");
     },
   });
 
@@ -210,6 +266,38 @@ export const QuestionForm = () => {
     );
   };
 
+  const handleDeleteQuestion = () => {
+    const questionId = watch("id");
+
+    if (!questionId) {
+      toast.error("Selecione uma pergunta para excluir");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Excluir esta pergunta definitivamente? Esta ação removerá vínculos, TAGs e itens de resposta.",
+    );
+
+    if (!confirmed) return;
+
+    deleteMutation.mutate(questionId);
+  };
+
+  const handleUnlinkQuestion = (questionId: number) => {
+    if (selectedQuestionnaireId === 0) {
+      toast.error("Selecione um questionário antes de remover a pergunta");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Remover esta pergunta apenas do questionário selecionado?",
+    );
+
+    if (!confirmed) return;
+
+    unlinkMutation.mutate(questionId);
+  };
+
   const handleOptions = (optionId: number, action: "DELETE") => {
     let optionList = watch("options") || [];
     let newList: IOption[] | undefined = [];
@@ -264,9 +352,7 @@ export const QuestionForm = () => {
 
   function handleUpdateQuestionnaire(id: number): void {
     setSelectedQuestionnaireId(id);
-    reset();
-    setSelectedOptionId(-1);
-    resetOptionForm();
+    resetQuestionForm();
   }
 
   return (
@@ -290,6 +376,7 @@ export const QuestionForm = () => {
             })) || []
           }
           updateAction={handleUpdate}
+          deleteAction={handleUnlinkQuestion}
         />
       </div>
 
@@ -375,11 +462,21 @@ export const QuestionForm = () => {
           />
         </div>
 
-        <Button
-          className="bg-dark-green text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg cursor-pointer ml-auto"
-          type="submit"
-          label="Salvar"
-        />
+        <div className="flex justify-end gap-2">
+          {watch("id") > 0 && (
+            <Button
+              classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
+              type="button"
+              label="Excluir pergunta"
+              onClick={handleDeleteQuestion}
+            />
+          )}
+          <Button
+            classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
+            type="submit"
+            label="Salvar"
+          />
+        </div>
       </form>
 
       <div className="flex flex-col gap-2 border-2 border-mediumGrey p-2 rounded-md">

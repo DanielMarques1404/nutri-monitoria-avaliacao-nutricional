@@ -111,7 +111,8 @@ export class QuestionSupabaseRepository implements IQuestionRepository {
   }
 
   async delete(id: number): Promise<void> {
-    console.log("deletando", id);
-    throw new Error("Method not implemented.");
+    const { error } = await supabase.from("questions").delete().eq("id", id);
+
+    if (error) throw error;
   }
 }
