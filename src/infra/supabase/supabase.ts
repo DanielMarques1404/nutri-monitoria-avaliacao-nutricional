@@ -194,7 +194,6 @@ export type Database = {
           description: string | null
           id: number
           name: string
-          url: string | null
         }
         Insert: {
           active?: boolean
@@ -202,7 +201,6 @@ export type Database = {
           description?: string | null
           id?: number
           name: string
-          url?: string | null
         }
         Update: {
           active?: boolean
@@ -210,7 +208,6 @@ export type Database = {
           description?: string | null
           id?: number
           name?: string
-          url?: string | null
         }
         Relationships: []
       }
@@ -225,7 +222,6 @@ export type Database = {
           question: string
           statement: string
           title: string
-          url_learn_more: string | null
         }
         Insert: {
           category_id?: number | null
@@ -237,7 +233,6 @@ export type Database = {
           question: string
           statement: string
           title: string
-          url_learn_more?: string | null
         }
         Update: {
           category_id?: number | null
@@ -249,7 +244,6 @@ export type Database = {
           question?: string
           statement?: string
           title?: string
-          url_learn_more?: string | null
         }
         Relationships: [
           {
