@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { ConfirmActionModal } from "./ConfirmActionModal";
 import type {
   ICategory,
   IOption,
@@ -10,6 +11,7 @@ import type {
   ITag,
 } from "../../domain/entities/entities";
 import { GenericUseCases } from "../../domain/useCases/GenericUseCases";
+import { QuestionnaireQuestionsUseCase } from "../../domain/useCases/QuestionnaireQuestionsUseCase";
 import { QuestionnaireUseCase } from "../../domain/useCases/QuestionnaireUseCase";
 import { QuestionUseCases } from "../../domain/useCases/QuestionUseCases";
 import { RepositoryFactory } from "../../infra/factory/RepositoryFactory";
@@ -26,6 +28,9 @@ const ucQuestions = new QuestionUseCases(
   RepositoryFactory.getRepo(
     CURRENT_TECH_REPOSITORY,
   ).createQuestionOptionsRepo(),
+  RepositoryFactory.getRepo(
+    CURRENT_TECH_REPOSITORY,
+  ).createQuestionnaireQuestionsRepo(),
 );
 
 const ucTags = new GenericUseCases<ITag>(
@@ -38,12 +43,43 @@ const ucCategories = new GenericUseCases<ICategory>(
 
 const ucQuestionnaires = new QuestionnaireUseCase(
   RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuestionnaireRepo(),
+  RepositoryFactory.getRepo(CURRENT_TECH_REPOSITORY).createQuestionnaireUrlsRepo(),
+  RepositoryFactory.getRepo(
+    CURRENT_TECH_REPOSITORY,
+  ).createQuestionnaireQuestionsRepo(),
 );
+
+const ucQuestionnaireQuestions = new QuestionnaireQuestionsUseCase(
+  RepositoryFactory.getRepo(
+    CURRENT_TECH_REPOSITORY,
+  ).createQuestionnaireQuestionsRepo(),
+);
+
+const defaultQuestion: IQuestion = {
+  id: 0,
+  title: "",
+  statement: "",
+  question: "",
+  options: [],
+  correctOption: 0,
+  explanation: "",
+  categoryId: 0,
+  difficulty: "",
+  tags: [],
+};
+
+type PendingQuestionAction =
+  | { type: "delete"; questionId: number }
+  | { type: "unlink"; questionId: number }
+  | null;
 
 export const QuestionForm = () => {
   const [selectedTagId, setSelectedTagId] = useState(0);
   const [selectedOptionId, setSelectedOptionId] = useState(-1);
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState(0);
+  const [optionDescription, setOptionDescription] = useState("");
+  const [editingOptionId, setEditingOptionId] = useState<number | null>(null);
+  const [pendingAction, setPendingAction] = useState<PendingQuestionAction>(null);
   const {
     register,
     handleSubmit,
@@ -52,19 +88,7 @@ export const QuestionForm = () => {
     setValue,
     formState: { errors },
   } = useForm<IQuestion>({
-    defaultValues: {
-      id: 0,
-      title: "",
-      statement: "",
-      question: "",
-      options: [],
-      correctOption: 0,
-      explanation: "",
-      categoryId: 0,
-      difficulty: "",
-      tags: [],
-      urlLearnMore: "",
-    },
+    defaultValues: defaultQuestion,
   });
 
   const { data: questionsList } = useQuery({
@@ -98,10 +122,24 @@ export const QuestionForm = () => {
 
   const queryClient = useQueryClient();
 
+  const resetQuestionForm = () => {
+    reset(defaultQuestion);
+    setSelectedOptionId(-1);
+    setSelectedTagId(0);
+    resetOptionForm();
+  };
+
+  const resetOptionForm = () => {
+    setOptionDescription("");
+    setEditingOptionId(null);
+  };
+
   const createUpdateMutation = useMutation({
-    mutationFn: (question: IQuestion) => {
-      return ucQuestions.createOrUpdate(question);
-    },
+    mutationFn: (question: IQuestion) =>
+      ucQuestions.createOrUpdateForQuestionnaire(
+        question,
+        selectedQuestionnaireId,
+      ),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["nutri-monitoria-questions"],
@@ -109,7 +147,7 @@ export const QuestionForm = () => {
       toast.success(
         `Pergunta "${variables.title}" ${variables.id ? "atualizada" : "criada"} com sucesso!`,
       );
-      reset();
+      resetQuestionForm();
     },
     onError: () => {
       console.error("Falha ao registrar Pergunta");
@@ -117,12 +155,105 @@ export const QuestionForm = () => {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (questionId: number) => {
+      return ucQuestions.delete(questionId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-questions"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-questionnaires"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-active-questionnaires"],
+      });
+      toast.success("Pergunta excluída com sucesso!");
+      resetQuestionForm();
+    },
+    onError: (error) => {
+      console.error("Falha ao excluir Pergunta", error);
+      toast.error("Falha ao excluir Pergunta");
+    },
+  });
+
+  const unlinkMutation = useMutation({
+    mutationFn: (questionId: number) => {
+      return ucQuestionnaireQuestions.deleteByQuestionnaireAndQuestion(
+        selectedQuestionnaireId,
+        questionId,
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-questions"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-questionnaires"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["nutri-monitoria-active-questionnaires"],
+      });
+      toast.success("Pergunta removida do questionário com sucesso!");
+      resetQuestionForm();
+    },
+    onError: (error) => {
+      console.error("Falha ao remover Pergunta do Questionário", error);
+      toast.error("Falha ao remover Pergunta do Questionário");
+    },
+  });
+
   const submit = (data: IQuestion) => {
+    if (selectedQuestionnaireId === 0) {
+      toast.error("Selecione um questionário antes de salvar a pergunta");
+      return;
+    }
+
     if (watch("correctOption") === 0) {
       alert("É necessário indicar uma resposta válida");
       return;
     }
     createUpdateMutation.mutate(data);
+  };
+
+  const handleSaveOption = () => {
+    const description = optionDescription.trim();
+    const currentOptions = watch("options") || [];
+
+    if (!description) {
+      toast.error("Informe a descrição do item de resposta");
+      return;
+    }
+
+    if (editingOptionId !== null) {
+      setValue(
+        "options",
+        currentOptions.map((option) =>
+          option.id === editingOptionId ? { ...option, description } : option,
+        ),
+      );
+      resetOptionForm();
+      return;
+    }
+
+    const nextTemporaryId =
+      Math.min(0, ...currentOptions.map((option) => option.id)) - 1;
+
+    setValue("options", [
+      ...currentOptions,
+      {
+        id: nextTemporaryId,
+        questionId: watch("id") || 0,
+        description,
+      },
+    ]);
+    resetOptionForm();
+  };
+
+  const handleEditOption = (option: IOption) => {
+    setEditingOptionId(option.id);
+    setOptionDescription(option.description);
   };
 
   const handleUpdate = async (id: number) => {
@@ -140,7 +271,6 @@ export const QuestionForm = () => {
     setValue("tags", QuestionToUpdate.tags || []);
     setValue("categoryId", QuestionToUpdate.categoryId || 0);
     setValue("difficulty", QuestionToUpdate.difficulty);
-    setValue("urlLearnMore", QuestionToUpdate.urlLearnMore || "");
     setValue("options", QuestionToUpdate.options || []);
     setValue("correctOption", QuestionToUpdate.correctOption);
 
@@ -149,6 +279,43 @@ export const QuestionForm = () => {
         (op) => op.id === QuestionToUpdate.correctOption,
       )?.id || -1,
     );
+  };
+
+  const handleDeleteQuestion = () => {
+    const questionId = watch("id");
+
+    if (!questionId) {
+      toast.error("Selecione uma pergunta para excluir");
+      return;
+    }
+
+    setPendingAction({ type: "delete", questionId });
+  };
+
+  const handleNewQuestion = () => {
+    resetQuestionForm();
+    (document.getElementById("question-title") as HTMLInputElement | null)?.focus();
+  };
+
+  const handleUnlinkQuestion = (questionId: number) => {
+    if (selectedQuestionnaireId === 0) {
+      toast.error("Selecione um questionário antes de remover a pergunta");
+      return;
+    }
+
+    setPendingAction({ type: "unlink", questionId });
+  };
+
+  const handleConfirmPendingAction = () => {
+    if (!pendingAction) return;
+
+    if (pendingAction.type === "delete") {
+      deleteMutation.mutate(pendingAction.questionId);
+    } else {
+      unlinkMutation.mutate(pendingAction.questionId);
+    }
+
+    setPendingAction(null);
   };
 
   const handleOptions = (optionId: number, action: "DELETE") => {
@@ -162,6 +329,7 @@ export const QuestionForm = () => {
           setSelectedOptionId(-1);
           setValue("correctOption", 0);
         }
+        if (editingOptionId === optionId) resetOptionForm();
         break;
 
       default:
@@ -204,12 +372,12 @@ export const QuestionForm = () => {
 
   function handleUpdateQuestionnaire(id: number): void {
     setSelectedQuestionnaireId(id);
-    reset();
+    resetQuestionForm();
   }
 
   return (
-    <section className="flex flex-col lg:grid lg:grid-cols-4 p-2 w-full gap-2">
-      <div className="border-2 border-mediumGrey p-2 rounded-md">
+    <section className="flex flex-col lg:grid lg:grid-cols-4 p-2 w-full gap-3">
+      <div className="border-2 border-mediumGrey bg-white p-3 rounded-md shadow-sm">
         <Table
           caption="Questionários"
           items={
@@ -218,7 +386,7 @@ export const QuestionForm = () => {
           updateAction={handleUpdateQuestionnaire}
         />
       </div>
-      <div className="border-2 border-mediumGrey p-2 rounded-md">
+      <div className="border-2 border-mediumGrey bg-white p-3 rounded-md shadow-sm">
         <Table
           caption={"Perguntas"}
           items={
@@ -228,15 +396,24 @@ export const QuestionForm = () => {
             })) || []
           }
           updateAction={handleUpdate}
+          deleteAction={handleUnlinkQuestion}
         />
       </div>
 
       <form
-        className="flex flex-col lg:col-span-2 border-2 border-mediumGrey p-2 rounded-md"
+        className="flex flex-col lg:col-span-2 border-2 border-mediumGrey bg-white p-3 rounded-md shadow-sm"
         onSubmit={handleSubmit(submit)}
       >
+        <div className="mb-2 flex flex-col gap-1 border-b border-lighter-green pb-2">
+          <h2 className="text-lg font-semibold text-dark-green">Dados da pergunta</h2>
+          <p className="text-sm text-gray-500">
+            Selecione um questionário, edite a pergunta e salve o vínculo automaticamente.
+          </p>
+        </div>
+
         <Input
           label="Título"
+          id="question-title"
           placeholder="Título"
           {...register("title", { required: "Este campo é obrigatório" })}
           errors={errors.title}
@@ -268,14 +445,6 @@ export const QuestionForm = () => {
           placeholder="Dificuldade"
           {...register("difficulty")}
           errors={errors.difficulty}
-        />
-
-        <Input
-          label={"URL para aprender mais"}
-          placeholder="https://..."
-          type="url"
-          {...register("urlLearnMore")}
-          errors={errors.urlLearnMore}
         />
 
         <Select
@@ -321,26 +490,85 @@ export const QuestionForm = () => {
           />
         </div>
 
-        <Button
-          className="bg-dark-green text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg cursor-pointer ml-auto"
-          type="submit"
-          label="Salvar"
-        />
+        <div className="flex justify-end gap-2">
+          <Button
+            classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
+            type="button"
+            label="Nova pergunta"
+            onClick={handleNewQuestion}
+          />
+          {watch("id") > 0 && (
+            <Button
+              classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
+              type="button"
+              label="Excluir pergunta"
+              onClick={handleDeleteQuestion}
+            />
+          )}
+          <Button
+            classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
+            type="submit"
+            label="Salvar"
+          />
+        </div>
       </form>
 
-      <div className="flex flex-col gap-2 border-2 border-mediumGrey p-2 rounded-md">
+      <div className="flex flex-col gap-2 border-2 border-mediumGrey bg-white p-3 rounded-md shadow-sm">
         <caption className="w-full p-1 font-semibold">
           Itens de Resposta
         </caption>
+        <div className="flex flex-col gap-2">
+          <Input
+            label="Item de resposta"
+            placeholder="Descrição do item de resposta"
+            value={optionDescription}
+            onChange={(event) => setOptionDescription(event.target.value)}
+          />
+          <div className="flex justify-end gap-2">
+            {editingOptionId !== null && (
+              <Button
+                classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
+                type="button"
+                label="Cancelar"
+                onClick={resetOptionForm}
+              />
+            )}
+            <Button
+              classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
+              type="button"
+              label={editingOptionId === null ? "Adicionar" : "Atualizar"}
+              onClick={handleSaveOption}
+            />
+          </div>
+        </div>
         {watch("options")?.map((op) => (
           <OptionItem
+            key={op.id}
             option={op}
             onDelete={(id) => handleOptions(id, "DELETE")}
+            onEdit={handleEditOption}
             onSelect={handleSelectRightOption}
             selected={op.id === watch("correctOption")}
           />
         ))}
       </div>
+
+      <ConfirmActionModal
+        isOpen={pendingAction !== null}
+        title={
+          pendingAction?.type === "delete"
+            ? "Excluir pergunta definitivamente?"
+            : "Remover pergunta do questionário?"
+        }
+        description={
+          pendingAction?.type === "delete"
+            ? "Esta ação removerá a pergunta, seus vínculos, TAGs e itens de resposta. Ela não poderá ser desfeita pela interface."
+            : "Esta ação remove a pergunta apenas do questionário selecionado. A pergunta continuará existindo na base."
+        }
+        confirmLabel={pendingAction?.type === "delete" ? "Excluir" : "Remover"}
+        onCancel={() => setPendingAction(null)}
+        onConfirm={handleConfirmPendingAction}
+      />
     </section>
   );
 };

@@ -1,4 +1,5 @@
 import type { IQuestion } from "../entities/entities";
+import type { IQuestionnaireQuestionsRepository } from "../repositories/IQuestionnaireQuestionsRepository";
 import type { IQuestionOptionsRepository } from "../repositories/IQuestionOptionsRepository";
 import type { IQuestionRepository } from "../repositories/IQuestionRepository";
 import type { IQuestionTagsRepository } from "../repositories/IQuestionTagsRepository";
@@ -7,15 +8,18 @@ export class QuestionUseCases {
   private repository: IQuestionRepository;
   private tagsRepository: IQuestionTagsRepository;
   private optionsRepository: IQuestionOptionsRepository;
+  private questionnaireQuestionsRepository: IQuestionnaireQuestionsRepository;
 
   constructor(
     repository: IQuestionRepository,
     tagsRepository: IQuestionTagsRepository,
     optionsRepository: IQuestionOptionsRepository,
+    questionnaireQuestionsRepository: IQuestionnaireQuestionsRepository,
   ) {
     this.repository = repository;
     this.tagsRepository = tagsRepository;
     this.optionsRepository = optionsRepository;
+    this.questionnaireQuestionsRepository = questionnaireQuestionsRepository;
   }
 
   async listByQuestionnaireId(
@@ -24,9 +28,10 @@ export class QuestionUseCases {
     return this.repository.listByQuestionnaireId(questionnaireId);
   }
 
-  async createOrUpdate(obj: IQuestion): Promise<void> {
+  async createOrUpdate(obj: IQuestion): Promise<number> {
     const questionId = await this.repository.createOrUpdate(obj);
-    let persistedCorrectOptionId = obj.correctOption;
+    let persistedCorrectOptionId: number | null =
+      obj.correctOption > 0 ? obj.correctOption : null;
 
     await this.tagsRepository.deleteByQuestionId(questionId);
     if (obj.tags) {
@@ -52,16 +57,26 @@ export class QuestionUseCases {
       );
     }
 
-    if (persistedCorrectOptionId > 0) {
-      await this.repository.updateCorrectOption(
-        questionId,
-        persistedCorrectOptionId,
-      );
-    }
+    await this.repository.updateCorrectOption(questionId, persistedCorrectOptionId);
+
+    return questionId;
+  }
+
+  async createOrUpdateForQuestionnaire(
+    obj: IQuestion,
+    questionnaireId: number,
+  ): Promise<number> {
+    const questionId = await this.createOrUpdate(obj);
+    await this.questionnaireQuestionsRepository.create(questionnaireId, questionId);
+    return questionId;
   }
 
   async delete(id: number): Promise<void> {
     try {
+      await this.repository.updateCorrectOption(id, null);
+      await this.questionnaireQuestionsRepository.deleteByQuestionId(id);
+      await this.tagsRepository.deleteByQuestionId(id);
+      await this.optionsRepository.deleteByQuestionId(id);
       await this.repository.delete(id);
     } catch (error) {
       console.error("Error in delete:", error);

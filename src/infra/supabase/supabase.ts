@@ -158,6 +158,35 @@ export type Database = {
           },
         ]
       }
+      questionnaire_urls: {
+        Row: {
+          created_at: string
+          id: number
+          questionnaire_id: number
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          questionnaire_id: number
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          questionnaire_id?: number
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questionnaire_urls_questionnaire_id_fkey"
+            columns: ["questionnaire_id"]
+            isOneToOne: false
+            referencedRelation: "questionnaires"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       questionnaires: {
         Row: {
           active: boolean
@@ -165,7 +194,6 @@ export type Database = {
           description: string | null
           id: number
           name: string
-          url: string | null
         }
         Insert: {
           active?: boolean
@@ -173,7 +201,6 @@ export type Database = {
           description?: string | null
           id?: number
           name: string
-          url?: string | null
         }
         Update: {
           active?: boolean
@@ -181,7 +208,6 @@ export type Database = {
           description?: string | null
           id?: number
           name?: string
-          url?: string | null
         }
         Relationships: []
       }
@@ -196,7 +222,6 @@ export type Database = {
           question: string
           statement: string
           title: string
-          url_learn_more: string | null
         }
         Insert: {
           category_id?: number | null
@@ -208,7 +233,6 @@ export type Database = {
           question: string
           statement: string
           title: string
-          url_learn_more?: string | null
         }
         Update: {
           category_id?: number | null
@@ -220,7 +244,6 @@ export type Database = {
           question?: string
           statement?: string
           title?: string
-          url_learn_more?: string | null
         }
         Relationships: [
           {
