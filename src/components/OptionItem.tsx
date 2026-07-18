@@ -1,4 +1,4 @@
-import { IconTrash } from "@tabler/icons-react";
+import { IconPencil, IconTrash } from "@tabler/icons-react";
 import type { IOption } from "../domain/entities/entities";
 import { cn } from "../utils/cn";
 
@@ -6,6 +6,7 @@ type OptionItemProps = {
   option: IOption;
   selected?: boolean;
   onDelete?: (id: number) => void;
+  onEdit?: (option: IOption) => void;
   onSelect?: (option: IOption) => void;
 };
 
@@ -27,11 +28,22 @@ export const OptionItem = (props: OptionItemProps) => {
         <span
           className={cn(
             "px-2 py-1",
-            !props.onDelete && !props.selected ? "col-span-12" : "col-span-11",
+            !props.onDelete && !props.onEdit && !props.selected
+              ? "col-span-12"
+              : "col-span-10",
           )}
         >
           {props.option.description}
         </span>
+
+        {props.onEdit && (
+          <div
+            className="flex items-center justify-center"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <IconPencil onClick={() => props.onEdit?.(props.option)} />
+          </div>
+        )}
 
         {props.onDelete && (
           <div

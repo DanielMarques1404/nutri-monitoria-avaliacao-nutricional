@@ -51,6 +51,8 @@ export const QuestionForm = () => {
   const [selectedTagId, setSelectedTagId] = useState(0);
   const [selectedOptionId, setSelectedOptionId] = useState(-1);
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState(0);
+  const [optionDescription, setOptionDescription] = useState("");
+  const [editingOptionId, setEditingOptionId] = useState<number | null>(null);
   const {
     register,
     handleSubmit,
@@ -104,6 +106,11 @@ export const QuestionForm = () => {
 
   const queryClient = useQueryClient();
 
+  const resetOptionForm = () => {
+    setOptionDescription("");
+    setEditingOptionId(null);
+  };
+
   const createUpdateMutation = useMutation({
     mutationFn: async (question: IQuestion) => {
       const questionId = await ucQuestions.createOrUpdate(question);
@@ -117,6 +124,8 @@ export const QuestionForm = () => {
         `Pergunta "${variables.title}" ${variables.id ? "atualizada" : "criada"} com sucesso!`,
       );
       reset();
+      setSelectedOptionId(-1);
+      resetOptionForm();
     },
     onError: () => {
       console.error("Falha ao registrar Pergunta");
@@ -135,6 +144,45 @@ export const QuestionForm = () => {
       return;
     }
     createUpdateMutation.mutate(data);
+  };
+
+  const handleSaveOption = () => {
+    const description = optionDescription.trim();
+    const currentOptions = watch("options") || [];
+
+    if (!description) {
+      toast.error("Informe a descrição do item de resposta");
+      return;
+    }
+
+    if (editingOptionId !== null) {
+      setValue(
+        "options",
+        currentOptions.map((option) =>
+          option.id === editingOptionId ? { ...option, description } : option,
+        ),
+      );
+      resetOptionForm();
+      return;
+    }
+
+    const nextTemporaryId =
+      Math.min(0, ...currentOptions.map((option) => option.id)) - 1;
+
+    setValue("options", [
+      ...currentOptions,
+      {
+        id: nextTemporaryId,
+        questionId: watch("id") || 0,
+        description,
+      },
+    ]);
+    resetOptionForm();
+  };
+
+  const handleEditOption = (option: IOption) => {
+    setEditingOptionId(option.id);
+    setOptionDescription(option.description);
   };
 
   const handleUpdate = async (id: number) => {
@@ -173,6 +221,7 @@ export const QuestionForm = () => {
           setSelectedOptionId(-1);
           setValue("correctOption", 0);
         }
+        if (editingOptionId === optionId) resetOptionForm();
         break;
 
       default:
@@ -216,6 +265,8 @@ export const QuestionForm = () => {
   function handleUpdateQuestionnaire(id: number): void {
     setSelectedQuestionnaireId(id);
     reset();
+    setSelectedOptionId(-1);
+    resetOptionForm();
   }
 
   return (
@@ -335,10 +386,36 @@ export const QuestionForm = () => {
         <caption className="w-full p-1 font-semibold">
           Itens de Resposta
         </caption>
+        <div className="flex flex-col gap-2">
+          <Input
+            label="Item de resposta"
+            placeholder="Descrição do item de resposta"
+            value={optionDescription}
+            onChange={(event) => setOptionDescription(event.target.value)}
+          />
+          <div className="flex justify-end gap-2">
+            {editingOptionId !== null && (
+              <Button
+                classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
+                type="button"
+                label="Cancelar"
+                onClick={resetOptionForm}
+              />
+            )}
+            <Button
+              classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
+              type="button"
+              label={editingOptionId === null ? "Adicionar" : "Atualizar"}
+              onClick={handleSaveOption}
+            />
+          </div>
+        </div>
         {watch("options")?.map((op) => (
           <OptionItem
+            key={op.id}
             option={op}
             onDelete={(id) => handleOptions(id, "DELETE")}
+            onEdit={handleEditOption}
             onSelect={handleSelectRightOption}
             selected={op.id === watch("correctOption")}
           />
