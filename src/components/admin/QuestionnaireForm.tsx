@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { ConfirmActionModal } from "./ConfirmActionModal";
 import type { IQuestionnaire } from "../../domain/entities/entities";
 import { QuestionnaireUseCase } from "../../domain/useCases/QuestionnaireUseCase";
 import { RepositoryFactory } from "../../infra/factory/RepositoryFactory";
@@ -31,6 +32,9 @@ export const QuestionnaireForm = () => {
   const queryClient = useQueryClient();
   const [urlInput, setUrlInput] = useState("");
   const [editingUrlId, setEditingUrlId] = useState<number | null>(null);
+  const [questionnaireIdToDelete, setQuestionnaireIdToDelete] = useState<
+    number | null
+  >(null);
   const {
     register,
     handleSubmit,
@@ -175,7 +179,14 @@ export const QuestionnaireForm = () => {
   };
 
   const handleDelete = (id: number) => {
-    deleteMutation.mutate(id);
+    setQuestionnaireIdToDelete(id);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!questionnaireIdToDelete) return;
+
+    deleteMutation.mutate(questionnaireIdToDelete);
+    setQuestionnaireIdToDelete(null);
   };
 
   const handleUpdate = (id: number) => {
@@ -199,8 +210,17 @@ export const QuestionnaireForm = () => {
   };
 
   return (
-    <section className="flex flex-col gap-2 w-1/2 border-2 border-mediumGrey p-4 rounded-md">
+    <section className="flex flex-col gap-3 w-full max-w-3xl border-2 border-mediumGrey bg-white p-4 rounded-md shadow-sm">
       <form className="flex flex-col gap-2" onSubmit={handleSubmit(submit)}>
+        <div className="mb-2 flex flex-col gap-1 border-b border-lighter-green pb-2">
+          <h2 className="text-lg font-semibold text-dark-green">
+            Dados do questionário
+          </h2>
+          <p className="text-sm text-gray-500">
+            Cadastre questionários, controle a publicação e mantenha suas referências.
+          </p>
+        </div>
+
         <Input
           label="Questionário"
           type="text"
@@ -290,6 +310,15 @@ export const QuestionnaireForm = () => {
         items={questionnairesList || []}
         deleteAction={(id) => handleDelete(id)}
         updateAction={(id) => handleUpdate(id)}
+      />
+
+      <ConfirmActionModal
+        isOpen={questionnaireIdToDelete !== null}
+        title="Excluir questionário?"
+        description="Esta ação removerá o questionário, suas URLs e seus vínculos com perguntas. As perguntas continuarão existindo na base."
+        confirmLabel="Excluir"
+        onCancel={() => setQuestionnaireIdToDelete(null)}
+        onConfirm={handleConfirmDelete}
       />
     </section>
   );

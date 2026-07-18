@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { ConfirmActionModal } from "./ConfirmActionModal";
 import type {
   ICategory,
   IOption,
@@ -67,12 +68,18 @@ const defaultQuestion: IQuestion = {
   tags: [],
 };
 
+type PendingQuestionAction =
+  | { type: "delete"; questionId: number }
+  | { type: "unlink"; questionId: number }
+  | null;
+
 export const QuestionForm = () => {
   const [selectedTagId, setSelectedTagId] = useState(0);
   const [selectedOptionId, setSelectedOptionId] = useState(-1);
   const [selectedQuestionnaireId, setSelectedQuestionnaireId] = useState(0);
   const [optionDescription, setOptionDescription] = useState("");
   const [editingOptionId, setEditingOptionId] = useState<number | null>(null);
+  const [pendingAction, setPendingAction] = useState<PendingQuestionAction>(null);
   const {
     register,
     handleSubmit,
@@ -282,13 +289,7 @@ export const QuestionForm = () => {
       return;
     }
 
-    const confirmed = window.confirm(
-      "Excluir esta pergunta definitivamente? Esta ação removerá vínculos, TAGs e itens de resposta.",
-    );
-
-    if (!confirmed) return;
-
-    deleteMutation.mutate(questionId);
+    setPendingAction({ type: "delete", questionId });
   };
 
   const handleNewQuestion = () => {
@@ -302,13 +303,19 @@ export const QuestionForm = () => {
       return;
     }
 
-    const confirmed = window.confirm(
-      "Remover esta pergunta apenas do questionário selecionado?",
-    );
+    setPendingAction({ type: "unlink", questionId });
+  };
 
-    if (!confirmed) return;
+  const handleConfirmPendingAction = () => {
+    if (!pendingAction) return;
 
-    unlinkMutation.mutate(questionId);
+    if (pendingAction.type === "delete") {
+      deleteMutation.mutate(pendingAction.questionId);
+    } else {
+      unlinkMutation.mutate(pendingAction.questionId);
+    }
+
+    setPendingAction(null);
   };
 
   const handleOptions = (optionId: number, action: "DELETE") => {
@@ -369,8 +376,8 @@ export const QuestionForm = () => {
   }
 
   return (
-    <section className="flex flex-col lg:grid lg:grid-cols-4 p-2 w-full gap-2">
-      <div className="border-2 border-mediumGrey p-2 rounded-md">
+    <section className="flex flex-col lg:grid lg:grid-cols-4 p-2 w-full gap-3">
+      <div className="border-2 border-mediumGrey bg-white p-3 rounded-md shadow-sm">
         <Table
           caption="Questionários"
           items={
@@ -379,7 +386,7 @@ export const QuestionForm = () => {
           updateAction={handleUpdateQuestionnaire}
         />
       </div>
-      <div className="border-2 border-mediumGrey p-2 rounded-md">
+      <div className="border-2 border-mediumGrey bg-white p-3 rounded-md shadow-sm">
         <Table
           caption={"Perguntas"}
           items={
@@ -394,9 +401,16 @@ export const QuestionForm = () => {
       </div>
 
       <form
-        className="flex flex-col lg:col-span-2 border-2 border-mediumGrey p-2 rounded-md"
+        className="flex flex-col lg:col-span-2 border-2 border-mediumGrey bg-white p-3 rounded-md shadow-sm"
         onSubmit={handleSubmit(submit)}
       >
+        <div className="mb-2 flex flex-col gap-1 border-b border-lighter-green pb-2">
+          <h2 className="text-lg font-semibold text-dark-green">Dados da pergunta</h2>
+          <p className="text-sm text-gray-500">
+            Selecione um questionário, edite a pergunta e salve o vínculo automaticamente.
+          </p>
+        </div>
+
         <Input
           label="Título"
           id="question-title"
@@ -499,7 +513,7 @@ export const QuestionForm = () => {
         </div>
       </form>
 
-      <div className="flex flex-col gap-2 border-2 border-mediumGrey p-2 rounded-md">
+      <div className="flex flex-col gap-2 border-2 border-mediumGrey bg-white p-3 rounded-md shadow-sm">
         <caption className="w-full p-1 font-semibold">
           Itens de Resposta
         </caption>
@@ -538,6 +552,23 @@ export const QuestionForm = () => {
           />
         ))}
       </div>
+
+      <ConfirmActionModal
+        isOpen={pendingAction !== null}
+        title={
+          pendingAction?.type === "delete"
+            ? "Excluir pergunta definitivamente?"
+            : "Remover pergunta do questionário?"
+        }
+        description={
+          pendingAction?.type === "delete"
+            ? "Esta ação removerá a pergunta, seus vínculos, TAGs e itens de resposta. Ela não poderá ser desfeita pela interface."
+            : "Esta ação remove a pergunta apenas do questionário selecionado. A pergunta continuará existindo na base."
+        }
+        confirmLabel={pendingAction?.type === "delete" ? "Excluir" : "Remover"}
+        onCancel={() => setPendingAction(null)}
+        onConfirm={handleConfirmPendingAction}
+      />
     </section>
   );
 };

@@ -40,6 +40,7 @@ export class QuestionnaireQuestionsSupabaseRepository
       question_id: questionId,
     });
 
+    if (error?.code === "23505") return;
     if (error) throw error;
   }
 
