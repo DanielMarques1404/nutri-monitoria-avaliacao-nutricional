@@ -41,6 +41,11 @@ export interface IQuestionnaire extends IGeneric {
   urls: IUrlQuestionnaire[];
 }
 
+export interface IQuestionnaireQuestion extends IGeneric {
+  questionnaireId: number;
+  questionId: number;
+}
+
 
 
 export interface IQuestionAttempt {

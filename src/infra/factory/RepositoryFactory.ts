@@ -1,5 +1,6 @@
 import type { ICategory, ITag } from "../../domain/entities/entities";
 import type { IQuestionnaireRepository } from "../../domain/repositories/IQuestionnaireRepository";
+import type { IQuestionnaireQuestionsRepository } from "../../domain/repositories/IQuestionnaireQuestionsRepository";
 import type { IQuestionnaireUrlsRepository } from "../../domain/repositories/IQuestionnaireUrlsRepository";
 import type { IQuestionOptionsRepository } from "../../domain/repositories/IQuestionOptionsRepository";
 import type { IQuestionRepository } from "../../domain/repositories/IQuestionRepository";
@@ -7,6 +8,7 @@ import type { IQuestionTagsRepository } from "../../domain/repositories/IQuestio
 import type { IRepository } from "../../domain/repositories/IRepository";
 import { REPOSITORY_SUPABASE } from "../../utils/data";
 import { QuestionnaireSupabaseRepository } from "../supabase/QuestionnaireSupabaseRepository";
+import { QuestionnaireQuestionsSupabaseRepository } from "../supabase/QuestionnaireQuestionsSupabaseRepository";
 import { QuestionnaireUrlsSupabaseRepository } from "../supabase/QuestionnaireUrlsSupabaseRepository";
 import { QuestionOptionsSupabaseRepository } from "../supabase/QuestionOptionsSupabaseRepository";
 import { QuestionSupabaseRepository } from "../supabase/QuestionSupabaseRepository";
@@ -20,6 +22,7 @@ interface IRepositoryFactory {
   createQuetionsRepo(): IQuestionRepository;
   createQuestionTagsRepo(): IQuestionTagsRepository;
   createQuestionnaireRepo(): IQuestionnaireRepository;
+  createQuestionnaireQuestionsRepo(): IQuestionnaireQuestionsRepository;
   createQuestionnaireUrlsRepo(): IQuestionnaireUrlsRepository;
   createQuestionOptionsRepo(): IQuestionOptionsRepository;
 }
@@ -44,6 +47,9 @@ class SupabaseFactory implements IRepositoryFactory {
   createQuestionnaireRepo(): IQuestionnaireRepository {
     return new QuestionnaireSupabaseRepository();
   }
+  createQuestionnaireQuestionsRepo(): IQuestionnaireQuestionsRepository {
+    return new QuestionnaireQuestionsSupabaseRepository();
+  }
   createQuestionnaireUrlsRepo(): IQuestionnaireUrlsRepository {
     return new QuestionnaireUrlsSupabaseRepository();
   }
@@ -67,6 +73,9 @@ class NotImplementedFactory implements IRepositoryFactory {
     throw new Error("Not implemented yet");
   }
   createQuestionnaireRepo(): IQuestionnaireRepository {
+    throw new Error("Not implemented yet");
+  }
+  createQuestionnaireQuestionsRepo(): IQuestionnaireQuestionsRepository {
     throw new Error("Not implemented yet");
   }
   createQuestionnaireUrlsRepo(): IQuestionnaireUrlsRepository {
