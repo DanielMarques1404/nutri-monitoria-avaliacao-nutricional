@@ -54,6 +54,19 @@ const ucQuestionnaireQuestions = new QuestionnaireQuestionsUseCase(
   ).createQuestionnaireQuestionsRepo(),
 );
 
+const defaultQuestion: IQuestion = {
+  id: 0,
+  title: "",
+  statement: "",
+  question: "",
+  options: [],
+  correctOption: 0,
+  explanation: "",
+  categoryId: 0,
+  difficulty: "",
+  tags: [],
+};
+
 export const QuestionForm = () => {
   const [selectedTagId, setSelectedTagId] = useState(0);
   const [selectedOptionId, setSelectedOptionId] = useState(-1);
@@ -68,18 +81,7 @@ export const QuestionForm = () => {
     setValue,
     formState: { errors },
   } = useForm<IQuestion>({
-    defaultValues: {
-      id: 0,
-      title: "",
-      statement: "",
-      question: "",
-      options: [],
-      correctOption: 0,
-      explanation: "",
-      categoryId: 0,
-      difficulty: "",
-      tags: [],
-    },
+    defaultValues: defaultQuestion,
   });
 
   const { data: questionsList } = useQuery({
@@ -114,8 +116,9 @@ export const QuestionForm = () => {
   const queryClient = useQueryClient();
 
   const resetQuestionForm = () => {
-    reset();
+    reset(defaultQuestion);
     setSelectedOptionId(-1);
+    setSelectedTagId(0);
     resetOptionForm();
   };
 
@@ -288,6 +291,11 @@ export const QuestionForm = () => {
     deleteMutation.mutate(questionId);
   };
 
+  const handleNewQuestion = () => {
+    resetQuestionForm();
+    (document.getElementById("question-title") as HTMLInputElement | null)?.focus();
+  };
+
   const handleUnlinkQuestion = (questionId: number) => {
     if (selectedQuestionnaireId === 0) {
       toast.error("Selecione um questionário antes de remover a pergunta");
@@ -391,6 +399,7 @@ export const QuestionForm = () => {
       >
         <Input
           label="Título"
+          id="question-title"
           placeholder="Título"
           {...register("title", { required: "Este campo é obrigatório" })}
           errors={errors.title}
@@ -468,6 +477,12 @@ export const QuestionForm = () => {
         </div>
 
         <div className="flex justify-end gap-2">
+          <Button
+            classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"
+            type="button"
+            label="Nova pergunta"
+            onClick={handleNewQuestion}
+          />
           {watch("id") > 0 && (
             <Button
               classname="text-white border-0 py-2 px-6 focus:outline-none rounded-md text-lg"

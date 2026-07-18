@@ -21,6 +21,10 @@ export const Intro = ({
   onResetQuestionnaireAttempt,
   canStart,
 }: IntroProps) => {
+  const selectedQuestionnaire = questionnaires.find(
+    (questionnaire) => questionnaire.id === selectedQuestionnaireId,
+  );
+
   return (
     <section className="text-gray-600 body-font">
       <div className="container mx-auto flex px-5 py-8 lg:px-12 md:flex-row flex-col items-center">
@@ -53,6 +57,28 @@ export const Intro = ({
               </div>
             )}
           </div>
+
+          {selectedQuestionnaire && selectedQuestionnaire.urls.length > 0 && (
+            <div className="w-full rounded-md border border-lighter-green bg-white/80 p-3 text-left">
+              <p className="text-sm font-semibold text-dark-green">
+                Referências do questionário
+              </p>
+              <ul className="mt-2 flex flex-col gap-1">
+                {selectedQuestionnaire.urls.map((item) => (
+                  <li key={item.id}>
+                    <a
+                      className="break-all text-sm text-indigo-600 underline-offset-2 hover:text-orange hover:underline"
+                      href={item.url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {item.url}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <div className="flex justify-center m-auto md:mr-0">
             <Button
