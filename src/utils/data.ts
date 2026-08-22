@@ -15,6 +15,7 @@ export const Student: Person = {
   name: "Emanuella Alves Monteiro Marques",
   foto: "assets/images/monitora-emanuella.jpg",
   instagram: "https://www.instagram.com/emanuellanutri/",
+  email: "emanuellamonteironutri@gmail.com",
 };
 
 export const Professor: Person = {
