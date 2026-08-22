@@ -95,7 +95,7 @@ export const CategoryForm = () => {
   };
 
   return (
-    <section className="flex flex-col gap-2 w-1/2 border-2 border-mediumGrey p-4 rounded-md">
+    <section className="flex flex-col gap-2 w-full md:w-1/2 border-2 border-mediumGrey p-4 rounded-md">
       <form className="flex flex-col gap-2" onSubmit={handleSubmit(submit)}>
         <Input
           label={"Categoria"}

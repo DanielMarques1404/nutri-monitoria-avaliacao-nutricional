@@ -35,38 +35,43 @@ export const Table = ({
   }, [selectedOption]);
 
   return (
-    <table>
-      {caption && (
-        <caption className="w-full p-1 font-semibold">{caption}</caption>
-      )}
-      <tbody>
-        {items?.map((item) => (
-          <tr
-            key={item.id}
-            className={cn("cursor-pointer hover:font-semibold", {
-              "border-4 border-orange":
-                highlightingOption && selectedItem === item.id,
-            })}
-            onClick={() => {
-              onSelectOption && onSelectOption(item.id);
-              updateAction && updateAction(item.id);
-              setSelectedItem(item.id);
-            }}
-          >
-            <td className="p-2">{item.name}</td>
-            <td className="flex items-center justify-end gap-2 p-2">
-              {deleteAction && (
-                <IconTrash
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    deleteAction(item.id);
-                  }}
-                />
-              )}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div className="w-full max-w-full overflow-x-auto">
+      <table className="min-w-0 table-fixed">
+        {caption && (
+          <caption className="w-full p-1 font-semibold">{caption}</caption>
+        )}
+        <tbody>
+          {items?.map((item) => (
+            <tr
+              key={item.id}
+              className={cn("cursor-pointer hover:font-semibold", {
+                "border-4 border-orange":
+                  highlightingOption && selectedItem === item.id,
+              })}
+              onClick={() => {
+                onSelectOption && onSelectOption(item.id);
+                updateAction && updateAction(item.id);
+                setSelectedItem(item.id);
+              }}
+            >
+              <td className="break-words p-2 align-middle">{item.name}</td>
+              <td className="w-10 p-2 align-middle">
+                <div className="flex items-center justify-end gap-2">
+                  {deleteAction && (
+                    <IconTrash
+                      className="shrink-0"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        deleteAction(item.id);
+                      }}
+                    />
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
