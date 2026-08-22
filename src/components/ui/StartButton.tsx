@@ -1,9 +1,14 @@
-export const StartButton = () => {
+import type { ButtonHTMLAttributes } from "react";
+
+type StartButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
+
+export const StartButton = ({ className, ...buttonProps }: StartButtonProps) => {
   return (
     <button
       aria-label="Iniciar questionário"
-      className="-mr-1 shrink-0 cursor-pointer"
+      className={`-mr-1 shrink-0 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 ${className ?? ""}`}
       type="button"
+      {...buttonProps}
     >
       <div className="relative flex h-9 w-9 items-center justify-center rounded-full bg-lighter-green shadow-[inset_0px_0px_1px_1px_rgba(2,66,33,0.35),2px_3px_5px_rgba(2,66,33,0.12)]">
         <div className="absolute left-1/2 top-1 h-7 w-7 -translate-x-1/2 rounded-full bg-dark-green/50 blur-[1px]" />
