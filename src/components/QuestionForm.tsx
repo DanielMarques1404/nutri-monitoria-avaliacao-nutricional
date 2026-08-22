@@ -1,3 +1,4 @@
+import { IconReportAnalytics } from "@tabler/icons-react";
 import type {
   IOption,
   IQuestion,
@@ -9,14 +10,18 @@ type QuestionFormProps = {
   question: IQuestion | null;
   options: IOption[];
   attemptForQuestion?: IQuestionAttempt;
+  showSummaryButton?: boolean;
   onSelectOption: (questionId: number, optionId: number) => void;
+  onOpenSummary?: () => void;
 };
 
 export function QuestionForm({
   question,
   options,
   attemptForQuestion,
+  showSummaryButton,
   onSelectOption,
+  onOpenSummary,
 }: QuestionFormProps) {
   const letter = ["A", "B", "C", "D", "E"];
   if (!question) return <div>Sem questão para exibir</div>;
@@ -54,6 +59,18 @@ export function QuestionForm({
             ))}
           </ul>
         </div>
+        {showSummaryButton && (
+          <div className="mt-4 flex justify-end">
+            <button
+              className="flex items-center justify-center gap-1 rounded-md bg-dark-green px-3 py-2 text-white hover:bg-medium-green cursor-pointer select-none"
+              type="button"
+              onClick={onOpenSummary}
+            >
+              <IconReportAnalytics size={22} />
+              <span>Resumo</span>
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

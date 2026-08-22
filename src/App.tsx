@@ -12,6 +12,7 @@ import { Header } from "./components/Header";
 import { Intro } from "./components/Intro";
 import Modal from "./components/layout/Modal";
 import { NavButtons } from "./components/NavButtons";
+import { PerformanceSummary } from "./components/PerformanceSummary";
 import { QuestionForm } from "./components/QuestionForm";
 import { Summary } from "./components/Summary";
 import type {
@@ -103,6 +104,8 @@ export default function App() {
   const [quiz, setQuiz] = useState<IQuestionnaire | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(-1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPerformanceSummaryOpen, setIsPerformanceSummaryOpen] =
+    useState(false);
   const [attemptStorageVersion, setAttemptStorageVersion] = useState(0);
 
   const [attempt, dispatch] = useReducer(
@@ -209,6 +212,12 @@ export default function App() {
         attempt.optionOrderByQuestionId[currentQuestion.id],
       )
     : [];
+  const allQuestionsAreRevealed =
+    !!quiz &&
+    quiz.questions.length > 0 &&
+    quiz.questions.every(
+      (question) => attempt.answersByQuestionId[question.id]?.isAnswerRevealed,
+    );
 
   const handleStart = () => {
     if (!quiz) return;
@@ -237,6 +246,7 @@ export default function App() {
     });
     setCurrentQuestionIndex(-1);
     setIsModalOpen(false);
+    setIsPerformanceSummaryOpen(false);
   };
 
   const handleSelectOption = (questionId: number, optionId: number) => {
@@ -302,7 +312,9 @@ export default function App() {
             question={currentQuestion}
             options={currentQuestionOptions}
             attemptForQuestion={attemptForCurrentQuestion}
+            showSummaryButton={allQuestionsAreRevealed}
             onSelectOption={handleSelectOption}
+            onOpenSummary={() => setIsPerformanceSummaryOpen(true)}
           />
 
           <NavButtons
@@ -333,6 +345,19 @@ export default function App() {
                   : "error"
             }
             
+          />
+        </Modal>
+      )}
+      {isPerformanceSummaryOpen && quiz && (
+        <Modal
+          isOpen={isPerformanceSummaryOpen}
+          contentClassName="max-w-2xl"
+          onClose={() => setIsPerformanceSummaryOpen(false)}
+        >
+          <PerformanceSummary
+            attempt={attempt}
+            questionnaire={quiz}
+            onClose={() => setIsPerformanceSummaryOpen(false)}
           />
         </Modal>
       )}
