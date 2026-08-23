@@ -3,6 +3,7 @@ import type { IQuestionnaireQuestionsRepository } from "../repositories/IQuestio
 import type { IQuestionOptionsRepository } from "../repositories/IQuestionOptionsRepository";
 import type { IQuestionRepository } from "../repositories/IQuestionRepository";
 import type { IQuestionTagsRepository } from "../repositories/IQuestionTagsRepository";
+import { MAX_QUESTION_OPTIONS } from "../../utils/data";
 
 export class QuestionUseCases {
   private repository: IQuestionRepository;
@@ -29,6 +30,12 @@ export class QuestionUseCases {
   }
 
   async createOrUpdate(obj: IQuestion): Promise<number> {
+    if ((obj.options?.length ?? 0) > MAX_QUESTION_OPTIONS) {
+      throw new Error(
+        `Cada pergunta pode ter no máximo ${MAX_QUESTION_OPTIONS} itens de resposta`,
+      );
+    }
+
     const questionId = await this.repository.createOrUpdate(obj);
     let persistedCorrectOptionId: number | null =
       obj.correctOption > 0 ? obj.correctOption : null;

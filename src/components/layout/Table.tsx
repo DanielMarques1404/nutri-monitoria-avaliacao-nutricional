@@ -54,7 +54,7 @@ export const Table = ({
                 setSelectedItem(item.id);
               }}
             >
-              <td className="break-words p-2 align-middle">{item.name}</td>
+              <td className="wrap-break-word p-2 align-middle">{item.name}</td>
               <td className="w-10 p-2 align-middle">
                 <div className="flex items-center justify-end gap-2">
                   {deleteAction && (

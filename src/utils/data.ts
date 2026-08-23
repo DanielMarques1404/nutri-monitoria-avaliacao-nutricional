@@ -29,6 +29,8 @@ export const Professor: Person = {
 export const getAttemptStorageKey = (questionnaireId: number) =>
   `quiz-attempt:${questionnaireId}`;
 
+export const MAX_QUESTION_OPTIONS = 5;
+
 export const REPOSITORY_SUPABASE = 1;
 
 export const CURRENT_TECH_REPOSITORY = REPOSITORY_SUPABASE;

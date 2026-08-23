@@ -15,7 +15,7 @@ import { QuestionnaireQuestionsUseCase } from "../../domain/useCases/Questionnai
 import { QuestionnaireUseCase } from "../../domain/useCases/QuestionnaireUseCase";
 import { QuestionUseCases } from "../../domain/useCases/QuestionUseCases";
 import { RepositoryFactory } from "../../infra/factory/RepositoryFactory";
-import { CURRENT_TECH_REPOSITORY } from "../../utils/data";
+import { CURRENT_TECH_REPOSITORY, MAX_QUESTION_OPTIONS } from "../../utils/data";
 import { Table } from "../layout/Table";
 import { OptionItem } from "../OptionItem";
 import { Button } from "../ui/Button";
@@ -149,9 +149,11 @@ export const QuestionForm = () => {
       );
       resetQuestionForm();
     },
-    onError: () => {
-      console.error("Falha ao registrar Pergunta");
-      toast.error("Falha ao registrar Pergunta");
+    onError: (error) => {
+      console.error("Falha ao registrar Pergunta", error);
+      toast.error(
+        error instanceof Error ? error.message : "Falha ao registrar Pergunta",
+      );
     },
   });
 
@@ -234,6 +236,13 @@ export const QuestionForm = () => {
         ),
       );
       resetOptionForm();
+      return;
+    }
+
+    if (currentOptions.length >= MAX_QUESTION_OPTIONS) {
+      toast.error(
+        `Cada pergunta pode ter no máximo ${MAX_QUESTION_OPTIONS} itens de resposta`,
+      );
       return;
     }
 
