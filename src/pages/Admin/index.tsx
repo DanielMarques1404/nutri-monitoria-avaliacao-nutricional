@@ -1,11 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { useAuthContext } from "../../app/hooks/useAuthContext";
 import { CategoryForm } from "../../components/admin/CategoryForm";
+import { Radio } from "../../components/admin/NavButtons";
 import { QuestionForm } from "../../components/admin/QuestionForm";
 import { QuestionnaireForm } from "../../components/admin/QuestionnaireForm";
 import { TagForm } from "../../components/admin/TagForm";
 import { Button } from "../../components/ui/Button";
-import { useNavigate } from "react-router";
 
 export const Admin = () => {
   const { logout } = useAuthContext();
@@ -36,27 +37,8 @@ export const Admin = () => {
         </div>
       </div>
 
-      <nav className="grid grid-cols-4 gap-2 text-white">
-        <Button
-          classname={`${entity === "tag" ? "bg-light-green text-white" : "bg-dark-green text-white"}`}
-          label="TAGs"
-          onClick={() => setEntity("tag")}
-        />
-        <Button
-          classname={`${entity === "category" ? "bg-light-green text-white" : "bg-dark-green text-white"}`}
-          label="Categorias"
-          onClick={() => setEntity("category")}
-        />
-        <Button
-          classname={`${entity === "questionnaire" ? "bg-light-green text-white" : "bg-dark-green text-white"}`}
-          label="Questionários"
-          onClick={() => setEntity("questionnaire")}
-        />
-        <Button
-          classname={`${entity === "question" ? "bg-light-green text-white" : "bg-dark-green text-white"}`}
-          label="Questões"
-          onClick={() => setEntity("question")}
-        />
+      <nav className="flex items-center justify-center text-white">
+        <Radio onselect={setEntity} />
       </nav>
       <div className="flex items-center justify-center py-2 px-6 w-full">
         {entity === "tag" && <TagForm />}
