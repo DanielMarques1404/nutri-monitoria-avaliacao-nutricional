@@ -43,7 +43,7 @@ export function Answer({
       <h1 className="text-sm text-center tracking-widest title-font mb-1 font-medium bg-light-green rounded-t-lg">
         {letter}
       </h1>
-      <span className="flex-1 font-ubuntu text-dark-green text-sm mx-3 my-1 overflow-auto">
+      <span className="flex flex-1 items-center justify-center font-ubuntu text-dark-green text-md text-center mx-2 my-1 overflow-auto">
         {option.description}
       </span>
       {(showUserAnswerBadge || showCorrectAnswerBadge) && (

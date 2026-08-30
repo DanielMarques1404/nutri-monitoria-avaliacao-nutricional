@@ -29,13 +29,10 @@ export function QuestionForm({
   return (
     <section className="text-gray-600 body-font">
       <div className="container p-2 mx-auto">
-        <div className="flex flex-col text-center w-full mb-2 gap-2">
+        <div className="flex flex-col text-center w-full mb-3 gap-3">
           <h1 className="sm:text-4xl text-3xl font-medium title-font mb-2 text-dark-green">
             {question.title}
           </h1>
-          <p className="lg:w-2/3 mx-auto leading-relaxed text-base text-gray-500">
-            {question.statement}
-          </p>
           <p className="lg:w-2/3 mx-auto leading-relaxed text-base text-medium-green font-semibold">
             {question.question}
           </p>
