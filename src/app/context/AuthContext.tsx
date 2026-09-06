@@ -10,6 +10,8 @@ import { supabase } from "../../infra/supabase/config";
 interface IAuthContext {
   logout: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<void>;
+  updatePassword: (password: string) => Promise<void>;
   session: Session | null;
 }
 
@@ -53,8 +55,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const requestPasswordReset = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/admin/reset-password`,
+    });
+
+    if (error) {
+      throw error;
+    }
+  };
+
+  const updatePassword = async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password });
+
+    if (error) {
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ session, logout, login }}>
+    <AuthContext.Provider value={{ session, logout, login, requestPasswordReset, updatePassword }}>
       {isLoading ? <section className="flex items-center justify-center min-h-screen">Carregando...</section> : children}
     </AuthContext.Provider>
   );

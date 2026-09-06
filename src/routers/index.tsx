@@ -3,6 +3,7 @@ import App from "../App";
 import { Admin } from "../pages/Admin";
 import { Login } from "../pages/Login";
 import { ProtectedRoute } from "../pages/ProtectedRoute";
+import { ResetPassword } from "../pages/ResetPassword";
 import RootLayout from "../pages/RootLayout";
 
 export const router = createBrowserRouter([
@@ -16,16 +17,20 @@ export const router = createBrowserRouter([
         children: [{ path: "", element: <App /> }],
       },
       {
+        path: "/admin/login",
+        element: <Login />,
+      },
+      {
+        path: "/admin/reset-password",
+        element: <ResetPassword />,
+      },
+      {
         path: "/admin",
         element: <ProtectedRoute />,
         children: [
           {
             path: "",
             element: <Admin />,
-          },
-          {
-            path: "login",
-            element: <Login />,
           },
         ],
       },

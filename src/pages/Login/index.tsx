@@ -6,8 +6,9 @@ import { Button } from "../../components/ui/Button";
 
 export const Login = () => {
     const [credentials, setCredentials] = useState({ email: '', password: '' });
+    const [isRequestingReset, setIsRequestingReset] = useState(false);
     const navigate = useNavigate();
-    const { login } = useAuthContext();
+    const { login, requestPasswordReset } = useAuthContext();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -26,6 +27,24 @@ export const Login = () => {
         } catch (error) {
             console.error("Falha ao efetuar login", error);
             toast.error("Falha no login", { position: "bottom-right"});
+        }
+    };
+
+    const handlePasswordReset = async () => {
+        if (!credentials.email) {
+            toast.warning("Informe seu email para solicitar a troca de senha", { position: "bottom-right" });
+            return;
+        }
+
+        try {
+            setIsRequestingReset(true);
+            await requestPasswordReset(credentials.email);
+            toast.success("Se o email estiver cadastrado, você receberá um link para trocar a senha.", { position: "bottom-right" });
+        } catch (error) {
+            console.error("Falha ao solicitar troca de senha", error);
+            toast.error("Falha ao solicitar troca de senha", { position: "bottom-right" });
+        } finally {
+            setIsRequestingReset(false);
         }
     };
 
@@ -52,6 +71,14 @@ export const Login = () => {
                     className="p-4"
                     required
                 />
+                <button
+                    type="button"
+                    onClick={handlePasswordReset}
+                    disabled={isRequestingReset}
+                    className="text-sm text-blue-600 underline disabled:cursor-not-allowed disabled:text-gray-400 cursor-pointer"
+                >
+                    {isRequestingReset ? "Enviando..." : "Esqueci minha senha"}
+                </button>
                 <Button classname="bg-light-green text-center p-2 rounded-md text-white font-ubuntu text-2xl my-2" type="submit" label={"Entrar"} />
             </form>
         </div>
