@@ -310,6 +310,7 @@ export const QuestionnaireForm = () => {
         items={questionnairesList || []}
         deleteAction={(id) => handleDelete(id)}
         updateAction={(id) => handleUpdate(id)}
+        markInactives
       />
 
       <ConfirmActionModal

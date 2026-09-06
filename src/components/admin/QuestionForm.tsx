@@ -390,9 +390,10 @@ export const QuestionForm = () => {
         <Table
           caption="Questionários"
           items={
-            questionnairesList?.map((q) => ({ id: q.id, name: q.name })) || []
+            questionnairesList?.map((q) => ({ id: q.id, name: q.name, active: q.active })) || []
           }
           updateAction={handleUpdateQuestionnaire}
+          markInactives
         />
       </div>
       <div className="border-2 border-mediumGrey bg-white p-3 rounded-md shadow-sm">

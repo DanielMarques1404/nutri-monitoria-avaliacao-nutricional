@@ -5,6 +5,7 @@ import { cn } from "../../utils/cn";
 type ItemTable = {
   id: number;
   name: string;
+  active?: boolean;
 };
 
 type RegisterdItemProps = {
@@ -12,6 +13,7 @@ type RegisterdItemProps = {
   items: ItemTable[];
   selectedOption?: number;
   highlightingOption?: boolean;
+  markInactives?: boolean;
   onSelectOption?: (id: number) => void;
   deleteAction?: (id: number) => void;
   updateAction?: (id: number) => void;
@@ -21,7 +23,8 @@ export const Table = ({
   caption,
   items,
   selectedOption,
-  highlightingOption,
+  highlightingOption = true,
+  markInactives,
   onSelectOption,
   deleteAction,
   updateAction,
@@ -54,7 +57,9 @@ export const Table = ({
                 setSelectedItem(item.id);
               }}
             >
-              <td className="wrap-break-word p-2 align-middle">{item.name}</td>
+              <td className={cn("wrap-break-word p-2 align-middle", { "line-through font-semibold": !item.active && markInactives })}>
+                {`${item.name} ${!item.active && markInactives ? " [INATIVA]" : ""}`}
+              </td>
               <td className="w-10 p-2 align-middle">
                 <div className="flex items-center justify-end gap-2">
                   {deleteAction && (
